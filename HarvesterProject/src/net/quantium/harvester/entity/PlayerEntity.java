@@ -53,7 +53,7 @@ public class PlayerEntity extends AliveEntity implements ISpectator{
 	
 	public boolean died;
 	
-	int slimesKilled = 100;
+	int slimesKilled = 0;
 	
 	public PlayerEntity(){
 		maxHealth = health = 20;
