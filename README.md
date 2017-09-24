@@ -1,5 +1,5 @@
 # The-Harvester
-This project i made as school project.
+This project i made for project competition.
 You can call it a mod for [this project](https://github.com/skeeto/Minicraft/tree/master/src/com/mojang/ld22).
 # What been modified:
  - World generation
