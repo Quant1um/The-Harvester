@@ -11,26 +11,21 @@ public class CrashScreen extends Screen{
 	private Throwable throwable;
 	public CrashScreen(Throwable throwable){
 		this.throwable = throwable;
-		showCursor = false;
+		this.mustRenderGame = false;
+		this.mustUpdateGame = false;
+		this.showCursor = true;
 	}
 	
 	@Override
-	protected void init() {
-
-	}
+	protected void init() {}
 
 	@Override
-	public void update() {
-		Main.getInstance().writeCrashlog(throwable);
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {}
-		System.exit(1);
-	}
+	public void update() {}
 
-	@Override
+	@Override 
 	public void render(Renderer render) {
 		render.get().fill(111);
+		//render.get().drawText(0, 0, FontSize.NORMAL, "test", 999);
 		render.get().drawText((Main.getInstance().getRenderWidth() - Localization.getWidth(FontSize.NORMAL, "crashheader")) / 2, 20, FontSize.NORMAL, "crashheader", 999);
 		render.get().drawText((Main.getInstance().getRenderWidth() - Localization.getWidth(FontSize.NORMAL, "crashinfo")) / 2, 30, FontSize.NORMAL, "crashinfo", 888);
 		String throwableMessage = throwable.getClass().getName();
@@ -39,10 +34,8 @@ public class CrashScreen extends Screen{
 	}
 
 	@Override
-	public void dispose() {
-
-	}
-
+	public void dispose() {}
+	
 	@Override
 	public void onMouseClick(int x, int y, int button, boolean first) {
 

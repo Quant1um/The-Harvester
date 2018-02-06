@@ -298,7 +298,6 @@ public class Layer {
 	
 	public void drawText(int x, int y, FontSize font, String text, int color, boolean localize){
 		drawText(x, y, font, text, ColorBundle.get(-1, -1, -1, -1, -1, color), localize);
-		
 	}
 	
 	public void drawText(int x, int y, FontSize font, String text, int color0, int color1, int color2, boolean localize){
@@ -348,7 +347,13 @@ public class Layer {
 			if(idx >= 0){
 				for(int ii = 0; ii < BLOCK_SIZE; ii++){
 					for(int jj = 0; jj < BLOCK_SIZE; jj++){
-						put(x + ii + sumwidth, y + jj, cc.get((idx % BLOCKS_ROWSIZE) * BLOCK_SIZE + ii, (3 + idx / BLOCKS_ROWSIZE) * BLOCK_SIZE + jj) > 1 ? Color.moreRed(get(x + ii + sumwidth, y + jj), ccc) : -1);
+						int xx = x + ii + sumwidth;
+						int yy = y + jj;
+						if(xx < offsetX + w && xx >= offsetX && yy < offsetY + h && yy >= offsetY){
+							boolean hasShadow = this.getShadows(xx - offsetX, yy - offsetY);
+							put(xx, yy, cc.get((idx % BLOCKS_ROWSIZE) * BLOCK_SIZE + ii, (3 + idx / BLOCKS_ROWSIZE) * BLOCK_SIZE + jj) > 1 ? Color.moreRed(get(xx, yy), ccc) : -1);
+							if(hasShadow) putShadow(xx, yy);
+						}
 					}
 				}
 				//drawColored(x + sumwidth, y, idx % BLOCKS_ROWSIZE, 3 + idx / BLOCKS_ROWSIZE, 1, 1, bundle, loc.getSheet(), 0);

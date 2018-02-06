@@ -471,12 +471,16 @@ public class World implements Serializable{
 	}
 	
 	public void throwItem(int xx, int yy, ItemSlot slot){
-		float fx = (float)(Main.GLOBAL_RANDOM.nextGaussian() * 0.8f);
-		float fy = (float)(Main.GLOBAL_RANDOM.nextGaussian() * 0.8f);
-		ItemEntity ie = new ItemEntity(slot, fx, fy);
-		ie.x = xx;
-		ie.y = yy;
-		addEntity(ie);
+		ItemSlot single = slot.copy();
+		single.count = 1;
+		for(int i = 0; i < slot.count; i++){
+			float fx = (float)(Main.GLOBAL_RANDOM.nextGaussian() * 0.8f);
+			float fy = (float)(Main.GLOBAL_RANDOM.nextGaussian() * 0.8f);
+			ItemEntity ie = new ItemEntity(single, fx, fy);
+			ie.x = xx;
+			ie.y = yy;
+			addEntity(ie);
+		}
 	}
 
 	public void damageParticle(int xx, int yy, int damage){

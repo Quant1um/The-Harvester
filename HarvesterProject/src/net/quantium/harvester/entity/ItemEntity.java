@@ -16,7 +16,7 @@ public class ItemEntity extends Entity {
 	int time = 0;
 	float xx, yy;
 	public ItemEntity(ItemSlot it, float xx, float yy){
-		slot = it;
+		slot = it.copy();
 		this.xx = xx * 2.4f;
 		this.yy = yy * 2.4f;
 	}

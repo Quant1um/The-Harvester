@@ -13,6 +13,7 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
 	@Override
 	public void uncaughtException(Thread thread, Throwable e) {
 		main.writeCrashlog(e);
+		e.printStackTrace();
 		System.exit(1);
 	}
 

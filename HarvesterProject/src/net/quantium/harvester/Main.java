@@ -34,6 +34,7 @@ import net.quantium.harvester.tile.Tiles;
 import net.quantium.harvester.timehook.TimeHook;
 import net.quantium.harvester.timehook.TimeHookManager;
 
+//legacy
 public class Main extends Canvas{
 	
 	/**
@@ -115,6 +116,7 @@ public class Main extends Canvas{
 			}
 			
 		}));
+		
 		_instance.init();
 		_instance.run();
 	}
@@ -151,25 +153,27 @@ public class Main extends Canvas{
 	private void run(){
 		long time = System.nanoTime();
 		double unp = 0;	
-		while(active){
-			try{
+		try{
+			while(active){
 				long cur = System.nanoTime();
 				long delta = cur - time;
 				time = cur;
 				if(delta > 0){
-					unp += delta / (NANOSECONDS_PER_TICK);
+					unp += delta / NANOSECONDS_PER_TICK;
 					while(unp >= 1){
 						update();
 						unp--;
 						updatesIncompleted++;
 					}
-					TimeHookManager.update(delta / NANOSECONDS_PER_SECOND);
 					render();
 					framesIncompleted++;
+					
+					TimeHookManager.update(delta / NANOSECONDS_PER_SECOND);
+					throw new Exception("abc");
 				}
-			}catch(Throwable e){
-				screenService.setScreen(new CrashScreen(e));
 			}
+		}catch(Throwable e){
+			forceCrashScreen(e);
 		}
 	}
 	
@@ -213,7 +217,7 @@ public class Main extends Canvas{
 			if(screenService.current().mustUpdateGame){
 				if(session != null) session.update();		
 			}
-			screenService.current().update();
+			if(screenService.isScreenActive()) screenService.current().update();
 		}else{
 			if(session != null) session.update();		
 		}
@@ -254,11 +258,12 @@ public class Main extends Canvas{
 		}
 		
 		if(IOContainer.isSaving){
-			renderer.get().drawColored(getRenderWidth() - 20 + 1, 4 + 1, ((counter / 10) % 5) * 2, 14, 2, 2, ColorBundle.get(-1, -1, -1, -1, 000, 000), "gui", 0);
-			renderer.get().drawColored(getRenderWidth() - 20, 4, ((counter / 10) % 5) * 2, 14, 2, 2, ColorBundle.get(-1, -1, -1, -1, 669, 888), "gui", 0);
+			renderer.get().drawColored(getRenderWidth() - 20 + 1, 4 + 1, ((counter / 30) % 5) * 2, 14, 2, 2, ColorBundle.get(-1, -1, -1, -1, 000, 000), "gui", 0);
+			renderer.get().drawColored(getRenderWidth() - 20, 4, ((counter / 30) % 5) * 2, 14, 2, 2, ColorBundle.get(-1, -1, -1, -1, 669, 888), "gui", 0);
 		}
 		
-		if(screenService.current() == null || screenService.current().showCursor) renderer.get().renderCursor(inputService.getMouseX(), inputService.getMouseY());
+		if(screenService.current() == null || screenService.current().showCursor) 
+			renderer.get().renderCursor(inputService.getMouseX(), inputService.getMouseY());
 		renderer.update();
 		Graphics g = bufstr.getDrawGraphics();
 		renderer.renderImage(g, getWidth(), getHeight());
@@ -267,7 +272,7 @@ public class Main extends Canvas{
 	}
 
 	public static final String CRASHLOG_FILE = "crash.log";
-	public void writeCrashlog(Throwable e) {
+	void writeCrashlog(Throwable e) {
 		BufferedWriter writer = null;
         try{
             File crashInfo = new File(IOContainer.DATA_FOLDER + File.separator + CRASHLOG_FILE);
@@ -292,5 +297,17 @@ public class Main extends Canvas{
                 } catch (IOException e1) {}
             }
         }
+	}
+	
+	private static final long CRASH_SCREEN_DURATION_NANOS = (long)(NANOSECONDS_PER_SECOND * 5);
+	private void forceCrashScreen(Throwable e) {
+		writeCrashlog(e);
+		screenService.setScreen(new CrashScreen(e));
+		
+		long nano = System.nanoTime();
+		while(System.nanoTime() - nano < CRASH_SCREEN_DURATION_NANOS)
+			render();
+
+		System.exit(-1);
 	}
 }
