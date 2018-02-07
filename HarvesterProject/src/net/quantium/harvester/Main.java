@@ -169,7 +169,6 @@ public class Main extends Canvas{
 					framesIncompleted++;
 					
 					TimeHookManager.update(delta / NANOSECONDS_PER_SECOND);
-					throw new Exception("abc");
 				}
 			}
 		}catch(Throwable e){
