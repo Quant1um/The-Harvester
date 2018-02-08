@@ -3,6 +3,7 @@ package net.quantium.harvester.screen;
 import net.quantium.harvester.Main;
 import net.quantium.harvester.craft.Crafts;
 import net.quantium.harvester.entity.BuildableInfo;
+import net.quantium.harvester.entity.BuildableInfo.BuildableType;
 import net.quantium.harvester.entity.inventory.Inventory;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.render.ColorBundle;
@@ -12,7 +13,7 @@ import net.quantium.harvester.screen.components.Button;
 public class WorkbenchScreen extends InventoryScreen {
 
 	public WorkbenchScreen(Inventory inventory, Inventory additionalInventory) {
-		super(inventory, additionalInventory, BuildableInfo.Registry.get(0));
+		super(inventory, additionalInventory, BuildableInfo.Registry.get(BuildableType.WORKBENCH));
 	}
 	
 	public void init(){

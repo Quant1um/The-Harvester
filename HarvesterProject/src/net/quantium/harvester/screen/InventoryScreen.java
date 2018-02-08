@@ -3,7 +3,7 @@ package net.quantium.harvester.screen;
 import com.sun.glass.events.KeyEvent;
 
 import net.quantium.harvester.Main;
-import net.quantium.harvester.entity.BuildableInfo.SettableBehavior;
+import net.quantium.harvester.entity.BuildableInfo.BuildableBehavior;
 import net.quantium.harvester.entity.inventory.Inventory;
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.render.Renderer;
@@ -14,15 +14,15 @@ import net.quantium.harvester.screen.components.InventorySlot;
 
 public class InventoryScreen extends Screen {
 
-	Inventory inventory, additionalInventory;
-	SettableBehavior behavior;
-	boolean isDual;
-	Container container;
+	protected Inventory inventory, additionalInventory;
+	protected BuildableBehavior behavior;
+	protected boolean isDual;
+	protected Container container;
 	
 	public static final int SLOTS_PER_ROW = 4;
 	public static final int EMPTYSPACE = (120 - SLOTS_PER_ROW * 24) / SLOTS_PER_ROW - 2;
 	
-	public InventoryScreen(Inventory inventory, Inventory additionalInventory, SettableBehavior behavior){
+	public InventoryScreen(Inventory inventory, Inventory additionalInventory, BuildableBehavior behavior){
 		this.isDual = additionalInventory != null && behavior != null;
 		this.additionalInventory = additionalInventory;
 		this.inventory = inventory;
@@ -64,7 +64,7 @@ public class InventoryScreen extends Screen {
 	public void render(Renderer render) {
 		renderBox(render, 50, 50, 120, (inventory.size() / SLOTS_PER_ROW) * (EMPTYSPACE + 24) + 26, "inventory");
 		if(isDual){
-			renderBox(render, Main.getInstance().getRenderWidth() - 170, 50, 120, behavior.getBoxHeight(), behavior.getName());
+			renderBox(render, Main.getInstance().getRenderWidth() - 170, 50, 120, behavior.boxHeight, behavior.name);
 		}
 		container.render(render);
 	}

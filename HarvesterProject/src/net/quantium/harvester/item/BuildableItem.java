@@ -1,6 +1,8 @@
 package net.quantium.harvester.item;
 
 import net.quantium.harvester.entity.BuildableEntity;
+import net.quantium.harvester.entity.BuildableInfo;
+import net.quantium.harvester.entity.BuildableInfo.BuildableType;
 import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.entity.Entity.InteractionMode;
 import net.quantium.harvester.world.World;
@@ -8,16 +10,16 @@ import net.quantium.harvester.world.World;
 public class BuildableItem extends Item {
 
 	private final String name;
-	private final int type;
+	private final BuildableType type;
 	
-	public BuildableItem(String name, int type){
+	public BuildableItem(String name, BuildableType type){
 		this.name = name;
 		this.type = type;
 	}
 	
 	@Override
 	public int getIconX() {
-		return type;
+		return BuildableInfo.Registry.get(type).spriteOffset;
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package net.quantium.harvester.entity;
 
+import net.quantium.harvester.entity.BuildableInfo.BuildableType;
 import net.quantium.harvester.entity.hitbox.Hitbox;
 import net.quantium.harvester.entity.inventory.Inventory;
 import net.quantium.harvester.item.ItemSlot;
@@ -13,17 +14,16 @@ public class BuildableEntity extends Entity {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public final int type;
+	public final BuildableType type;
 	
 	protected int clicks = 0;
-	
 	public Inventory inventory;
 	
 	public int data0;
 	
-	public BuildableEntity(int type){
+	public BuildableEntity(BuildableType type){
 		this.type = type;
-		inventory = new Inventory(BuildableInfo.Registry.get(type).getInventorySize());
+		inventory = new Inventory(BuildableInfo.Registry.get(type).inventorySize);
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class BuildableEntity extends Entity {
 
 	@Override
 	public void render(Renderer render) {
-		render.get().draw(x - 12, y - 16, type * 3, 19, 3, 3, "sheet0", 0);		
+		render.get().draw(x - 12, y - 16, BuildableInfo.Registry.get(type).spriteOffset * 3, 19, 3, 3, "sheet0", 0);		
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class BuildableEntity extends Entity {
 			clicks += 50;
 			
 			if(clicks >= 60){
-				playerEntity.inventory.add(new ItemSlot((byte) type, 0, 1));
+				playerEntity.inventory.add(new ItemSlot(BuildableInfo.Registry.get(type).item, 0, 1));
 				this.remove();
 			}
 		}

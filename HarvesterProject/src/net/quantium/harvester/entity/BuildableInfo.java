@@ -6,6 +6,7 @@ import net.quantium.harvester.entity.inventory.Inventory;
 import net.quantium.harvester.item.FuelItem;
 import net.quantium.harvester.item.Item;
 import net.quantium.harvester.item.ItemSlot;
+import net.quantium.harvester.item.Items;
 import net.quantium.harvester.screen.AnvilScreen;
 import net.quantium.harvester.screen.FurnaceScreen;
 import net.quantium.harvester.screen.InventoryScreen;
@@ -15,29 +16,41 @@ import net.quantium.harvester.world.World;
 
 public class BuildableInfo {
 	public static class Registry{
-		private static SettableBehavior[] metaRegistry = new SettableBehavior[256];
-		private static int cursor = 0; 
+		private static BuildableBehavior[] registry = new BuildableBehavior[BuildableType.values().length];
 
-		public static void register(SettableBehavior meta){
-			metaRegistry[cursor++] = meta;
+		public static void register(BuildableType type, BuildableBehavior meta){
+			if(registry[type.ordinal()] != null) throw new java.lang.IllegalStateException("Buildable info for type " + type + " already registered!");
+			registry[type.ordinal()] = meta;
 		}
 		
-		public static SettableBehavior get(int id){
-			return metaRegistry[id];
+		public static BuildableBehavior get(BuildableType type){
+			return registry[type.ordinal()];
 		}
 	}
 	
-	public static abstract class SettableBehavior{
+	public static abstract class BuildableBehavior{
+		
+		public final int inventorySize;
+		public final int boxHeight;
+		public final String name;
+		public final byte item;
+		public final int spriteOffset;
+		
+		public BuildableBehavior(String name, int inventorySize, int boxHeight, byte item, int spriteOffset) {
+			this.inventorySize = inventorySize;
+			this.boxHeight = boxHeight;
+			this.name = name;
+			this.item = item;
+			this.spriteOffset = spriteOffset;
+		}
 		public abstract void onInteract(World world, PlayerEntity playerEntity, InteractionMode im, ItemSlot item, BuildableEntity ent);
-		public abstract int getBoxHeight();
 		public abstract InventorySlot[] getLayout(Inventory inventory);
-		public abstract int getInventorySize();
-		public abstract String getName();
 		public abstract void update(BuildableEntity e);
+		public abstract ItemSlot[] getRequiredItems();
 	}
 	
 	public static void register(){
-		Registry.register(new SettableBehavior(){
+		Registry.register(BuildableType.WORKBENCH, new BuildableBehavior("workbench", 3, 75, Items.workbench, 0){
 
 			@Override
 			public void onInteract(World world, PlayerEntity playerEntity, InteractionMode im, ItemSlot item, BuildableEntity ent) {
@@ -52,26 +65,22 @@ public class BuildableInfo {
 			}
 
 			@Override
-			public int getInventorySize() {
-				return 3;
-			}
-			
-			@Override
-			public int getBoxHeight() {
-				return 75;
-			}
+			public void update(BuildableEntity e) {}
 
 			@Override
-			public String getName() {
-				return "workbench";
-			}
-
-			@Override
-			public void update(BuildableEntity e) {
-				
+			public ItemSlot[] getRequiredItems() {
+				return new ItemSlot[]{
+						new ItemSlot(Items.wood,  0, 4),
+						new ItemSlot(Items.stick, 0, 2),
+						new ItemSlot(Items.wood,  0, 6),
+						new ItemSlot(Items.rock,  0, 4),
+						new ItemSlot(Items.stick, 0, 2),
+						new ItemSlot(Items.wood,  0, 2),
+				};
 			}
 		});
-		Registry.register(new SettableBehavior(){
+		
+		Registry.register(BuildableType.CHEST, new BuildableBehavior("chest", 20, (20 / InventoryScreen.SLOTS_PER_ROW) * (InventoryScreen.EMPTYSPACE + 24) + 26, Items.chest, 1){
 
 			@Override
 			public void onInteract(World world, PlayerEntity playerEntity, InteractionMode im, ItemSlot item, BuildableEntity ent) {
@@ -80,39 +89,32 @@ public class BuildableInfo {
 
 			@Override
 			public InventorySlot[] getLayout(Inventory inventory) {
-				InventorySlot[] slots = new InventorySlot[getInventorySize()];
-				for(int i = 0; i < getInventorySize(); i++){
+				InventorySlot[] slots = new InventorySlot[this.inventorySize];
+				for(int i = 0; i < slots.length; i++){
 					int x = InventoryScreen.EMPTYSPACE + (i % InventoryScreen.SLOTS_PER_ROW) * InventoryScreen.EMPTYSPACE * 8;
 					int y = InventoryScreen.EMPTYSPACE + (i / InventoryScreen.SLOTS_PER_ROW) * InventoryScreen.EMPTYSPACE * 8 + 12;
 					slots[i] = new InventorySlot(x, y, inventory, i);
 				}
 				return slots;
 			}
-
-			@Override
-			public int getInventorySize() {
-				return 20;
-			}
 			
 			@Override
-			public int getBoxHeight() {
-				return (getInventorySize() / InventoryScreen.SLOTS_PER_ROW) * (InventoryScreen.EMPTYSPACE + 24) + 26;
-			}
+			public void update(BuildableEntity e) {}
 			
 			@Override
-			public String getName() {
-				return "chest";
+			public ItemSlot[] getRequiredItems() {
+				return new ItemSlot[]{
+						new ItemSlot(Items.wood,   0, 4),
+						new ItemSlot(Items.copper, 0, 2),
+						new ItemSlot(Items.wood,   0, 6),
+						new ItemSlot(Items.rock,   0, 4),
+						new ItemSlot(Items.wood,   0, 2),
+						new ItemSlot(Items.iron,   0, 2),
+				};
 			}
-
-			@Override
-			public void update(BuildableEntity e) {
-				
-			}
-			
-			
 		});
 		
-		Registry.register(new SettableBehavior(){
+		Registry.register(BuildableType.FURNACE, new BuildableBehavior("furnace", 3, 75, Items.alloyFurnace, 2){
 
 			@Override
 			public void onInteract(World world, PlayerEntity playerEntity, InteractionMode im, ItemSlot item, BuildableEntity ent) {
@@ -124,21 +126,6 @@ public class BuildableInfo {
 				return new InventorySlot[]{ new InventorySlot(5, 15, inventory, 0), 
 											new InventorySlot(100, 15, inventory, 1), 
 											new InventorySlot(55, 30, inventory, 2) };
-			}
-
-			@Override
-			public int getInventorySize() {
-				return 3;
-			}
-			
-			@Override
-			public int getBoxHeight() {
-				return 75;
-			}
-
-			@Override
-			public String getName() {
-				return "furnace";
 			}
 
 			@Override
@@ -154,8 +141,20 @@ public class BuildableInfo {
 					}
 				}
 			}
+			
+			@Override
+			public ItemSlot[] getRequiredItems() {
+				return new ItemSlot[]{
+						new ItemSlot(Items.rock, 0, 8),
+						new ItemSlot(Items.rock, 0, 12),
+						new ItemSlot(Items.coal, 0, 6),
+						new ItemSlot(Items.wood, 0, 4),
+						new ItemSlot(Items.rock, 0, 12),
+						new ItemSlot(Items.rock, 0, 10),
+				};
+			}
 		});
-		Registry.register(new SettableBehavior(){
+		Registry.register(BuildableType.ANVIL, new BuildableBehavior("anvil", 2, 170, Items.anvil, 3){
 
 			@Override
 			public void onInteract(World world, PlayerEntity playerEntity, InteractionMode im, ItemSlot item, BuildableEntity ent) {
@@ -169,25 +168,23 @@ public class BuildableInfo {
 			}
 
 			@Override
-			public int getInventorySize() {
-				return 2;
-			}
+			public void update(BuildableEntity e) {}
 			
 			@Override
-			public int getBoxHeight() {
-				return 170;
-			}
-
-			@Override
-			public String getName() {
-				return "anvil";
-			}
-
-			@Override
-			public void update(BuildableEntity e) {
-				
+			public ItemSlot[] getRequiredItems() {
+				return new ItemSlot[]{
+						new ItemSlot(Items.iron,   0, 4),
+						new ItemSlot(Items.lead, 0, 2),
+						new ItemSlot(Items.wood,   0, 6),
+						new ItemSlot(Items.rock,   0, 4),
+						new ItemSlot(Items.wood,   0, 2),
+						new ItemSlot(Items.iron,   0, 2),
+				};
 			}
 		});
 	}
 	
+	public enum BuildableType {
+		WORKBENCH, CHEST, FURNACE, ANVIL
+	}
 }

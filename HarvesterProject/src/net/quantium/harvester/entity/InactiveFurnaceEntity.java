@@ -1,5 +1,6 @@
 package net.quantium.harvester.entity;
 
+import net.quantium.harvester.entity.BuildableInfo.BuildableType;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.item.Items;
 import net.quantium.harvester.render.Renderer;
@@ -15,7 +16,7 @@ public class InactiveFurnaceEntity extends BuildableEntity {
 	private int epoch;
 	
 	public InactiveFurnaceEntity() {
-		super(2);
+		super(BuildableType.FURNACE);
 	}
 
 	@Override
@@ -65,7 +66,7 @@ public class InactiveFurnaceEntity extends BuildableEntity {
 			case 4: if(playerEntity.inventory.reduce(new ItemSlot(Items.rock, 0, 5))) epoch++; break;
 			case 5: if(playerEntity.inventory.reduce(new ItemSlot(Items.rock, 0, 7))) epoch++; 
 			if(epoch >= 6){
-				BuildableEntity e = new BuildableEntity(2);
+				BuildableEntity e = new BuildableEntity(BuildableType.FURNACE);
 				e.x = x;
 				e.y = y;
 				world.addEntity(e);

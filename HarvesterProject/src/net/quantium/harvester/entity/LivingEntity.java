@@ -27,6 +27,7 @@ public abstract class LivingEntity extends Entity{
 	
 	public void onDied() {}
 	
+	@Override
 	public void update(){
 		if(invincibleTime > 0) invincibleTime--;
 	}

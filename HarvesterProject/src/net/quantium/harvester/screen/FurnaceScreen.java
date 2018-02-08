@@ -4,6 +4,7 @@ import net.quantium.harvester.Main;
 import net.quantium.harvester.craft.Crafts;
 import net.quantium.harvester.entity.BuildableEntity;
 import net.quantium.harvester.entity.BuildableInfo;
+import net.quantium.harvester.entity.BuildableInfo.BuildableType;
 import net.quantium.harvester.entity.inventory.Inventory;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.render.ColorBundle;
@@ -15,7 +16,7 @@ public class FurnaceScreen extends InventoryScreen {
 	private BuildableEntity entity;
 
 	public FurnaceScreen(Inventory inventory, Inventory additionalInventory, BuildableEntity ent) {
-		super(inventory, additionalInventory, BuildableInfo.Registry.get(2));
+		super(inventory, additionalInventory, BuildableInfo.Registry.get(BuildableType.FURNACE));
 		this.entity = ent;
 	}
 	

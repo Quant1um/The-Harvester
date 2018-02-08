@@ -1,5 +1,6 @@
 package net.quantium.harvester.entity;
 
+import net.quantium.harvester.entity.BuildableInfo.BuildableType;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.item.Items;
 import net.quantium.harvester.render.Renderer;
@@ -15,7 +16,7 @@ public class InactiveAnvilEntity extends BuildableEntity {
 	private int epoch;
 	
 	public InactiveAnvilEntity() {
-		super(3);
+		super(BuildableType.ANVIL);
 	}
 
 	@Override
@@ -65,7 +66,7 @@ public class InactiveAnvilEntity extends BuildableEntity {
 			case 4: if(playerEntity.inventory.reduce(new ItemSlot(Items.iron, 0, 10))) epoch++; break;
 			case 5: if(playerEntity.inventory.reduce(new ItemSlot(Items.iron, 0, 7))) epoch++; 
 			if(epoch >= 6){
-				BuildableEntity e = new BuildableEntity(3);
+				BuildableEntity e = new BuildableEntity(BuildableType.ANVIL);
 				e.x = x;
 				e.y = y;
 				world.addEntity(e);
