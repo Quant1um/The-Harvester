@@ -17,18 +17,23 @@ public class PassingInfo {
 		this.tileX = tileX;
 		this.tileY = tileY;
 	}
+	
 	public boolean isPassed() {
 		return passed;
 	}
+	
 	public List<Entity> getBumped() {
 		return bump;
 	}
+	
 	public byte getSteppedOn() {
 		return steppedOn;
 	}
+	
 	public int getTileX() {
 		return tileX;
 	}
+	
 	public int getTileY() {
 		return tileY;
 	}

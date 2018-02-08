@@ -8,7 +8,7 @@ import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.ScreenService;
 import net.quantium.harvester.system.text.FontSize;
-import net.quantium.harvester.system.text.Localization;
+import net.quantium.harvester.system.text.TextAlign;
 
 public class Selector extends Component {
 	
@@ -38,7 +38,7 @@ public class Selector extends Component {
 		render.get().renderPseudo3DRect(x, y, 2, 2, lColor, 777, 444, 666, lClick <= 0);
 		render.get().drawColored(x + lOffset, y + lOffset, 4, 2, 2, 2, bnd, "gui", 1);
 		render.get().renderPseudo3DRect(x + 2 * Layer.BLOCK_SIZE, y, w / Layer.BLOCK_SIZE - 4, 2, 222, 777, 444, 666, false);
-		render.get().drawText(x + 4 * Layer.BLOCK_SIZE + (w - 8 * Layer.BLOCK_SIZE - Localization.getWidth(FontSize.NORMAL, names[selected])) / 2, y + Layer.BLOCK_SIZE - 4, FontSize.NORMAL, names[selected], 888);
+		render.get().drawText(x + 4 * Layer.BLOCK_SIZE + (w - 8 * Layer.BLOCK_SIZE) / 2, y + Layer.BLOCK_SIZE - 4, FontSize.NORMAL, names[selected], 888, TextAlign.CENTER);
 		render.get().renderPseudo3DRect(x + w - 2 * Layer.BLOCK_SIZE, y, 2, 2, rColor, 777, 444, 666, rClick <= 0);
 		render.get().drawColored(x + w - 2 * Layer.BLOCK_SIZE + rOffset, y + rOffset, 4, 2, 2, 2, bnd, "gui", 0);
 	}

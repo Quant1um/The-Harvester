@@ -60,7 +60,6 @@ public class WorldGenerator {
 		int h = 256;
 		Tiles.register();
 		
-
 		BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 		World ww = new World(w, h);
 		int[] pixels = new int[w * h];
@@ -88,8 +87,6 @@ public class WorldGenerator {
 				
 		
 		img.setRGB(0, 0, w, h, pixels, 0, w);
-		JOptionPane.showMessageDialog(null, null, "OK", JOptionPane.CLOSED_OPTION, new ImageIcon(img.getScaledInstance((int) (w * 1), (int) (h * 1), Image.SCALE_SMOOTH)));
-	
+		JOptionPane.showMessageDialog(null, null, "OK", JOptionPane.CLOSED_OPTION, new ImageIcon(img.getScaledInstance((int) (w * 2f), (int) (h * 2f), Image.SCALE_SMOOTH)));
 	}
-	
 }

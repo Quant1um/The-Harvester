@@ -102,10 +102,10 @@ public class Items {
 	 public static byte redAxeFragment;
 	 
 	 public static void register(){
-		 workbench = Item.Registry.register(new SettableItem("workbench", 0));
-		 chest = Item.Registry.register(new SettableItem("workbench", 1));
-		 alloyFurnace = Item.Registry.register(new SettableItem("alloyfurnace", 2));
-		 anvil = Item.Registry.register(new SettableItem("anvil", 3));
+		 workbench = Item.Registry.register(new BuildableItem("workbench", 0));
+		 chest = Item.Registry.register(new BuildableItem("workbench", 1));
+		 alloyFurnace = Item.Registry.register(new BuildableItem("alloyfurnace", 2));
+		 anvil = Item.Registry.register(new BuildableItem("anvil", 3));
 		 nut = Item.Registry.register(new EatableItem(){
 
 			@Override

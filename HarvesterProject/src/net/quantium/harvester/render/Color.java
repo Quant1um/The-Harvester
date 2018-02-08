@@ -1,11 +1,8 @@
 package net.quantium.harvester.render;
 
-
 public class Color {
-	private static int[] indexedPalette;
-	
-	public static final int[] treeColors;
-	
+	private static final int[] indexedPalette;
+
 	static{ 
 		indexedPalette = new int[1000];
 		int step = 255 / 10;
@@ -19,68 +16,81 @@ public class Color {
 		}
 	}
 	
-	static{
-		treeColors = new int[256];
-		for(int i = 0; i < 256; i++){
-			treeColors[i] = (int) Math.min(Math.max(((1 - (i / 256f)) * 3), 0), 9) * 100 + (int) Math.min(Math.max(((i / 256f) * 8), 0), 9) * 10;
-		}
-	}
-	
 	public static int get(short idx){
 		if(idx < 0 || idx >= 1000) return -1;
 		return indexedPalette[idx];
 	}
 		
-	public static short blend(short first, short second, float w0, float w1){
-		float wSum = w1 + w0;
-		if(wSum == 0) return 0;
-		float a0 = w0 / wSum;
-		float a1 = w1 / wSum;
+	public static short lerp(short original, short target, int transition){
+		int[] o = decompose(original, 3);
+		int[] t = decompose(target, 3);
 		
-		int r = Math.min(9, Math.max((int)(((first / 100) % 10) * a0 + ((second / 100) % 10) * a1), 0));
-		int g = Math.min(9, Math.max((int)(((first / 10) % 10) 	* a0 + ((second / 10) % 10)  * a1), 0));
-		int b = Math.min(9, Math.max((int)(((first / 1) % 10) 	* a0 + ((second / 1) % 10)   * a1), 0));
-		return (short)(r * 100 + g * 10 + b);
+		return (short) ((o[0] + (t[0] - o[0]) * transition / 10) * 100 + 
+			            (o[1] + (t[1] - o[1]) * transition / 10) * 10 +
+			            (o[2] + (t[2] - o[2]) * transition / 10));
 	}
 	
-	public static short interpolate(short first, short second, float transition){
-		float a0 = 1 - transition;
-		float a1 = transition;
+	public static short multiply(short a, short b){
+		int[] o = decompose(a, 3);
+		int[] t = decompose(b, 3);
 		
-		int r = Math.min(9, Math.max((int)(((first / 100) % 10) * a0 + ((second / 100) % 10) * a1), 0));
-		int g = Math.min(9, Math.max((int)(((first / 10) % 10) 	* a0 + ((second / 10) % 10)  * a1), 0));
-		int b = Math.min(9, Math.max((int)(((first / 1) % 10) 	* a0 + ((second / 1) % 10)   * a1), 0));
-		return (short)(r * 100 + g * 10 + b);
+		return (short) ((o[0] * t[0] / 9) * 100 + 
+			            (o[1] * t[1] / 9) * 10 +
+			            (o[2] * t[2] / 9));
 	}
 	
 	public static short darker(short color, int c){
-		int r = color / 100 % 10 - c;
-		int g = color / 10 % 10 - c;
-		int b = color % 10 - c;
-		if(r < 0) r = 0;
-		if(g < 0) g = 0;
-		if(b < 0) b = 0;
-		return (short)(r * 100 + g * 10 + b);
-	}
-	
-	public static short moreRed(short color, int c){
-		int r = color / 100 % 10 + c;
-		int g = color / 10 % 10 - c;
-		int b = color % 10 - c;
-		if(r > 9) r = 9;
-		if(g < 0) g = 0;
-		if(b < 0) b = 0;
-		return (short)(r * 100 + g * 10 + b);
+		int[] o = decompose(color, 3);
+		for(int i = 0; i < 3; i++)
+			o[i] = (o[i] <= c) ? 0 : o[i] - c;
+		return (short)(o[0] * 100 + o[1] * 10 + o[2]);
 	}
 	
 	public static short lighter(short color, int c){
-		int r = color / 100 % 10 + c;
-		int g = color / 10 % 10 + c;
-		int b = color % 10 + c;
-		if(r > 9) r = 9;
-		if(g > 9) g = 9;
-		if(b > 9) b = 9;
-		return (short)(r * 100 + g * 10 + b);
+		int[] o = decompose(color, 3);
+		for(int i = 0; i < 3; i++)
+			o[i] = (o[i] >= 9 - c) ? 9 : o[i] + c;
+		return (short)(o[0] * 100 + o[1] * 10 + o[2]);
+	}
+	
+	public static void main(String...strings){
+		long nanos = System.nanoTime();
+		
+		for(int i = 0; i < 1000000; i++){
+			lerp((short)000, (short)999, 5);
+			lerp((short)900, (short)9, 8);
+			multiply((short)975, (short)135);
+			lerp((short)000, (short)999, 2);
+		}
+		System.out.println((System.nanoTime() - nanos) / 1000000d / 1e6d);
+	}
+	
+	//http://forum.arduino.cc/index.php?topic=167414.0
+	private static int[] fastDivMod10(int in){
+		int q = (in >> 1) + (in >> 2);
+		q = q + (q >> 4);
+		q = q + (q >> 8);
+ 
+		q = q >> 3;
+ 
+		int r = in - ((q << 3) + (q << 1)); 
+		int div = q;
+		if(r > 9) div++;
+		int mod = r;
+		if (r > 9) mod = r - 10; 
+		
+		return new int[] { div, mod };
+	}
+	
+	private static int[] decompose(int in, int digits){
+		int[] arr;
+		int[] result = new int[digits];
+		for(int i = 0; i < digits; i++){
+			arr = fastDivMod10(in);
+			result[digits - 1 - i] = arr[1];
+			in = arr[0];
+		}
+		return result;
 	}
 	
 	public static short inverse(short color){
@@ -100,15 +110,4 @@ public class Color {
 		if(b > 9) b = 9;
 		return (short) (r * 100 + g * 10 + b);
 	}
-
-	public static short moreYellow(short color, int c) {
-		int r = color / 100 % 10 + c;
-		int g = color / 10 % 10 + c;
-		int b = color % 10 - c;
-		if(r > 9) r = 9;
-		if(g > 9) g = 9;
-		if(b < 0) b = 0;
-		return (short)(r * 100 + g * 10 + b);
-	}
-	
 }

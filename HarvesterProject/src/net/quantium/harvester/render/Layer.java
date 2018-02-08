@@ -1,12 +1,12 @@
 package net.quantium.harvester.render;
 
-import net.quantium.harvester.Main;
 import net.quantium.harvester.resources.ColorableImageContainer;
 import net.quantium.harvester.resources.ImageContainer;
 import net.quantium.harvester.resources.ResourceLoader;
 import net.quantium.harvester.system.text.FontSize;
 import net.quantium.harvester.system.text.Locale;
 import net.quantium.harvester.system.text.Localization;
+import net.quantium.harvester.system.text.TextAlign;
 
 public class Layer {
 	public static final int MIRRORFLAG_NONE = 0;
@@ -17,30 +17,22 @@ public class Layer {
 	public static final int BLOCK_SIZE = 8;
 	
 	public static final int BLOCKS_ROWSIZE = 16;
+	
 	private short data[];
-	
-	private boolean shadowmap[];
-	
 	private final int w, h;
 	
-	public int clipX0, clipY0, clipX1, clipY1;
-	
+	public int clipX0, clipY0, clipX1, clipY1;	
 	public int offsetX, offsetY;
 	
 	public Layer(int w, int h){
 		this.w = w;
 		this.h = h;
 		this.data = new short[w * h];
-		this.shadowmap = new boolean[w * h];
 		resetClip();
 	}
 	
 	public short[] getData() {
 		return data;
-	}
-
-	public void setData(short[] data) {
-		this.data = data;
 	}
 
 	public int getWidth() {
@@ -51,26 +43,18 @@ public class Layer {
 		return h;
 	}
 	
-	public void put(int xx, int yy, int c){
+	public void put(int x, int y, int c){
 		if(c < 0) return;
-		int x = xx - offsetX;
-		int y = yy - offsetY;
-		if(x < 0 || y < 0 || x >= w || y >= h) return;
 		
+		x -= offsetX;
+		y -= offsetY;
+		if(x < 0 || y < 0 || x >= w || y >= h) return;
 		if(x < clipX0 || y < clipY0 || x >= clipX1 || y >= clipY1) return;
+		
+		if(c > 999)
+			c = Color.lerp(data[x + y * w], (short)(c % 1000), c / 1000);
+		
 		data[x + y * w] = (short) c;
-		if(Main.getInstance().useShadows())
-			removeShadow(x, y);
-	}
-	
-	public void putShadow(int xx, int yy){
-		if(!Main.getInstance().useShadows()) return;
-		int x = xx - offsetX;
-		int y = yy - offsetY;
-		if(x < 0 || y < 0 || x >= w || y >= h) return;
-		
-		if(x < clipX0 || y < clipY0 || x >= clipX1 || y >= clipY1) return;
-		shadowmap[x + y * w] = true;
 	}
 	
 	public short get(int x, int y){
@@ -85,20 +69,7 @@ public class Layer {
 			data[i] = (short) c;
 	}
 	
-	public void resetShadows(){
-		this.shadowmap = new boolean[w * h];
-	}
-	
-	public boolean getShadows(int x, int y){
-		return shadowmap[x + y * w];
-	}
-	
-	public void removeShadow(int x, int y){
-		shadowmap[x + y * w] = false;
-	}
-	
-	
-	private void _renderLine(int x0, int y0, int x1, int y1, int c){
+	private void _drawLine(int x0, int y0, int x1, int y1, int c){
 	     double deltax = x0 - x1;
 	     double deltay = y0 - y1;
 	     double delta = 0;
@@ -115,13 +86,13 @@ public class Layer {
 	     }
 	}
 
-	public void renderLine(int x0, int y0, int x1, int y1, int c){
+	public void drawLine(int x0, int y0, int x1, int y1, int c){
 		boolean diff = Math.min(x0, x1) == x0;
 		if(x0 == x1){
 			fillRect(x0, Math.min(y0, y1), 1, Math.max(y0, y1) - Math.min(y0, y1), c);
 			return;
 		}
-		_renderLine(Math.min(x0, x1), diff ? y0 : y1, Math.max(x0, x1), diff ? y1 : y0, c);
+		_drawLine(Math.min(x0, x1), diff ? y0 : y1, Math.max(x0, x1), diff ? y1 : y0, c);
 	}
 	
 	public void fillRect(int x, int y, int w, int h, int c){
@@ -199,8 +170,7 @@ public class Layer {
 		this.offsetY = y;
 	}
 	
-	public void draw(int x, int y, int tx, int ty, int w, int h, String sprId, int mirrorFlags){
-		
+	public void draw(int x, int y, int tx, int ty, int w, int h, String sprId, int mirrorFlags){	
 		boolean mirrorH = (mirrorFlags & MIRRORFLAG_HORIZONTAL) != 0;
 		boolean mirrorV = (mirrorFlags & MIRRORFLAG_VERTICAL) != 0;
 		
@@ -212,62 +182,6 @@ public class Layer {
 			for(int j = 0; j < h * BLOCK_SIZE; j++){
 				int yy = mirrorV ? h * BLOCK_SIZE - j - 1 : j;
 				put(x + i, y + j, cc.get(tx * BLOCK_SIZE + xx, ty * BLOCK_SIZE + yy));
-			}
-		}
-	}
-	
-	public void drawShadow(int x, int y, int tx, int ty, int w, int h, String sprId, int mirrorFlags){
-		
-		boolean mirrorH = (mirrorFlags & MIRRORFLAG_HORIZONTAL) != 0;
-		boolean mirrorV = (mirrorFlags & MIRRORFLAG_VERTICAL) != 0;
-		
-		ImageContainer cc = ResourceLoader.ImageLoader.get(sprId);
-		if(cc == null) throw new RuntimeException("Render error: can\'t find sprite " + sprId);
-		
-		for(int i = 0; i < w * BLOCK_SIZE; i++){
-			int xx = mirrorH ? w * BLOCK_SIZE - i - 1 : i;
-			for(int j = 0; j < h * BLOCK_SIZE; j++){
-				int yy = mirrorV ? h * BLOCK_SIZE - j - 1 : j;
-				if(cc.get(tx * BLOCK_SIZE + xx, ty * BLOCK_SIZE + yy) >= 0)
-					putShadow(x + i + y, y + j);
-			}
-		}
-	}
-	
-	public void drawWorldShadow(int x, int y, int tx, int ty, int w, int h, String sprId, int mirrorFlags){
-		if(!Main.getInstance().useShadows()) return;
-		boolean mirrorH = (mirrorFlags & MIRRORFLAG_HORIZONTAL) != 0;
-		boolean mirrorV = (mirrorFlags & MIRRORFLAG_VERTICAL) != 0;
-		
-		ImageContainer cc = ResourceLoader.ImageLoader.get(sprId);
-		if(cc == null) throw new RuntimeException("Render error: can\'t find sprite " + sprId);
-		
-		for(int i = 0; i < w * BLOCK_SIZE; i++){
-			int xx = mirrorH ? w * BLOCK_SIZE - i - 1 : i;
-			for(int j = 0; j < h * BLOCK_SIZE; j++){
-				int yy = mirrorV ? h * BLOCK_SIZE - j - 1 : j;
-				int xxj = (h * BLOCK_SIZE - j - 1) / 2;
-				if(cc.get(tx * BLOCK_SIZE + xx, ty * BLOCK_SIZE + yy) >= 0)
-					putShadow(i + xxj + x, y + j);
-			}
-		}
-	}
-	
-	public void drawWorldShadowForColored(int x, int y, int tx, int ty, int w, int h, int except, String sprId, int mirrorFlags){
-		if(!Main.getInstance().useShadows()) return;
-		boolean mirrorH = (mirrorFlags & MIRRORFLAG_HORIZONTAL) != 0;
-		boolean mirrorV = (mirrorFlags & MIRRORFLAG_VERTICAL) != 0;
-		
-		ImageContainer cc = ResourceLoader.ImageLoader.get(sprId);
-		if(cc == null) throw new RuntimeException("Render error: can\'t find sprite " + sprId);
-		
-		for(int i = 0; i < w * BLOCK_SIZE; i++){
-			int xx = mirrorH ? w * BLOCK_SIZE - i - 1 : i;
-			for(int j = 0; j < h * BLOCK_SIZE; j++){
-				int yy = mirrorV ? h * BLOCK_SIZE - j - 1 : j;
-				int xxj = (h * BLOCK_SIZE - j - 1) / 2;
-				if(cc.get(tx * BLOCK_SIZE + xx, ty * BLOCK_SIZE + yy) != except)
-					putShadow(i + xxj + x, y + j);
 			}
 		}
 	}
@@ -288,26 +202,34 @@ public class Layer {
 		}
 	}
 
-	public void drawText(int x, int y, FontSize font, String text, int color){
-		drawText(x, y, font, text, color, true);
+	public void drawText(int x, int y, FontSize font, String text, int color, TextAlign align){
+		drawText(x, y, font, text, color, align, true);
 	}
 	
-	public void drawText(int x, int y, FontSize font, String text, int color0, int color1, int color2){
-		drawText(x, y, font, text, color0, color1, color2, true);
+	public void drawText(int x, int y, FontSize font, String text, int color0, int color1, int color2, TextAlign align){
+		drawText(x, y, font, text, color0, color1, color2, align, true);
 	}
 	
-	public void drawText(int x, int y, FontSize font, String text, int color, boolean localize){
-		drawText(x, y, font, text, ColorBundle.get(-1, -1, -1, -1, -1, color), localize);
+	public void drawText(int x, int y, FontSize font, String text, int color, TextAlign align, boolean localize){
+		drawText(x, y, font, text, ColorBundle.get(-1, -1, -1, -1, -1, color), align, localize);
 	}
 	
-	public void drawText(int x, int y, FontSize font, String text, int color0, int color1, int color2, boolean localize){
-		drawText(x, y, font, text, ColorBundle.get(-1, -1, -1, color2, color0, color1), localize);
+	public void drawText(int x, int y, FontSize font, String text, int color0, int color1, int color2, TextAlign align, boolean localize){
+		drawText(x, y, font, text, ColorBundle.get(-1, -1, -1, color2, color0, color1), align, localize);
 	}
 	
-	public void drawText(int x, int y, FontSize font, String text, ColorBundle bundle, boolean localize){
+	public void drawText(int x, int y, FontSize font, String text, ColorBundle bundle, TextAlign align, boolean localize){	
 		Locale loc = Localization.getCurrentLocale();
 		text = text.toLowerCase();
-		if(localize) text = loc.getTranslation(text);
+		if(localize) 
+			text = loc.getTranslation(text).toLowerCase();
+		
+		switch(align){
+			case CENTER: x -= Localization.getWidth(font, text, localize) / 2; break;
+			case RIGHT:  x -= Localization.getWidth(font, text, localize); break;
+			default: break;
+		}
+		
 		int bwidth = font == FontSize.BIG ? 2 : 1;
 		int sumwidth = 0;
 		for(int i = 0; i < text.length(); i++){
@@ -337,48 +259,7 @@ public class Layer {
 			}
 		}
 	}
-	
-	public void drawDamageText(int x, int y, String text, int ccc){
-		ColorableImageContainer cc = (ColorableImageContainer) ResourceLoader.ImageLoader.get("font.png");
-		int sumwidth = 0;
-		for(int i = 0; i < text.length(); i++){
-			char c = text.charAt(i);
-			int idx = Locale.DEFAULT.getCharsetInfo(1).indexOf(c);
-			if(idx >= 0){
-				for(int ii = 0; ii < BLOCK_SIZE; ii++){
-					for(int jj = 0; jj < BLOCK_SIZE; jj++){
-						int xx = x + ii + sumwidth;
-						int yy = y + jj;
-						if(xx < offsetX + w && xx >= offsetX && yy < offsetY + h && yy >= offsetY){
-							boolean hasShadow = this.getShadows(xx - offsetX, yy - offsetY);
-							put(xx, yy, cc.get((idx % BLOCKS_ROWSIZE) * BLOCK_SIZE + ii, (3 + idx / BLOCKS_ROWSIZE) * BLOCK_SIZE + jj) > 1 ? Color.moreRed(get(xx, yy), ccc) : -1);
-							if(hasShadow) putShadow(xx, yy);
-						}
-					}
-				}
-				//drawColored(x + sumwidth, y, idx % BLOCKS_ROWSIZE, 3 + idx / BLOCKS_ROWSIZE, 1, 1, bundle, loc.getSheet(), 0);
-				sumwidth += Locale.DEFAULT.getWidth(FontSize.NORMAL, c);
-			}
-		}
-	}
-	
-	public void drawDamageOverlay(int x, int y, int tx, int ty, int w, int h, String sprId, int mirrorFlags){
-		boolean mirrorH = (mirrorFlags & MIRRORFLAG_HORIZONTAL) != 0;
-		boolean mirrorV = (mirrorFlags & MIRRORFLAG_VERTICAL) != 0;
-		
-		ImageContainer cc = ResourceLoader.ImageLoader.get(sprId);
-		if(cc == null) throw new RuntimeException("Render error: can\'t find sprite " + sprId);
-		
-		for(int i = 0; i < w * BLOCK_SIZE; i++){
-			int xx = mirrorH ? w * BLOCK_SIZE - i - 1 : i;
-			for(int j = 0; j < h * BLOCK_SIZE; j++){
-				int yy = mirrorV ? h * BLOCK_SIZE - j - 1 : j;
-				if(cc.get(tx * BLOCK_SIZE + xx, ty * BLOCK_SIZE + yy) >= 0)
-					put(x + i, y + j, Color.moreRed(get(x + i, y + j), 2));
-			}
-		}
-	}
-	
+
 	public void renderPseudo3DRect(int x, int y, int w, int h, int color, int lShade, int rShade, int nShade, boolean raised){
 		ColorBundle bundle = ColorBundle.get(-1, rShade, color, nShade, lShade, -1);
 		int offset = raised ? 0 : 3;
@@ -405,18 +286,6 @@ public class Layer {
 			}
 	}
 		
-	
-	
-	public void renderCursor(int x, int y){
-		ColorableImageContainer cc = (ColorableImageContainer) ResourceLoader.ImageLoader.get("gui");
-		for(int i = 0; i < 10; i++)
-			for(int j = 0; j < 14; j++){
-				if(cc.get(i, 6 * BLOCK_SIZE + j) > 2){
-					put(x + i, y + j, Color.lighter(get(x + i, y + j), 4));
-				}
-			}
-	}
-	
 	public void drawUnderscore(int x, int y, FontSize font, char c, int color){
 		int w = Localization.getWidth(font, c);
 		for(int i = 0; i < w; i++)

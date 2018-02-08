@@ -7,14 +7,14 @@ import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.components.Button;
 import net.quantium.harvester.system.text.FontSize;
+import net.quantium.harvester.system.text.TextAlign;
 
 public class MainScreen extends MenuScreen {
 
 	public static final String[] names = new String[]{"startgame", "settings", "information", "exit"};
 	
-	public static int textX = (Main.getInstance().getRenderWidth() - Main.NAME.length() * 17) / 2;
 	public static final int buttonSize = 20;
-	public static int buttonCenterX = (Main.getInstance().getRenderWidth() - buttonSize * Layer.BLOCK_SIZE) / 2;
+	public static final int buttonCenterX = (Main.getInstance().getRenderWidth() - buttonSize * Layer.BLOCK_SIZE) / 2;
 	public static final int shadowOffset = 5;
 	public static final String alphaText = "infoalphaversion";
 	public static final String authorText = "infocreatedby";
@@ -62,10 +62,8 @@ public class MainScreen extends MenuScreen {
 	public void render(Renderer render) {
 		super.render(render);
 		
-		render.get().drawText(textX + shadowOffset, 35 + shadowOffset, FontSize.BIG, Main.NAME, 0, 0, 0);
-		render.get().drawText(textX, 35, FontSize.BIG, Main.NAME, 474, 686, 353);
-		//render.get().drawMediumText(textX + 1 + shadowOffset, 60 + shadowOffset, "DEMONSTRATIONAL VERSION", 000);
-		render.get().drawText(textX + 1, 60, FontSize.NORMAL, "infodemo", 373);
+		render.get().drawText(Main.getInstance().getRenderWidth() / 2 + shadowOffset, 35 + shadowOffset, FontSize.BIG, Main.NAME, 0, 0, 0, TextAlign.CENTER);
+		render.get().drawText(Main.getInstance().getRenderWidth() / 2, 35, FontSize.BIG, Main.NAME, 474, 686, 353, TextAlign.CENTER);
 		
 		container.render(render);
 	}

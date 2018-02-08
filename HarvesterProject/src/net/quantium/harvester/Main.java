@@ -30,11 +30,17 @@ import net.quantium.harvester.system.IOContainer;
 import net.quantium.harvester.system.Session;
 import net.quantium.harvester.system.Settings;
 import net.quantium.harvester.system.text.FontSize;
+import net.quantium.harvester.system.text.TextAlign;
 import net.quantium.harvester.tile.Tiles;
 import net.quantium.harvester.timehook.TimeHook;
 import net.quantium.harvester.timehook.TimeHookManager;
 
-//legacy
+//old and legacy and unreadable code
+//its has a lot of not-encapsulated variables
+//                 hardcode
+//                 uncommented ununderstandable code
+//                 invalid abstractions
+//                 useless stuff
 public class Main extends Canvas{
 	
 	/**
@@ -111,7 +117,7 @@ public class Main extends Canvas{
 
 			@Override
 			public void run() {
-				if(_instance.session != null) _instance.session.save();
+				if(_instance.session != null) _instance.session.save(true);
 				_instance.active = false;
 			}
 			
@@ -127,20 +133,13 @@ public class Main extends Canvas{
 	}
 	
 	private void init(){
-		TimeHookManager.register(new TimeHook(){
-
+		TimeHookManager.register(new TimeHook(1d, true){
 			@Override
 			public void elapsed() {	
 				frames = framesIncompleted;
 				updates = updatesIncompleted;
 				framesIncompleted = updatesIncompleted = 0;
 			}
-
-			@Override
-			public double seconds() {
-				return 1;
-			}
-			
 		});
 		
 		renderer = new Renderer(getRenderWidth(), getRenderHeight());
@@ -153,8 +152,9 @@ public class Main extends Canvas{
 	private void run(){
 		long time = System.nanoTime();
 		double unp = 0;	
-		try{
-			while(active){
+
+		while(active){
+			try{
 				long cur = System.nanoTime();
 				long delta = cur - time;
 				time = cur;
@@ -170,9 +170,9 @@ public class Main extends Canvas{
 					
 					TimeHookManager.update(delta / NANOSECONDS_PER_SECOND);
 				}
+			}catch(Throwable e){
+				forceCrashScreen(e);
 			}
-		}catch(Throwable e){
-			forceCrashScreen(e);
 		}
 	}
 	
@@ -228,15 +228,14 @@ public class Main extends Canvas{
 			createBufferStrategy(3);
 			return;
 		}
-		renderer.get().fill(000);
 
 		if(!screenService.isScreenActive() || screenService.current().mustRenderGame){
 			if(session != null){
 				session.render(renderer);
 				if(session.getWorld().player != null){
-					for(int i = 0; i < session.getWorld().player.maxHealth; i++){
-						boolean have = session.getWorld().player.health > i;
-						renderer.get().drawColored(3 + i * 11, getRenderHeight() - 16, 0, 10, 2, 2, ColorBundle.get(-1, -1, -1, have ? 833 : 333, have ? 722 : 222, -1), "gui", 0);
+					for(int i = 0; i < session.getWorld().player.getMaxHealth(); i++){
+						boolean has = session.getWorld().player.health > i;
+						renderer.get().drawColored(3 + i * 11, getRenderHeight() - 16, 0, 10, 2, 2, ColorBundle.get(-1, -1, -1, has ? 833 : 333, has ? 722 : 222, -1), "gui", 0);
 					}
 				}
 			}
@@ -246,13 +245,13 @@ public class Main extends Canvas{
 			screenService.current().render(renderer);
 		
 		if(debugMode > 0){
-			renderer.get().drawText(5, 5, FontSize.NORMAL, "debug enabled: " + DEBUG_NAMES[debugMode], 999);
-			renderer.get().drawText(5, 15, FontSize.NORMAL, "fps: " + frames, 999);
-			renderer.get().drawText(5, 25, FontSize.NORMAL, "ups: " + updates, 999);
+			renderer.get().drawText(5, 5, FontSize.NORMAL, "debug enabled: " + DEBUG_NAMES[debugMode], 999, TextAlign.LEFT);
+			renderer.get().drawText(5, 15, FontSize.NORMAL, "fps: " + frames, 999, TextAlign.LEFT);
+			renderer.get().drawText(5, 25, FontSize.NORMAL, "ups: " + updates, 999, TextAlign.LEFT);
 			if(session != null && session.getWorld() != null && session.getWorld().player != null){
-				renderer.get().drawText(5, 35, FontSize.NORMAL, "x: " + session.getWorld().player.x, 999);
-				renderer.get().drawText(5, 45, FontSize.NORMAL, "y: " + session.getWorld().player.y, 999);
-				renderer.get().drawText(5, 55, FontSize.NORMAL, "time: " + session.getWorld().time, 999);
+				renderer.get().drawText(5, 35, FontSize.NORMAL, "x: " + session.getWorld().player.x, 999, TextAlign.LEFT);
+				renderer.get().drawText(5, 45, FontSize.NORMAL, "y: " + session.getWorld().player.y, 999, TextAlign.LEFT);
+				renderer.get().drawText(5, 55, FontSize.NORMAL, "time: " + session.getWorld().time, 999, TextAlign.LEFT);
 			}
 		}
 		
@@ -261,8 +260,9 @@ public class Main extends Canvas{
 			renderer.get().drawColored(getRenderWidth() - 20, 4, ((counter / 30) % 5) * 2, 14, 2, 2, ColorBundle.get(-1, -1, -1, -1, 669, 888), "gui", 0);
 		}
 		
-		if(screenService.current() == null || screenService.current().showCursor) 
-			renderer.get().renderCursor(inputService.getMouseX(), inputService.getMouseY());
+		if(screenService.current() == null || screenService.current().showCursor)
+			renderer.get().drawColored(inputService.getMouseX(), inputService.getMouseY(), 0, 6, 2, 2, ColorBundle.get(-1, -1, -1, -1, -1, 7999), "gui", 0);
+		
 		renderer.update();
 		Graphics g = bufstr.getDrawGraphics();
 		renderer.renderImage(g, getWidth(), getHeight());
@@ -272,6 +272,7 @@ public class Main extends Canvas{
 
 	public static final String CRASHLOG_FILE = "crash.log";
 	void writeCrashlog(Throwable e) {
+		e.printStackTrace();
 		BufferedWriter writer = null;
         try{
             File crashInfo = new File(IOContainer.DATA_FOLDER + File.separator + CRASHLOG_FILE);
@@ -298,15 +299,10 @@ public class Main extends Canvas{
         }
 	}
 	
-	private static final long CRASH_SCREEN_DURATION_NANOS = (long)(NANOSECONDS_PER_SECOND * 5);
 	private void forceCrashScreen(Throwable e) {
-		writeCrashlog(e);
+		writeCrashlog(e);		
+		if(screenService.current() instanceof CrashScreen)
+			System.exit(-1);
 		screenService.setScreen(new CrashScreen(e));
-		
-		long nano = System.nanoTime();
-		while(System.nanoTime() - nano < CRASH_SCREEN_DURATION_NANOS)
-			render();
-
-		System.exit(-1);
 	}
 }

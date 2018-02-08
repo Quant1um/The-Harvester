@@ -40,7 +40,6 @@ public class ItemEntity extends Entity {
 	public void render(Renderer render) {
 		if(slot == null) return;
 		Item itemd = Item.Registry.get(slot.getItem());
-		render.get().drawShadow(x + 5, y + 5, itemd.getIconX() * 2, itemd.getIconY() * 2, 2, 2, "sheet0", 0);
 		render.get().draw(x - 3, y - 3, itemd.getIconX() * 2, itemd.getIconY() * 2, 2, 2, "sheet0", 0);
 	}
 

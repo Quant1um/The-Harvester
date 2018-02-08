@@ -1,5 +1,8 @@
 package net.quantium.harvester.entity;
 
+import net.quantium.harvester.item.ItemSlot;
+import net.quantium.harvester.world.World;
+
 public abstract class ParticleEntity extends Entity{
 	/**
 	 * 
@@ -21,4 +24,13 @@ public abstract class ParticleEntity extends Entity{
 		return time;
 	}
 	
+	@Override
+	public boolean isPassable(Entity ent) {
+		return true;
+	}
+
+	@Override
+	public boolean onInteract(World world2, PlayerEntity playerEntity, InteractionMode im, ItemSlot active) {
+		return false;
+	}
 }

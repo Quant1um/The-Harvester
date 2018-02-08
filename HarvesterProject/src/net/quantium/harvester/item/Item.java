@@ -41,8 +41,6 @@ public abstract class Item {
 	public abstract boolean interact(World w, int x, int y, PlayerEntity ply, InteractionMode mode, ItemSlot slot);
 	
 	public enum ItemType {
-		TOOL, CLOTHES, WEAPON, SETTABLE, OTHER
+		TOOL, CLOTHES, WEAPON, BUILDABLE, OTHER
 	}
-	
-	
 }

@@ -8,6 +8,7 @@ import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.ScreenService;
 import net.quantium.harvester.system.text.FontSize;
 import net.quantium.harvester.system.text.Localization;
+import net.quantium.harvester.system.text.TextAlign;
 
 public class InputField extends Component{
 
@@ -28,11 +29,11 @@ public class InputField extends Component{
 		render.get().renderPseudo3DRect(x, y, w / Layer.BLOCK_SIZE, 2, 222, 777, 444, 666, false);
 		boolean renderCursor = focused && tick >= 25;
 		if(text.length() > 0)
-			render.get().drawText(x + 3, y + Layer.BLOCK_SIZE - 4, FontSize.NORMAL, text, 888, false);
+			render.get().drawText(x + 3, y + Layer.BLOCK_SIZE - 4, FontSize.NORMAL, text, 888, TextAlign.LEFT, false);
 		else
-			render.get().drawText(x + 3, y + Layer.BLOCK_SIZE - 4, FontSize.NORMAL, placeholder, 555);
+			render.get().drawText(x + 3, y + Layer.BLOCK_SIZE - 4, FontSize.NORMAL, placeholder, 555, TextAlign.LEFT);
 		if(renderCursor)
-			render.get().drawUnderscore(x + Localization.getWidth(FontSize.NORMAL, text.substring(0, cursor)) + 3, y + Layer.BLOCK_SIZE + 5, FontSize.NORMAL, cursor >= text.length() ? ' ' : text.charAt(cursor), 888);
+			render.get().drawUnderscore(x + Localization.getWidth(FontSize.NORMAL, text.substring(0, cursor), false) + 3, y + Layer.BLOCK_SIZE + 5, FontSize.NORMAL, cursor >= text.length() ? ' ' : text.charAt(cursor), 888);
 	}
 
 	@Override
@@ -41,7 +42,7 @@ public class InputField extends Component{
 		if(xx < 0){
 			cursor = 0;
 			return;
-		}else if(xx >= Localization.getWidth(FontSize.NORMAL, text)){
+		}else if(xx >= Localization.getWidth(FontSize.NORMAL, text, false)){
 			cursor = text.length();
 		}else{
 			int i = 0;
@@ -71,7 +72,6 @@ public class InputField extends Component{
 	@Override
 	public void onKeyWrite(char key, boolean backspace, boolean submit) {
 		if(!backspace){
-			//System.out.println(key + ":" + Localization.isPresentMedium(Character.toLowerCase(key)));
 			if(cursor < w / Layer.BLOCK_SIZE && Localization.isPresent(FontSize.NORMAL, Character.toLowerCase(key))){
 				text = text.substring(0, cursor) + Character.toLowerCase(key) + text.substring(cursor, text.length());
 				cursor++;
@@ -97,5 +97,4 @@ public class InputField extends Component{
 	public void onSelect() {
 		
 	}
-
 }

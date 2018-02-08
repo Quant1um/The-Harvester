@@ -5,12 +5,12 @@ import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.entity.Entity.InteractionMode;
 import net.quantium.harvester.world.World;
 
-public class SettableItem extends Item {
+public class BuildableItem extends Item {
 
 	private final String name;
 	private final int type;
 	
-	public SettableItem(String name, int type){
+	public BuildableItem(String name, int type){
 		this.name = name;
 		this.type = type;
 	}
@@ -37,7 +37,7 @@ public class SettableItem extends Item {
 
 	@Override
 	public ItemType getType() {
-		return ItemType.SETTABLE;
+		return ItemType.BUILDABLE;
 	}
 
 	@Override
@@ -53,5 +53,4 @@ public class SettableItem extends Item {
 		w.addEntity(e);
 		return slot.consume(1);
 	}
-
 }

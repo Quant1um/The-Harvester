@@ -27,15 +27,8 @@ public class Localization {
 		return Locale.DEFAULT.isPresent(font, c) || getCurrentLocale().isPresent(font, c);
 	}
 	
-	public static int getWidth(FontSize font, String s){
-		s = getTranslation(s.toLowerCase()).toLowerCase();
-		int summary = 0;
-		for(int i = 0; i < s.length(); i++) summary += getWidth(font, s.charAt(i));
-		return summary;
-	}
-	
-	public static int getWidthUnlocalized(FontSize font, String s){
-		s = s.toLowerCase();
+	public static int getWidth(FontSize font, String s, boolean localize){
+		s = (localize ? getTranslation(s.toLowerCase()) : s).toLowerCase();
 		int summary = 0;
 		for(int i = 0; i < s.length(); i++) summary += getWidth(font, s.charAt(i));
 		return summary;

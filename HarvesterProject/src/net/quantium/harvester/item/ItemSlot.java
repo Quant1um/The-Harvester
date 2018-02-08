@@ -6,6 +6,7 @@ import net.quantium.harvester.Main;
 import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.system.text.FontSize;
+import net.quantium.harvester.system.text.TextAlign;
 
 public class ItemSlot implements Serializable{
 	/**
@@ -68,17 +69,17 @@ public class ItemSlot implements Serializable{
 		if(itemd == null) return;
 		render.get().draw(x, y, itemd.getIconX() * 2, itemd.getIconY() * 2, 2, 2, "sheet0", 0);
 		if(item.getCount() > 1){
-			render.get().drawText(x + 2 * Layer.BLOCK_SIZE - 4 + 1, y + 2 * Layer.BLOCK_SIZE - 4 + 1, FontSize.NORMAL, String.valueOf(item.getCount()), 000);
-			render.get().drawText(x + 2 * Layer.BLOCK_SIZE - 4, y + 2 * Layer.BLOCK_SIZE - 4, FontSize.NORMAL, String.valueOf(item.getCount()), 777);
+			render.get().drawText(x + 2 * Layer.BLOCK_SIZE + 1, y + 2 * Layer.BLOCK_SIZE - 4 + 1, FontSize.NORMAL, String.valueOf(item.getCount()), 000, TextAlign.RIGHT);
+			render.get().drawText(x + 2 * Layer.BLOCK_SIZE,     y + 2 * Layer.BLOCK_SIZE - 4, FontSize.NORMAL, String.valueOf(item.getCount()), 777, TextAlign.RIGHT);
 		}else if(itemd instanceof ToolItem){
 			int percentage = 100 - (int)(((float)item.getMeta() / ((ToolItem) itemd).getDurability()) * 100f);
 			String ss = percentage >= 97 ? "s" : percentage >= 85 ? "a" : percentage >= 60 ? "b" : percentage >= 35 ? "c" : percentage >= 10 ? "d" : "f";
 			
-			render.get().drawText(x + 2 * Layer.BLOCK_SIZE - 8 + 1, y + 2 * Layer.BLOCK_SIZE - 8 + 1, FontSize.NORMAL, ss, 000);
-			render.get().drawText(x + 2 * Layer.BLOCK_SIZE - 8, y + 2 * Layer.BLOCK_SIZE - 8, FontSize.NORMAL, ss, 777);
+			render.get().drawText(x + 2 * Layer.BLOCK_SIZE + 1, y + 2 * Layer.BLOCK_SIZE - 8 + 1, FontSize.NORMAL, ss, 000, TextAlign.RIGHT);
+			render.get().drawText(x + 2 * Layer.BLOCK_SIZE,     y + 2 * Layer.BLOCK_SIZE - 8, FontSize.NORMAL, ss, 777, TextAlign.RIGHT);
 		}
 		if(Main.getInstance().getDebugMode() == 3){
-			render.get().drawText(x, y, FontSize.SMALL, String.valueOf(item.meta), 358);
+			render.get().drawText(x, y, FontSize.SMALL, String.valueOf(item.meta), 358, TextAlign.LEFT);
 		}
 	}
 	

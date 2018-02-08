@@ -8,7 +8,7 @@ import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.ScreenService;
 import net.quantium.harvester.system.text.FontSize;
-import net.quantium.harvester.system.text.Localization;
+import net.quantium.harvester.system.text.TextAlign;
 
 public abstract class ToggleButton extends Component {
 	private boolean hover = false;
@@ -38,7 +38,7 @@ public abstract class ToggleButton extends Component {
 		int color = hover ? 666 : 555;
 		int offset = clicked ? 1 : 0;
 		render.get().renderPseudo3DRect(x, y, w / Layer.BLOCK_SIZE, 2, color, 777, 444, 666, !clicked);
-		render.get().drawText(x + w - Localization.getWidth(FontSize.NORMAL, text) - 5 + offset, y + offset + Layer.BLOCK_SIZE - 4, FontSize.NORMAL, text, this.color);
+		render.get().drawText(x + w - 5 + offset, y + offset + Layer.BLOCK_SIZE - 4, FontSize.NORMAL, text, this.color, TextAlign.RIGHT);
 		render.get().drawColored(x + 3 + offset, y + offset + Layer.BLOCK_SIZE - 4, 3, 0, 1, 1, ColorBundle.get(-1, value ? 161 : 611, value ? 383 : 833, value ? 484 : 844, value ? 595 : 955, -1), "gui", 0);
 	}
 

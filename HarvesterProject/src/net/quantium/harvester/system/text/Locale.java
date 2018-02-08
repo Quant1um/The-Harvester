@@ -95,7 +95,7 @@ public class Locale {
 		System.out.println("Loaded locale: " + name);
 	}
 	
-	public static Locale DEFAULT;
+	public static final Locale DEFAULT;
 	static{
 		try {
 			DEFAULT = new Locale("default.locale"){
@@ -141,6 +141,7 @@ public class Locale {
 	}
 
 	public boolean isPresent(FontSize font, char c) {
+		if(charsetsInfo[font.ordinal()] == null) return false;
 		return charsetsInfo[font.ordinal()].indexOf(Character.toLowerCase(c)) >= 0;
 	}
 	

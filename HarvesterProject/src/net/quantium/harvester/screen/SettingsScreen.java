@@ -10,6 +10,7 @@ import net.quantium.harvester.screen.components.ToggleButton;
 import net.quantium.harvester.system.Settings;
 import net.quantium.harvester.system.text.FontSize;
 import net.quantium.harvester.system.text.Localization;
+import net.quantium.harvester.system.text.TextAlign;
 
 public class SettingsScreen extends MenuScreen {
 
@@ -77,8 +78,8 @@ public class SettingsScreen extends MenuScreen {
 	public void render(Renderer render) {
 		super.render(render);
 		container.render(render);
-		render.get().drawText(MainScreen.buttonCenterX, 74, FontSize.NORMAL, "resolution", 888);
-		render.get().drawText(MainScreen.buttonCenterX, 94, FontSize.NORMAL, "language", 888);
+		render.get().drawText(MainScreen.buttonCenterX, 74, FontSize.NORMAL, "resolution", 888, TextAlign.LEFT);
+		render.get().drawText(MainScreen.buttonCenterX, 94, FontSize.NORMAL, "language", 888, TextAlign.LEFT);
 
 	}
 

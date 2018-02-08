@@ -8,7 +8,7 @@ import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.components.Button;
 import net.quantium.harvester.system.Session;
 import net.quantium.harvester.system.text.FontSize;
-import net.quantium.harvester.system.text.Localization;
+import net.quantium.harvester.system.text.TextAlign;
 
 public class DeleteScreen extends MenuScreen {
 
@@ -58,8 +58,8 @@ public class DeleteScreen extends MenuScreen {
 		
 		String text0 = "deleteconf";
 		String text1 = Session.getName(slot) + "?";
-		render.get().drawText((Main.getInstance().getRenderWidth() - Localization.getWidth(FontSize.NORMAL, text0)) / 2, 100, FontSize.NORMAL, text0, 888);
-		render.get().drawText((Main.getInstance().getRenderWidth() - Localization.getWidth(FontSize.NORMAL, text1)) / 2, 110, FontSize.NORMAL, text1, 888);
+		render.get().drawText(Main.getInstance().getRenderWidth() / 2, 100, FontSize.NORMAL, text0, 888, TextAlign.CENTER);
+		render.get().drawText(Main.getInstance().getRenderWidth() / 2, 110, FontSize.NORMAL, text1, 888, TextAlign.CENTER);
 		
 		container.render(render);
 	}

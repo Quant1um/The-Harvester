@@ -27,11 +27,8 @@ public class SlimeBossEntity extends SlimeEntity {
 	
 	@Override
 	public void render(Renderer render){
-		render.get().drawWorldShadow(x - 16, y - yOffset[frame] * 3 - 16, frame * 4 + 6, 33, 4, 4, "sheet0", 0);
 		render.get().draw(x - 16, y - yOffset[frame] * 3 - 16, frame * 4 + 6, 33 + (readyToEject ? 4 : 0), 4, 4, "sheet0", 0);
-		if(invicibleTime >= 20){
-			render.get().drawDamageOverlay(x - 16, y - yOffset[frame] * 3 - 16, frame * 4 + 6, 33, 4, 4, "sheet0", 0);
-		}
+		if(invincibleTime >= 20){} //todo: draw damage overlay
 	}
 	
 	@Override
@@ -52,8 +49,7 @@ public class SlimeBossEntity extends SlimeEntity {
 	@Override
 	public void bump(Entity ent) {
 		if(ent instanceof PlayerEntity){
-			((AliveEntity) ent).hit(4);
+			((LivingEntity) ent).hit(4);
 		}
 	}
-
 }

@@ -12,7 +12,7 @@ import net.quantium.harvester.tile.Tile;
 import net.quantium.harvester.world.PassingInfo;
 import net.quantium.harvester.world.World;
 
-public class SlimeEntity extends AggressiveEntity implements AIEntity {
+public class SlimeEntity extends MobEntity implements AIEntity {
 
 	/**
 	 * 
@@ -46,17 +46,14 @@ public class SlimeEntity extends AggressiveEntity implements AIEntity {
 
 	@Override
 	public void render(Renderer render) {
-		render.get().drawWorldShadow(x - 16, y - yOffset[frame] - 16, frame * 2, 33 + type * 2, 2, 2, "sheet0", 0);
 		render.get().draw(x - 16, y - yOffset[frame] - 16, frame * 2, 33 + type * 2, 2, 2, "sheet0", 0);
-		if(invicibleTime >= 20){
-			render.get().drawDamageOverlay(x - 16, y - yOffset[frame] - 16, frame * 2, 33 + type * 2, 2, 2, "sheet0", 0);
-		}
+		if(invincibleTime >= 20){} //todo
 	}
 
 	@Override
 	public void bump(Entity ent) {
 		if(ent instanceof PlayerEntity){
-			((AliveEntity) ent).hit(damage[type]);
+			((LivingEntity) ent).hit(damage[type]);
 		}
 	}
 
@@ -110,13 +107,13 @@ public class SlimeEntity extends AggressiveEntity implements AIEntity {
 			frame = 2;
 		}
 		if(jump > 15 && jump < 35){
-			AIEntity.update(this);
+			ai.update(this);
 		}
 		jump++;
 	}
 
 	@Override
-	public void died() {
+	public void onDied() {
 		world.player.slimesKilled++;
 		if(world.player.slimesKilled >= 100){
 			SlimeBossEntity e = new SlimeBossEntity();

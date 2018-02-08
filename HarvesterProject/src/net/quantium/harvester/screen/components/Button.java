@@ -8,7 +8,7 @@ import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.ScreenService;
 import net.quantium.harvester.system.text.FontSize;
-import net.quantium.harvester.system.text.Localization;
+import net.quantium.harvester.system.text.TextAlign;
 
 public abstract class Button extends Component {
 	private boolean hover = false;
@@ -24,11 +24,9 @@ public abstract class Button extends Component {
 		return iconflag;
 	}
 
-
 	public void setIconFlag(int iconflag) {
 		this.iconflag = iconflag;
 	}
-
 
 	public Button(int x, int y, int bw, String text, int icon){
 		this.x = x;
@@ -57,7 +55,7 @@ public abstract class Button extends Component {
 			int iy = icon / 5;
 			render.get().drawColored(x + offset, y + offset, ix * 2 + 4, iy * 2, 2, 2, ColorBundle.get(-1, -1, -1, -1, -1, this.color), "gui", iconflag);
 		}
-		render.get().drawText(x + w - Localization.getWidth(FontSize.NORMAL, text) - 5 + offset, y + offset + Layer.BLOCK_SIZE - 4, FontSize.NORMAL, text, this.color);
+		render.get().drawText(x + w - 5 + offset, y + offset + Layer.BLOCK_SIZE - 4, FontSize.NORMAL, text, this.color, TextAlign.RIGHT);
 	}
 
 	public int getColor() {

@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.quantium.harvester.Main;
-import net.quantium.harvester.entity.AggressiveEntity;
+import net.quantium.harvester.entity.MobEntity;
 import net.quantium.harvester.entity.CollidableTileEntity;
 import net.quantium.harvester.entity.DamageParticle;
 import net.quantium.harvester.entity.Entity;
@@ -19,6 +19,7 @@ import net.quantium.harvester.entity.hitbox.Hitbox;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.system.text.FontSize;
+import net.quantium.harvester.system.text.TextAlign;
 import net.quantium.harvester.tile.Tile;
 
 public class World implements Serializable{
@@ -55,12 +56,8 @@ public class World implements Serializable{
 	private List<ParticleEntity> particles = new ArrayList<ParticleEntity>();
 	
 	public int w, h;
-	
 	public transient PlayerEntity player;
-	
 	public int seed;
-	
-
 	
 	private transient Comparator<Entity> compatator = new Comparator<Entity>() {
 		  public int compare(Entity a, Entity b) {
@@ -140,8 +137,8 @@ public class World implements Serializable{
 				for(int i = (int)(render.get().offsetX / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; i <= (int)(Main.getInstance().getRenderWidth() + render.get().offsetX) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; i++)
 					for(int j = (int)(render.get().offsetY / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; j <= (int)(Main.getInstance().getRenderHeight() + render.get().offsetY) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; j++){
 						Tile.Registry.get(getTile(i, j)).render(render, this, i, j);
-						if(Main.getInstance().getDebugMode() == 2) render.get().drawText(i * 16, j * 16, FontSize.SMALL, String.valueOf(getTargetValue(i, j)), 833);
-						if(Main.getInstance().getDebugMode() == 3) render.get().drawText(i * 16, j * 16, FontSize.SMALL, getMetadata(i, j, 0) + " " + getMetadata(i, j, 1), 338);
+						if(Main.getInstance().getDebugMode() == 2) render.get().drawText(i * 16, j * 16, FontSize.SMALL, String.valueOf(getTargetValue(i, j)), 833, TextAlign.LEFT);
+						if(Main.getInstance().getDebugMode() == 3) render.get().drawText(i * 16, j * 16, FontSize.SMALL, getMetadata(i, j, 0) + "; " + getMetadata(i, j, 1), 338, TextAlign.LEFT);
 					}
 				return;
 			}
@@ -419,7 +416,7 @@ public class World implements Serializable{
 		int ents = 1;
 		int j = 0;
 		for(int i = 0; i < entities.size(); i++){
-			if(entities.get(i) instanceof AggressiveEntity && Main.GLOBAL_RANDOM.nextInt(3) == 0){
+			if(entities.get(i) instanceof MobEntity && Main.GLOBAL_RANDOM.nextInt(3) == 0){
 				j++;
 				if(j >= 70){
 					j = 0;

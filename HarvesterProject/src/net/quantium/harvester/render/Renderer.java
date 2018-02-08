@@ -6,14 +6,9 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
-import net.quantium.harvester.Main;
-
 public class Renderer {
-
 	public final int w, h;
-	
 	public final Layer layer;
-	
 	private BufferedImage image;
 	private int[] data;
 	
@@ -41,10 +36,6 @@ public class Renderer {
 		for(int i = 0; i < w; i++)
 			for(int j = 0; j < h; j++){
 				short c = get().get(i, j);
-				if(Main.getInstance().useShadows() && get().getShadows(i, j)){
-					c = Color.darker(c, 3);
-					get().removeShadow(i, j);
-				}
 				int cc = Color.get(c);
 				if(cc >= 0)
 				data[i + j * w] = cc;

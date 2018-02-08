@@ -25,9 +25,7 @@ public class InactiveWorkbenchEntity extends BuildableEntity {
 
 	@Override
 	public void render(Renderer render) {
-		render.get().drawWorldShadow(x - 12, y - 16, epoch * 3, 43, 3, 3, "sheet0", 0);
-		render.get().draw(x - 12, y - 16, epoch * 3, 43, 3, 3, "sheet0", 0);
-		
+		render.get().draw(x - 12, y - 16, epoch * 3, 43, 3, 3, "sheet0", 0);	
 	}
 
 	@Override

@@ -39,9 +39,7 @@ public class BuildableEntity extends Entity {
 
 	@Override
 	public void render(Renderer render) {
-		render.get().drawWorldShadow(x - 12, y - 16, type * 3, 19, 3, 3, "sheet0", 0);
-		render.get().draw(x - 12, y - 16, type * 3, 19, 3, 3, "sheet0", 0);
-		
+		render.get().draw(x - 12, y - 16, type * 3, 19, 3, 3, "sheet0", 0);		
 	}
 
 	@Override

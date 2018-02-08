@@ -7,10 +7,10 @@ import net.quantium.harvester.render.Renderer;
 
 public class InventoryLayout extends AbstractContainer<InventorySlot>{
 	
-	protected int selectedSlot = -1;
+	protected int selectedSlot0 = -1;
 	protected int selectedSlot1 = -1;
-	protected int clickd = 0;
-	protected int clickmode = 0;
+	protected int clicked = 0;
+	protected InventoryManipulationMode mode = InventoryManipulationMode.NONE;
 	
 	protected Inventory inventory;
 	
@@ -25,18 +25,20 @@ public class InventoryLayout extends AbstractContainer<InventorySlot>{
 	@Override
 	public void onMouseClick(int x, int y, int button, boolean selectedNow, boolean first){
 		if(button == 4){
-			if(selectedSlot >= 0 && selectedSlot1 >= 0){
-				if(clickmode == 1)
-					separate(selectedSlot, selectedSlot1);
-				else if(clickmode == 0)
-					swap(selectedSlot, selectedSlot1);
-				clickmode = -1;
-				selectedSlot = -1;
+			if(selectedSlot0 >= 0 && selectedSlot1 >= 0){
+				switch(mode){
+					case SEPARATE: separate(selectedSlot0, selectedSlot1); break;
+					case MERGE_SWAP: swap(selectedSlot1, selectedSlot1); break;
+					default: break;
+				}
+				mode = InventoryManipulationMode.NONE;
+				selectedSlot0 = -1;
 				selectedSlot1 = -1;
 			}
 			return;
 		}
-		clickmode = button == 3 ? 1 : 0;
+		mode = button == 3 ? InventoryManipulationMode.SEPARATE :
+							 InventoryManipulationMode.MERGE_SWAP;
 		boolean sNow = false;
 		int c = getIndexOn(x, y);
 		if(c >= 0){
@@ -49,7 +51,7 @@ public class InventoryLayout extends AbstractContainer<InventorySlot>{
 			focused = -1;
 		}
 		if(focused >= 0 && focused < comps.size()){
-			if(first) selectedSlot = focused;
+			if(first) selectedSlot0 = focused;
 			else selectedSlot1 = focused;
 			comps.get(focused).onMouseClick(x, y, button, sNow, first);
 		}
@@ -58,10 +60,10 @@ public class InventoryLayout extends AbstractContainer<InventorySlot>{
 	@Override
 	public void render(Renderer render, boolean tfocused){
 		super.render(render, tfocused);
-		if(selectedSlot >= 0 && selectedSlot < this.comps.size() && selectedSlot1 >= 0 && selectedSlot1 < this.comps.size()){
-			Component c0 = this.comps.get(selectedSlot);
+		if(selectedSlot0 >= 0 && selectedSlot0 < this.comps.size() && selectedSlot1 >= 0 && selectedSlot1 < this.comps.size()){
+			Component c0 = this.comps.get(selectedSlot0);
 			Component c1 = this.comps.get(selectedSlot1);
-			render.get().renderLine(c0.x + 8, c0.y + 8, c1.x + 8, c1.y + 8, clickmode == 1 ? 939 : 993);
+			render.get().drawLine(c0.x + 8, c0.y + 8, c1.x + 8, c1.y + 8, mode == InventoryManipulationMode.SEPARATE ? 939 : 993);
 		}
 	}
 	
@@ -112,5 +114,9 @@ public class InventoryLayout extends AbstractContainer<InventorySlot>{
 				}
 			}
 		}
+	}
+	
+	public enum InventoryManipulationMode{
+		NONE, SEPARATE, MERGE_SWAP
 	}
 }

@@ -23,10 +23,10 @@ public class TileLittleStone extends TileGrass {
 			default: break;
 		}
 		switch(w.getMetadata(x, y, 0) & 3){
-			case 0: render.get().drawWorldShadow(x * 16, y * 16, xx, yy, 1, 1, "sheet0", flag); render.get().draw(x * 16, y * 16, xx, yy, 1, 1, "sheet0", flag);  break;
-			case 1: render.get().drawWorldShadow(x * 16 + 8, y * 16, xx, yy, 1, 1, "sheet0", flag); render.get().draw(x * 16 + 8, y * 16, xx, yy, 1, 1, "sheet0", flag); break;
-			case 2: render.get().drawWorldShadow(x * 16, y * 16 + 8, xx, yy, 1, 1, "sheet0", flag); render.get().draw(x * 16, y * 16 + 8, xx, yy, 1, 1, "sheet0", flag); break;
-			case 3: render.get().drawWorldShadow(x * 16 + 8, y * 16 + 8, xx, yy, 1, 1, "sheet0", flag); render.get().draw(x * 16 + 8, y * 16 + 8, xx, yy, 1, 1, "sheet0", flag); break;
+			case 0: render.get().draw(x * 16, y * 16, xx, yy, 1, 1, "sheet0", flag);  break;
+			case 1: render.get().draw(x * 16 + 8, y * 16, xx, yy, 1, 1, "sheet0", flag); break;
+			case 2: render.get().draw(x * 16, y * 16 + 8, xx, yy, 1, 1, "sheet0", flag); break;
+			case 3: render.get().draw(x * 16 + 8, y * 16 + 8, xx, yy, 1, 1, "sheet0", flag); break;
 			default: break;
 		}
 	}

@@ -14,8 +14,16 @@ import net.quantium.harvester.render.ColorBundle;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.world.World;
 
-public class TreeEntity extends AliveEntity {
+public class TreeEntity extends LivingEntity {
 
+	public static final int[] treeColors;
+	static{
+		treeColors = new int[256];
+		for(int i = 0; i < 256; i++){
+			treeColors[i] = (int) Math.min(Math.max(((1 - (i / 256f)) * 3), 0), 9) * 100 + (int) Math.min(Math.max(((i / 256f) * 8), 0), 9) * 10;
+		}
+	}
+	
 	/**
 	 * 
 	 */
@@ -28,7 +36,7 @@ public class TreeEntity extends AliveEntity {
 		if(type > 2) type = 2;
 		this.type = rand.nextInt(100) == 10 ? rand.nextInt(3) : type;
 		rotation = rand.nextInt(1);
-		this.temp = Color.treeColors[temp + 128];
+		this.temp = treeColors[temp + 128];
 		health = maxHealth = 20;
 	}
 	
@@ -36,7 +44,6 @@ public class TreeEntity extends AliveEntity {
 	public void init() {
 		hitbox = new Hitbox(type == 0 ? 7 : type == 1 ? 4 : 10, 5, type == 0 ? -1 : type == 1 ? -3 : -5, -5);
 	}
-
 
 	private static final int[] spriteSheetMetaX0 = {0, 4, 11};
 	private static final int[] spriteSheetMetaY0 = {0, 3, 0};
@@ -61,18 +68,12 @@ public class TreeEntity extends AliveEntity {
 		int h0 = spriteSheetMetaH0[meta];
 		int h1 = spriteSheetMetaH1[meta];
 		
-		
-		render.get().drawWorldShadowForColored(x - w0 * 4, y - h0 * 8, x0, y0, w0, h0, 0, "ambient", 0);
-		render.get().drawWorldShadowForColored(x - w0 * 4 + (type == 0 ? -1 : 0), y - h0 * 8 + (type == 1 ? -20 : 0), x1, y1, w1, h1, 0, "ambient", 0);
-		
 		render.get().drawColored(x - w0 * 4, y - h0 * 8, x0, y0, w0, h0, bnd0, "ambient", 0);
 		render.get().drawColored(x - w0 * 4 + (type == 0 ? -1 : 0), y - h0 * 8 + (type == 1 ? -20 : 0), x1, y1, w1, h1, bnd, "ambient", 0);
 	}
 
 	@Override
-	public void bump(Entity ent) {
-
-	}
+	public void bump(Entity ent) {}
 
 	@Override
 	public boolean isPassable(Entity ent) {
@@ -92,8 +93,7 @@ public class TreeEntity extends AliveEntity {
 	}
 
 	@Override
-	public void died() {
+	public void onDied() {
 		world.throwItem(x, y, new ItemSlot(Items.wood, 0, Main.GLOBAL_RANDOM.nextInt(5) + 1));
 	}
-
 }

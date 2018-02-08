@@ -11,7 +11,7 @@ import java.util.Map;
 
 import net.quantium.harvester.Main;
 
-public class IOContainer {
+public class IOContainer{
 	
 	private final String path;
 	
@@ -53,27 +53,29 @@ public class IOContainer {
 	
 	public void save(){
 		new Thread(new Runnable(){
-
 			@Override
 			public void run() {
-				isSaving = true;
-				try {
-					if(!new File(DATA_FOLDER + path).exists()){
-						new File(DATA_FOLDER + path).createNewFile();
-					}
-					FileOutputStream f = new FileOutputStream(DATA_FOLDER + path);
-				    ObjectOutputStream o = new ObjectOutputStream(f);
-				    o.writeObject(map);
-				    o.close();
-				    f.close();
-				    System.gc();//dirty trick
-			    } catch (IOException e) {
-			    	e.printStackTrace();
-				}
-				isSaving = false;
+				saveSynchronized();
 			}
-			
 		}).start();
+	}
+	
+	public void saveSynchronized(){
+		isSaving = true;
+		try {
+			File file = new File(DATA_FOLDER + path);
+			if(!file.exists())
+				file.createNewFile();
+			FileOutputStream f = new FileOutputStream(file);
+		    ObjectOutputStream o = new ObjectOutputStream(f);
+		    o.writeObject(map);
+		    o.close();
+		    f.close();
+		    System.gc();//dirty trick
+	    } catch (IOException e) {
+	    	e.printStackTrace();
+		}
+		isSaving = false;
 	}
 	
 	public Map<String, Object> get(){

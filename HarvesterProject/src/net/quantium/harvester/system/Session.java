@@ -128,14 +128,19 @@ public class Session {
 	}
 	
 	public void save(){
+		save(false);
+	}
+	
+	public void save(boolean sync){
 		try{
 			IOContainer io = new IOContainer("saves" + File.separator + "save" + (slot + 1) + ".dat");
-			io.get().put("version", Main.VERSION);//will be used in next version eheheheheh 
+			io.get().put("version", Main.VERSION); //nope
 			io.get().put("name", name);
 			io.get().put("size", size);
 			io.get().put("world", world);
 			io.get().put("player", player);
-			io.save();
+			if(sync) io.saveSynchronized();
+			else io.save();
 		}catch(Exception e){
 			e.printStackTrace();
 		}

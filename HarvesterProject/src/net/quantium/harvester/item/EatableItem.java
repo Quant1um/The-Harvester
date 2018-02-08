@@ -6,7 +6,6 @@ import net.quantium.harvester.world.World;
 
 public abstract class EatableItem extends Item {
 
-
 	@Override
 	public ItemType getType() {
 		return ItemType.OTHER;
@@ -19,12 +18,11 @@ public abstract class EatableItem extends Item {
 
 	@Override
 	public boolean interact(World w, int x, int y, PlayerEntity ply, InteractionMode mode, ItemSlot slot) {
-		if(ply.health < ply.maxHealth) 
+		if(ply.health < ply.getMaxHealth()) 
 			if(slot.consume(1))
-				ply.health = Math.max(ply.maxHealth, ply.health + getHeal());
+				ply.health = Math.max(ply.getMaxHealth(), ply.health + getHeal());
 		return false;
 	}
 
 	public abstract int getHeal();
-
 }

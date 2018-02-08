@@ -16,9 +16,11 @@ public class TimeHookManager {
 		for(int i = 0; i < hooks.length; i++)
 			if(hooks[i] != null){
 				hooks[i].time += delta;
-				if(hooks[i].time >= hooks[i].seconds()){
+				if(hooks[i].time >= hooks[i].duration){
 					hooks[i].time = 0;
 					hooks[i].elapsed();
+					if(!hooks[i].repeating)
+						hooks[i] = null;
 				}	
 			}
 	}

@@ -24,7 +24,7 @@ import net.quantium.harvester.tile.Tiles;
 import net.quantium.harvester.world.PassingInfo;
 import net.quantium.harvester.world.World;
 
-public class PlayerEntity extends AliveEntity implements ISpectator{
+public class PlayerEntity extends LivingEntity implements ISpectator{
 
 	/**
 	 * 
@@ -62,7 +62,7 @@ public class PlayerEntity extends AliveEntity implements ISpectator{
 	@Override
 	public void init() {
 		hitbox = new Hitbox(10, 6, -2, -6);
-		if(died) openScreen(new DeathScreen(this)); //after game loading died value can be false
+		if(died) openScreen(new DeathScreen(this));
 	}
 
 	@Override
@@ -113,11 +113,8 @@ public class PlayerEntity extends AliveEntity implements ISpectator{
 			render.get().draw(x - hitbox.getWidth() / 2 - 1, y - hitbox.getHeight(), 12 + (Main.getInstance().getCounter() / 30 % 2 == 0 ? 2 : 0), 19, 2, 1, "sheet0", 0);
 			render.get().clipY1 = y - hitbox.getHeight() + 5 - getYOffset();	
 		}
-		render.get().drawWorldShadow(x - hitbox.getWidth() / 2 - offset / 3, y - hitbox.getHeight() - 18 + offset, o0 + (walking > 0 ? walkFrame / 10 * 2 : 0), 16, 2, 3, "sheet0", direction == 0 ? 1 : 0);
 		render.get().draw(x - hitbox.getWidth() / 2, y - hitbox.getHeight() - 18 + offset, o0 + (walking > 0 ? walkFrame / 10 * 2 : 0), 16, 2, 3, "sheet0", direction == 0 ? 1 : 0);
-		if(invicibleTime >= 20){
-			render.get().drawDamageOverlay(x - hitbox.getWidth() / 2, y - hitbox.getHeight() - 18 + offset, o0 + (walking > 0 ? walkFrame / 10 * 2 : 0), 16, 2, 3, "sheet0", direction == 0 ? 1 : 0);
-		}
+		if(invincibleTime >= 20){}//todo: damage overlay
 		render.get().resetClip();
 
 		if(intCursor > 0) render.get().drawCircle(x + 2, y - hitbox.getHeight() / 2 - 9, (int)(INTERACTION_DISTANCE * World.ENTITY_TILE_COORDSCALE * ExternalUtils.easeInElastic(intCursor)), 999);
@@ -246,7 +243,7 @@ public class PlayerEntity extends AliveEntity implements ISpectator{
 	}
 
 	@Override
-	public void died() {
+	public void onDied() {
 		openScreen(new DeathScreen(this));
 		for(int i = 0; i < inventory.size(); i++)
 			if(inventory.get(i) != null){
@@ -311,7 +308,7 @@ public class PlayerEntity extends AliveEntity implements ISpectator{
 				", Direction=" + direction + ", Walking=" + walking + ", MoveX=" + moveX + ", MoveY=" + moveY + 
 				", InteractionCooldown=" + interactionTime + ", RequestAnimation=" + requestAnimation + ", Inventory=" + inventory + 
 				", RequestedHitLevel=" + requestedHitLevel + ", RequestedHitTool=" + requestedHitTool + ", SpawnX=" + spawnX + ", SpawnY=" + spawnY + 
-				", Health=" + health + ", MaxHealth=" + maxHealth + ", InvicibleTime=" + invicibleTime + ", SlimesKilled=" + slimesKilled + 
+				", Health=" + health + ", MaxHealth=" + maxHealth + ", InvicibleTime=" + invincibleTime + ", SlimesKilled=" + slimesKilled + 
 				", X=" + x + ", Y= " + y + "}";
 	}
 }

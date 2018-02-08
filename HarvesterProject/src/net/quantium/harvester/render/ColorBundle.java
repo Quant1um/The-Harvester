@@ -3,6 +3,7 @@ package net.quantium.harvester.render;
 public class ColorBundle {
 	private int[] colors = new int[6];
 	
+	private ColorBundle() { }
 	public static ColorBundle get(int c0, int c1, int c2, int c3, int c4, int c5){
 		ColorBundle bnd = new ColorBundle();
 		bnd.colors[0] = c0;

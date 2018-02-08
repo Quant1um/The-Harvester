@@ -3,6 +3,7 @@ package net.quantium.harvester.screen;
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.system.text.FontSize;
+import net.quantium.harvester.system.text.TextAlign;
 
 public abstract class Screen {
 	protected ScreenService service;
@@ -44,6 +45,6 @@ public abstract class Screen {
 		render.get().fillRect(x + 2, y + 2, w, h, 111);
 		render.get().fillRect(x, y, w, h, 666);
 		render.get().drawRect(x, y, w, h, 555);
-		if(name != null) render.get().drawText(x + 3, y + 3, FontSize.NORMAL, name, 888);
+		if(name != null) render.get().drawText(x + 3, y + 3, FontSize.NORMAL, name, 888, TextAlign.LEFT);
 	}
 }

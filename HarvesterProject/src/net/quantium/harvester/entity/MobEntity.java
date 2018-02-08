@@ -1,6 +1,6 @@
 package net.quantium.harvester.entity;
 
-public abstract class AggressiveEntity extends AliveEntity {
+public abstract class MobEntity extends LivingEntity {
 
 	/**
 	 * 
@@ -11,7 +11,7 @@ public abstract class AggressiveEntity extends AliveEntity {
 	@Override
 	public void bump(Entity ent) {
 		if(ent instanceof PlayerEntity){
-			((AliveEntity) ent).hit(damage);
+			((LivingEntity) ent).hit(damage);
 		}
 	}
 }

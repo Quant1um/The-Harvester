@@ -7,6 +7,7 @@ import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.components.Button;
 import net.quantium.harvester.system.Session;
 import net.quantium.harvester.system.text.FontSize;
+import net.quantium.harvester.system.text.TextAlign;
 
 public class GameScreen extends MenuScreen{
 	
@@ -20,7 +21,7 @@ public class GameScreen extends MenuScreen{
 			render.get().drawRect(MainScreen.buttonCenterX, 50 + i * 22, MainScreen.buttonSize * Layer.BLOCK_SIZE, 18, 555);
 			String name = Session.getName(i);
 			boolean haveSaving = name != null;
-			render.get().drawText(MainScreen.buttonCenterX + 3, 50 + i * 22 + Layer.BLOCK_SIZE - 3, FontSize.NORMAL, haveSaving ? name : " - ", 888);
+			render.get().drawText(MainScreen.buttonCenterX + 3, 50 + i * 22 + Layer.BLOCK_SIZE - 3, FontSize.NORMAL, haveSaving ? name : " - ", 888, TextAlign.LEFT);
 		}
 		
 		container.render(render);
