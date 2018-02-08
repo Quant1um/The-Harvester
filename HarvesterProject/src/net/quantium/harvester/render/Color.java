@@ -1,5 +1,7 @@
 package net.quantium.harvester.render;
 
+import java.util.Arrays;
+
 public class Color {
 	private static final int[] indexedPalette;
 
@@ -54,32 +56,26 @@ public class Color {
 	}
 	
 	public static void main(String...strings){
-		long nanos = System.nanoTime();
-		
-		for(int i = 0; i < 1000000; i++){
-			lerp((short)000, (short)999, 5);
-			lerp((short)900, (short)9, 8);
-			multiply((short)975, (short)135);
-			lerp((short)000, (short)999, 2);
-		}
-		System.out.println((System.nanoTime() - nanos) / 1000000d / 1e6d);
+		System.out.println("" + Arrays.toString(decompose(12345678, 8)));
 	}
 	
 	//http://forum.arduino.cc/index.php?topic=167414.0
 	private static int[] fastDivMod10(int in){
-		int q = (in >> 1) + (in >> 2);
-		q = q + (q >> 4);
-		q = q + (q >> 8);
- 
-		q = q >> 3;
- 
-		int r = in - ((q << 3) + (q << 1)); 
-		int div = q;
-		if(r > 9) div++;
-		int mod = r;
-		if (r > 9) mod = r - 10; 
-		
-		return new int[] { div, mod };
+		int x = (in >> 1); 
+		int q = x;
+
+		q = (q >> 8) + x;
+		q = (q >> 8) + x;
+		q = (q >> 8) + x;
+		q = (q >> 8) + x + 1;
+
+		x = q;
+		q = (q >> 1) + x;
+		q = (q >> 3) + x;
+		q = (q >> 1) + x;
+
+		int div = (q >> 3);
+		return new int[] { div, in - (((div << 2) + div) << 1) };
 	}
 	
 	private static int[] decompose(int in, int digits){
