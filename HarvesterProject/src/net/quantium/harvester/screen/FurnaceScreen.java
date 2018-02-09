@@ -6,6 +6,7 @@ import net.quantium.harvester.entity.BuildableEntity;
 import net.quantium.harvester.entity.BuildableInfo;
 import net.quantium.harvester.entity.BuildableInfo.BuildableType;
 import net.quantium.harvester.entity.inventory.Inventory;
+import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.render.ColorBundle;
 import net.quantium.harvester.render.Renderer;
@@ -22,10 +23,10 @@ public class FurnaceScreen extends InventoryScreen {
 	
 	public void init(){
 		super.init();
-		container.addFirst(new Button(Main.getInstance().getRenderWidth() - 162, 105, 13, "create", 0){
+		getContainer().addFirst(new Button(Main.getInstance().getRenderWidth() - 162, 105, 13, "create", 0){
 
 			@Override
-			public void onClick(int button) {
+			public void onClick(MouseState button) {
 				if(additionalInventory.get(1) != null) return;
 				ItemSlot cc = Crafts.tryCraftInFurnace(additionalInventory.get(0), entity);
 				if(cc == null) return;

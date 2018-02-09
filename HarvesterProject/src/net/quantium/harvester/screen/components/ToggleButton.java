@@ -3,21 +3,20 @@ package net.quantium.harvester.screen.components;
 import com.sun.glass.events.KeyEvent;
 
 import net.quantium.harvester.input.InputService.Key;
+import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.ColorBundle;
 import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
-import net.quantium.harvester.screen.ScreenService;
 import net.quantium.harvester.system.text.FontSize;
 import net.quantium.harvester.system.text.TextAlign;
 
-public abstract class ToggleButton extends Component {
-	private boolean hover = false;
+public abstract class ToggleButton extends Component implements IValueHolder<Boolean>{
 	private int click = 0;
 	
 	protected int color;
 	protected String text;
 
-	public boolean value;
+	private boolean value;
 
 	public ToggleButton(int x, int y, int bw, String text){
 		this.x = x;
@@ -35,7 +34,7 @@ public abstract class ToggleButton extends Component {
 	@Override
 	public void render(Renderer render, boolean focused) {
 		boolean clicked = isClicked();
-		int color = hover ? 666 : 555;
+		int color = isMouseOver() ? 666 : 555;
 		int offset = clicked ? 1 : 0;
 		render.get().renderPseudo3DRect(x, y, w / Layer.BLOCK_SIZE, 2, color, 777, 444, 666, !clicked);
 		render.get().drawText(x + w - 5 + offset, y + offset + Layer.BLOCK_SIZE - 4, FontSize.NORMAL, text, this.color, TextAlign.RIGHT);
@@ -59,51 +58,42 @@ public abstract class ToggleButton extends Component {
 	}
 
 	@Override
-	public void onMouseClick(int x, int y, int button, boolean selectedNow, boolean first) {
+	public void onMouseClick(int x, int y, MouseState button, boolean first) {
 		click = 5;
 	}
 
 	@Override
-	public boolean onKeyPress(Key key, boolean first) {
-		if(key.code == KeyEvent.VK_SPACE){
+	public void onKeyPress(Key key, boolean first) {
+		if(key.code == KeyEvent.VK_SPACE)
 			click = 5;
-			return true;
-		}
-		return false;
 	}
 
 	@Override
-	public void onMouseWheel(int ticks) {
-
-	}
-
-	@Override
-	public void update(ScreenService scr) {
+	public void update() {
 		if(click > 0){
 			click--;
 			if(click <= 0){
 				value = !value;
-				onToggle(value);
+				onValueChanged(value);
 			}
-				
-				
 		}
-		hover = scr.getInput().isMouseOverButton(x, y, w / Layer.BLOCK_SIZE);
 	}
 
-	public boolean isHover(){
-		return hover;
-	}
-	
 	public boolean isClicked(){
 		return click > 0;
 	}
 	
-	public abstract void onToggle(boolean value);
+	@Override
+	public void onValueChanged(Boolean value){}
 	
 	@Override
-	public void onSelect(){
-		
+	public void setValue(Boolean value){
+		this.value = value;
+	}
+	
+	@Override
+	public Boolean getValue(){
+		return value;
 	}
 	
 	@Override

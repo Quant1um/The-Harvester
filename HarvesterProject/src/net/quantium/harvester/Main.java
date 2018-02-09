@@ -19,7 +19,10 @@ import java.util.Random;
 import javax.swing.JFrame;
 
 import net.quantium.harvester.entity.BuildableInfo;
+import net.quantium.harvester.input.IInputListener;
 import net.quantium.harvester.input.InputService;
+import net.quantium.harvester.input.InputService.Key;
+import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.item.Items;
 import net.quantium.harvester.render.ColorBundle;
 import net.quantium.harvester.render.Renderer;
@@ -41,7 +44,7 @@ import net.quantium.harvester.timehook.TimeHookManager;
 //                 uncommented ununderstandable code
 //                 invalid abstractions
 //                 useless stuff
-public class Main extends Canvas{
+public class Main extends Canvas implements IInputListener{
 	
 	/**
 	 * 
@@ -59,14 +62,13 @@ public class Main extends Canvas{
 	
 	public static final Random GLOBAL_RANDOM = new Random();
 	
-	int frames = 0, 
-		updates = 0;
-	int framesIncompleted = 0, 
-		updatesIncompleted = 0;
+	private int frames = 0, 
+				updates = 0;
+	private int framesIncompleted = 0, 
+				updatesIncompleted = 0;
 
-	private int debugMode = 0;
-	private static final String[] DEBUG_NAMES = new String[]{null, "hitbox", "ai_valuable", "metadata"};
-	
+	private DebugMode debugMode = DebugMode.NONE;
+
 	private boolean active = true;
 	
 	private Renderer renderer;
@@ -75,8 +77,8 @@ public class Main extends Canvas{
 	
 	private JFrame frame;
 	
-	public Session session;
-	public Settings settings = new Settings();
+	private Session session;
+	private Settings settings = new Settings();
 	
 	private static Main _instance;
 	public static Main getInstance(){
@@ -144,7 +146,7 @@ public class Main extends Canvas{
 		
 		renderer = new Renderer(getRenderWidth(), getRenderHeight());
 		inputService = new InputService(this);
-		screenService = new ScreenService(this);
+		screenService = new ScreenService();
 		
 		screenService.setScreen(new MainScreen());
 	}
@@ -170,6 +172,8 @@ public class Main extends Canvas{
 					
 					TimeHookManager.update(delta / NANOSECONDS_PER_SECOND);
 				}
+				
+				Thread.sleep(1);
 			}catch(Throwable e){
 				forceCrashScreen(e);
 			}
@@ -196,12 +200,32 @@ public class Main extends Canvas{
 		return inputService;
 	}
 	
-	public int getDebugMode(){
+	public Session getSession(){
+		return session;
+	}
+	
+	public boolean hasSession(){
+		return session != null;
+	}
+	
+	public void setSession(Session session){
+		this.session = session;
+	}
+	
+	public void resetSession(){
+		session = null;
+	}
+	
+	public Settings getSettings(){
+		return settings;
+	}
+	
+	public DebugMode getDebugMode(){
 		return debugMode;
 	}
 	
 	public void nextDebugMode(){
-		debugMode = (debugMode + 1) % DEBUG_NAMES.length;
+		debugMode = DebugMode.values()[(debugMode.ordinal() + 1) % DebugMode.values().length];
 	}
 	
 	public int getCounter(){
@@ -244,14 +268,30 @@ public class Main extends Canvas{
 		if(screenService.isScreenActive())
 			screenService.current().render(renderer);
 		
-		if(debugMode > 0){
-			renderer.get().drawText(5, 5, FontSize.NORMAL, "debug enabled: " + DEBUG_NAMES[debugMode], 999, TextAlign.LEFT);
-			renderer.get().drawText(5, 15, FontSize.NORMAL, "fps: " + frames, 999, TextAlign.LEFT);
-			renderer.get().drawText(5, 25, FontSize.NORMAL, "ups: " + updates, 999, TextAlign.LEFT);
+		int y = 5;
+		if(debugMode != DebugMode.NONE){
+			renderer.get().drawText(5, y, FontSize.NORMAL, "debug enabled: " + debugMode.name(), 999, TextAlign.LEFT);
+			renderer.get().drawText(5, y += 10, FontSize.NORMAL, "fps: " + frames, 999, TextAlign.LEFT);
+			renderer.get().drawText(5, y += 10, FontSize.NORMAL, "ups: " + updates, 999, TextAlign.LEFT);
 			if(session != null && session.getWorld() != null && session.getWorld().player != null){
-				renderer.get().drawText(5, 35, FontSize.NORMAL, "x: " + session.getWorld().player.x, 999, TextAlign.LEFT);
-				renderer.get().drawText(5, 45, FontSize.NORMAL, "y: " + session.getWorld().player.y, 999, TextAlign.LEFT);
-				renderer.get().drawText(5, 55, FontSize.NORMAL, "time: " + session.getWorld().time, 999, TextAlign.LEFT);
+				renderer.get().drawText(5, y += 10, FontSize.NORMAL, "x: " + session.getWorld().player.x, 999, TextAlign.LEFT);
+				renderer.get().drawText(5, y += 10, FontSize.NORMAL, "y: " + session.getWorld().player.y, 999, TextAlign.LEFT);
+				renderer.get().drawText(5, y += 10, FontSize.NORMAL, "time: " + session.getWorld().time, 999, TextAlign.LEFT);
+			}
+			
+			
+			switch(debugMode){
+				case GUI_INPUT: {
+					if(screenService.isScreenActive())
+						renderer.get().drawText(5, y += 10, FontSize.NORMAL, "screen: " + screenService.current().getClass().getSimpleName(), 999, TextAlign.LEFT);
+					renderer.get().drawText(5, y += 10, FontSize.NORMAL, "mouse x: " + inputService.getMouseX(), 999, TextAlign.LEFT);
+					renderer.get().drawText(5, y += 10, FontSize.NORMAL, "mouse y: " + inputService.getMouseY(), 999, TextAlign.LEFT);
+					for(Key key : inputService.keys()){
+						if(key.isDown())
+							renderer.get().drawText(5, y += 10, FontSize.NORMAL, key.toString(), 888, TextAlign.LEFT);
+					}
+				} break;
+				default: break;
 			}
 		}
 		
@@ -304,5 +344,39 @@ public class Main extends Canvas{
 		if(screenService.current() instanceof CrashScreen)
 			System.exit(-1);
 		screenService.setScreen(new CrashScreen(e));
+	}
+
+	@Override
+	public void onMouseClick(int x, int y, MouseState button, boolean first) {
+		if(session != null) 
+			session.getSpectator().onMouseClick(x, y, button, first);
+		if(screenService.isScreenActive())
+			screenService.current().onMouseClick(x, y, button, first);
+	}
+
+	@Override
+	public void onKeyPress(Key key, boolean first) {
+		if(session != null) 
+			session.getSpectator().onKeyPress(key, first);
+		
+		if(key.isSuppressed()) return;
+		if(screenService.isScreenActive())
+			screenService.current().onKeyPress(key, first);
+	
+		if(key.isSuppressed()) return;
+		if(first && key == inputService.debug)
+			nextDebugMode();
+	}
+
+	@Override
+	public void onMouseWheel(int ticks) {
+		if(session != null) 
+			session.getSpectator().onMouseWheel(ticks);
+		if(screenService.isScreenActive())
+			screenService.current().onMouseWheel(ticks);
+	}
+	
+	public enum DebugMode{
+		NONE, HITBOX, AI_HEATMAP, METADATA, GUI_INPUT
 	}
 }

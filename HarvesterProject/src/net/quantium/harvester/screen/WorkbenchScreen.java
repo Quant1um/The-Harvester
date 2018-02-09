@@ -5,6 +5,7 @@ import net.quantium.harvester.craft.Crafts;
 import net.quantium.harvester.entity.BuildableInfo;
 import net.quantium.harvester.entity.BuildableInfo.BuildableType;
 import net.quantium.harvester.entity.inventory.Inventory;
+import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.render.ColorBundle;
 import net.quantium.harvester.render.Renderer;
@@ -18,16 +19,15 @@ public class WorkbenchScreen extends InventoryScreen {
 	
 	public void init(){
 		super.init();
-		container.addFirst(new Button(Main.getInstance().getRenderWidth() - 162, 105, 13, "create", 0){
+		getContainer().addFirst(new Button(Main.getInstance().getRenderWidth() - 162, 105, 13, "create", 0){
 
 			@Override
-			public void onClick(int button) {
+			public void onClick(MouseState button) {
 				if(additionalInventory.get(2) != null) return;
 				ItemSlot cc = Crafts.tryCraftOnWorkbench(additionalInventory.get(0), additionalInventory.get(1));
 				if(cc == null) return;
 				additionalInventory.set(2, cc);
 			}
-			
 		});
 	}
 	
@@ -36,5 +36,4 @@ public class WorkbenchScreen extends InventoryScreen {
 		super.render(render);
 		render.get().drawColored(Main.getInstance().getRenderWidth() - 120, 75, 3, 4, 4, 2, ColorBundle.get(-1, -1, -1, -1, -1, 888), "gui", 0);
 	}
-
 }

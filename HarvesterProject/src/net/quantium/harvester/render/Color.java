@@ -3,26 +3,29 @@ package net.quantium.harvester.render;
 import java.util.Arrays;
 
 public class Color {
+	public static final int COLOR_CHANNEL = 10;
+	public static final int CHANNEL_MAX_VALUE = COLOR_CHANNEL - 1;
+	public static final int COLORS_IN_PALETTE = COLOR_CHANNEL * COLOR_CHANNEL * COLOR_CHANNEL;
+	
 	private static final int[] indexedPalette;
 
 	static{ 
-		indexedPalette = new int[1000];
-		int step = 255 / 10;
-		for(int i = 0; i < 10; i++){
-			for(int j = 0; j < 10; j++){
-				for(int k = 0; k < 10; k++){
+		indexedPalette = new int[COLORS_IN_PALETTE];
+		int step = 255 / COLOR_CHANNEL;
+		for(int i = 0; i < COLOR_CHANNEL; i++){
+			for(int j = 0; j < COLOR_CHANNEL; j++){
+				for(int k = 0; k < COLOR_CHANNEL; k++){
 					java.awt.Color c = new java.awt.Color(step * i, step * j, step * k);
-					indexedPalette[i * 100 + j * 10 + k] = (c.getRed() + step / 2) << 16 | (c.getGreen() + step / 2) << 8 | (c.getBlue() + step / 2);
+					indexedPalette[i * COLOR_CHANNEL * COLOR_CHANNEL + j * COLOR_CHANNEL + k] = (c.getRed() + step / 2) << 16 | (c.getGreen() + step / 2) << 8 | (c.getBlue() + step / 2);
 				}
 			}
 		}
 	}
 	
 	public static int get(short idx){
-		if(idx < 0 || idx >= 1000) return -1;
 		return indexedPalette[idx];
 	}
-		
+	
 	public static short lerp(short original, short target, int transition){
 		int[] o = decompose(original, 3);
 		int[] t = decompose(target, 3);
@@ -94,16 +97,16 @@ public class Color {
 	}
 	
 	public static short convertColor(int color){
-		int step = 255 / 10;
+		int step = 255 / COLOR_CHANNEL;
 		int r = (color >> 16) & 255;
 		int g = (color >> 8) & 255;
 		int b = (color) & 255;
 		r /= step;
-		if(r > 9) r = 9;
+		if(r > CHANNEL_MAX_VALUE) r = CHANNEL_MAX_VALUE;
 		g /= step;
-		if(g > 9) g = 9;
+		if(g > CHANNEL_MAX_VALUE) g = CHANNEL_MAX_VALUE;
 		b /= step;
-		if(b > 9) b = 9;
-		return (short) (r * 100 + g * 10 + b);
+		if(b > CHANNEL_MAX_VALUE) b = CHANNEL_MAX_VALUE;
+		return (short) (r * COLOR_CHANNEL * COLOR_CHANNEL + g * COLOR_CHANNEL + b);
 	}
 }

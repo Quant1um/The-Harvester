@@ -3,6 +3,7 @@ package net.quantium.harvester.item;
 import java.io.Serializable;
 
 import net.quantium.harvester.Main;
+import net.quantium.harvester.Main.DebugMode;
 import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.system.text.FontSize;
@@ -78,7 +79,7 @@ public class ItemSlot implements Serializable{
 			render.get().drawText(x + 2 * Layer.BLOCK_SIZE + 1, y + 2 * Layer.BLOCK_SIZE - 8 + 1, FontSize.NORMAL, ss, 000, TextAlign.RIGHT);
 			render.get().drawText(x + 2 * Layer.BLOCK_SIZE,     y + 2 * Layer.BLOCK_SIZE - 8, FontSize.NORMAL, ss, 777, TextAlign.RIGHT);
 		}
-		if(Main.getInstance().getDebugMode() == 3){
+		if(Main.getInstance().getDebugMode() == DebugMode.METADATA){
 			render.get().drawText(x, y, FontSize.SMALL, String.valueOf(item.meta), 358, TextAlign.LEFT);
 		}
 	}

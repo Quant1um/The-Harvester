@@ -1,6 +1,7 @@
 package net.quantium.harvester.screen.components;
 
 import net.quantium.harvester.entity.inventory.Inventory;
+import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.item.ItemSlot.MergedItem;
 import net.quantium.harvester.render.Renderer;
@@ -23,8 +24,8 @@ public class InventoryLayout extends AbstractContainer<InventorySlot>{
 	}
 	
 	@Override
-	public void onMouseClick(int x, int y, int button, boolean selectedNow, boolean first){
-		if(button == 4){
+	public void onMouseClick(int x, int y, MouseState button, boolean first){
+		if(button == MouseState.RELEASED){
 			if(selectedSlot0 >= 0 && selectedSlot1 >= 0){
 				switch(mode){
 					case SEPARATE: separate(selectedSlot0, selectedSlot1); break;
@@ -37,15 +38,13 @@ public class InventoryLayout extends AbstractContainer<InventorySlot>{
 			}
 			return;
 		}
-		mode = button == 3 ? InventoryManipulationMode.SEPARATE :
-							 InventoryManipulationMode.MERGE_SWAP;
-		boolean sNow = false;
+		mode = button == MouseState.RIGHT ? InventoryManipulationMode.SEPARATE :
+							 				InventoryManipulationMode.MERGE_SWAP;
 		int c = getIndexOn(x, y);
 		if(c >= 0){
 			if(focused != c){
 				focused = c;
 				comps.get(c).onSelect();
-				sNow = true;
 			}
 		}else{
 			focused = -1;
@@ -53,7 +52,7 @@ public class InventoryLayout extends AbstractContainer<InventorySlot>{
 		if(focused >= 0 && focused < comps.size()){
 			if(first) selectedSlot0 = focused;
 			else selectedSlot1 = focused;
-			comps.get(focused).onMouseClick(x, y, button, sNow, first);
+			comps.get(focused).onMouseClick(x, y, button, first);
 		}
 	}
 	
@@ -72,20 +71,20 @@ public class InventoryLayout extends AbstractContainer<InventorySlot>{
 		if(slot0 >= 0 && slot0 < this.comps.size() && slot1 >= 0 && slot1 < this.comps.size()){
 			InventorySlot c0 = this.comps.get(slot0);
 			InventorySlot c1 = this.comps.get(slot1);
-			if(c0.inv.get(c0.slot) != null && c0.inv.get(c0.slot).equalsIgnoreCount(c1.inv.get(c1.slot))){
-				MergedItem temp = ItemSlot.merge(c0.inv.get(c0.slot), c1.inv.get(c1.slot));
+			if(c0.getValue() != null && c0.getValue().equalsIgnoreCount(c1.getValue())){
+				MergedItem temp = ItemSlot.merge(c0.getValue(), c1.getValue());
 				if(!temp.isMerged()){
-					ItemSlot temp2 = c0.inv.get(c0.slot);
-					c0.inv.set(c0.slot, c1.inv.get(c1.slot));
-					c1.inv.set(c1.slot, temp2);
+					ItemSlot temp2 = c0.getValue();
+					c0.setValue(c1.getValue());
+					c1.setValue(temp2);
 				}else{
-					c0.inv.set(c0.slot, temp.getOther());
-					c1.inv.set(c1.slot, temp.getSlot());
+					c0.setValue(temp.getOther());
+					c1.setValue(temp.getSlot());
 				}
 			}else{
-				ItemSlot temp = c0.inv.get(c0.slot);
-				c0.inv.set(c0.slot, c1.inv.get(c1.slot));
-				c1.inv.set(c1.slot, temp);
+				ItemSlot temp2 = c0.getValue();
+				c0.setValue(c1.getValue());
+				c1.setValue(temp2);
 			}
 		}
 	}
@@ -95,8 +94,8 @@ public class InventoryLayout extends AbstractContainer<InventorySlot>{
 		if(slot0 >= 0 && slot0 < this.comps.size() && slot1 >= 0 && slot1 < this.comps.size()){
 			InventorySlot c0 = this.comps.get(slot0);
 			InventorySlot c1 = this.comps.get(slot1);
-			ItemSlot is0 = c0.inv.get(c0.slot);
-			ItemSlot is1 = c1.inv.get(c1.slot);
+			ItemSlot is0 = c0.getValue();
+			ItemSlot is1 = c1.getValue();
 			//if(c0.inv.get(c0.slot) != null && c1.inv.get(c1.slot) != null) return;
 			if(is0 != null && (is1 == null || is0.equalsIgnoreCount(is1))){		
 				if(is0.getCount() <= 1){
@@ -109,7 +108,7 @@ public class InventoryLayout extends AbstractContainer<InventorySlot>{
 					if(is0.consume(1)){
 						ItemSlot temp = is0.copy();
 						is0.count = 1;
-						c1.inv.set(c1.slot, temp);
+						c1.setValue(temp);
 					}
 				}
 			}

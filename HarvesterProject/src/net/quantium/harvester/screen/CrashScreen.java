@@ -1,7 +1,6 @@
 package net.quantium.harvester.screen;
 
 import net.quantium.harvester.Main;
-import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.system.text.FontSize;
 import net.quantium.harvester.system.text.TextAlign;
@@ -23,7 +22,7 @@ public class CrashScreen extends Screen{
 		TimeHookManager.register(new TimeHook(5d, false){
 			@Override
 			public void elapsed() {
-				System.exit(-1);
+				Main.getInstance().forceExit();
 			}			
 		});
 	}
@@ -41,33 +40,4 @@ public class CrashScreen extends Screen{
 		if(throwable.getMessage() != null) throwableMessage += ": " + throwable.getMessage();
 		render.get().drawText(Main.getInstance().getRenderWidth() / 2, 40, FontSize.NORMAL, throwableMessage, 888, TextAlign.CENTER, false);
 	}
-
-	@Override
-	public void dispose() {}
-	
-	@Override
-	public void onMouseClick(int x, int y, int button, boolean first) {
-
-	}
-
-	@Override
-	public void onKeyPress(Key key, boolean first) {
-		
-	}
-
-	@Override
-	public void onKeyWrite(char key, boolean backspace, boolean submit) {
-
-	}
-
-	@Override
-	public void onMouseWheel(int ticks) {
-
-	}
-
-	@Override
-	public void shown() {
-
-	}
-	
 }

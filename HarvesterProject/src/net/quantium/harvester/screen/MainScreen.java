@@ -2,7 +2,7 @@ package net.quantium.harvester.screen;
 
 
 import net.quantium.harvester.Main;
-import net.quantium.harvester.input.InputService.Key;
+import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.components.Button;
@@ -26,10 +26,10 @@ public class MainScreen extends MenuScreen {
 		super.init();
 		for(int i = 0; i < 3; i++){
 			final Screen scr = screens[i];
-			container.add(new Button(buttonCenterX, 80 + i * 20, buttonSize, names[i], i){
+			getContainer().add(new Button(buttonCenterX, 80 + i * 20, buttonSize, names[i], i){
 
 				@Override
-				public void onClick(int button) {
+				public void onClick(MouseState button) {
 					service.setScreen(scr);
 				}
 				
@@ -42,10 +42,10 @@ public class MainScreen extends MenuScreen {
 			});
 		}
 		
-		container.add(new Button(buttonCenterX, 140, buttonSize, names[3], 3){
+		getContainer().add(new Button(buttonCenterX, 140, buttonSize, names[3], 3){
 
 			@Override
-			public void onClick(int button) {
+			public void onClick(MouseState button) {
 				Main.getInstance().forceExit();
 			}
 			
@@ -61,39 +61,7 @@ public class MainScreen extends MenuScreen {
 	@Override
 	public void render(Renderer render) {
 		super.render(render);
-		
 		render.get().drawText(Main.getInstance().getRenderWidth() / 2 + shadowOffset, 35 + shadowOffset, FontSize.BIG, Main.NAME, 0, 0, 0, TextAlign.CENTER);
 		render.get().drawText(Main.getInstance().getRenderWidth() / 2, 35, FontSize.BIG, Main.NAME, 474, 686, 353, TextAlign.CENTER);
-		
-		container.render(render);
-	}
-
-	@Override
-	public void dispose() {
-		
-	}
-
-	@Override
-	public void onMouseClick(int x, int y, int button, boolean first) {
-		container.onMouseClick(x, y, button, first);
-	}
-
-	@Override
-	public void onKeyPress(Key key, boolean first) {
-		container.onKeyPress(key, first);
-	}
-
-	@Override
-	public void onMouseWheel(int ticks) {
-		container.onMouseWheel(ticks);
-	}
-
-	@Override
-	public void onKeyWrite(char key, boolean backspace, boolean submit) {
-		container.onKeyWrite(key, backspace,  submit);
-	}
-
-	@Override
-	public void shown() {
 	}
 }

@@ -8,16 +8,14 @@ import net.quantium.harvester.entity.inventory.Inventory;
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.components.ActiveInventorySlot;
-import net.quantium.harvester.screen.components.Container;
 import net.quantium.harvester.screen.components.InventoryLayout;
 import net.quantium.harvester.screen.components.InventorySlot;
 
-public class InventoryScreen extends Screen {
+public class InventoryScreen extends IngameScreen {
 
 	protected Inventory inventory, additionalInventory;
 	protected BuildableBehavior behavior;
 	protected boolean isDual;
-	protected Container container;
 	
 	public static final int SLOTS_PER_ROW = 4;
 	public static final int EMPTYSPACE = (120 - SLOTS_PER_ROW * 24) / SLOTS_PER_ROW - 2;
@@ -32,9 +30,7 @@ public class InventoryScreen extends Screen {
 	
 	@Override
 	protected void init() {
-		this.mustRenderGame = true;
-		this.mustUpdateGame = true;
-		container = new Container();
+		super.init();
 		InventoryLayout first = new InventoryLayout(0, 0, Main.getInstance().getRenderWidth(), Main.getInstance().getRenderHeight(), inventory);
 		first.add(new ActiveInventorySlot(50 + EMPTYSPACE, 50 + EMPTYSPACE + 12, inventory, 0));
 		for(int i = 1; i < inventory.size(); i++){
@@ -52,12 +48,12 @@ public class InventoryScreen extends Screen {
 				}
 			}
 		}
-		container.add(first);
+		getContainer().add(first);
 	}
 
 	@Override
 	public void update() {
-		container.update(service);
+		super.update();
 	}
 
 	@Override
@@ -66,38 +62,13 @@ public class InventoryScreen extends Screen {
 		if(isDual){
 			renderBox(render, Main.getInstance().getRenderWidth() - 170, 50, 120, behavior.boxHeight, behavior.name);
 		}
-		container.render(render);
+		super.render(render);
 	}
- 
+	
 	@Override
-	public void dispose() {
-
-	}
-
-	@Override
-	public void onMouseClick(int x, int y, int button, boolean first) {
-		container.onMouseClick(x, y, button, first);
-	}
-
-	@Override
-	public void onKeyPress(Key key, boolean first) {
-		container.onKeyPress(key, first);
-		if((key.code == KeyEvent.VK_ESCAPE || key.code == KeyEvent.VK_E) && first)
+	public void onKeyPress(Key key, boolean first){
+		super.onKeyPress(key, first);
+		if(key.code == KeyEvent.VK_E && first)
 			service.back();
-	}
-
-	@Override
-	public void onKeyWrite(char key, boolean backspace, boolean submit) {
-		container.onKeyWrite(key, backspace, submit);
-	}
-
-	@Override
-	public void onMouseWheel(int ticks) {
-		container.onMouseWheel(ticks);
-	}
-
-	@Override
-	public void shown() {
-		
 	}
 }

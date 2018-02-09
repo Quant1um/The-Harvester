@@ -60,10 +60,12 @@ public class Session {
 	}
 	
 	public void render(Renderer render){
-		render.get().setOffset(player.getXOffset(), player.getYOffset());
+		render.get().push();
+		render.get().transform().translate(player.getXOffset(), player.getYOffset());
+		//if(Main.getInstance().getDebugMode() != 0) render.get().transform().tint(Color.lerp((short)338, (short)999, (world.time < 43200 ? world.time : 43200 - (world.time - 43200)) / 4320));
 		for(int i = 0; i < 3; i++)
 			world.renderLayer(render, i);
-		render.get().setOffset(0, 0);
+		render.get().pop();
 
 	}
 

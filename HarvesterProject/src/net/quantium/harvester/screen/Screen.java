@@ -1,11 +1,13 @@
 package net.quantium.harvester.screen;
 
+import net.quantium.harvester.input.IInputListener;
 import net.quantium.harvester.input.InputService.Key;
+import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.system.text.FontSize;
 import net.quantium.harvester.system.text.TextAlign;
 
-public abstract class Screen {
+public abstract class Screen implements IInputListener {
 	protected ScreenService service;
 	protected Screen parent;
 	
@@ -15,21 +17,16 @@ public abstract class Screen {
 	public boolean mustUpdateGame = false;
 	public boolean showCursor = true;
 	
-	protected abstract void init();
-	
+	protected void init(){}
+	public void shown(){}
 	public abstract void update();
-	
 	public abstract void render(Renderer render);
+	public void release(){}
 	
-	public abstract void dispose();
-	
-	public abstract void onMouseClick(int x, int y, int button, boolean first);
-	
-	public abstract void onKeyPress(Key key, boolean first);
-	
-	public abstract void onKeyWrite(char key, boolean backspace, boolean submit);
-	
-	public abstract void onMouseWheel(int ticks);
+	@Override public void onMouseClick(int x, int y, MouseState button, boolean first){}
+	@Override public void onKeyPress(Key key, boolean first){}
+	@Override public void onMouseWheel(int ticks){}
+	public void onKeyWrite(char key, boolean backspace, boolean submit){}
 	
 	public void initialize(ScreenService service, Screen parent){
 		if(isInitialized) return;
@@ -38,8 +35,6 @@ public abstract class Screen {
 		this.service = service;
 		this.parent = parent;
 	}
-	
-	public abstract void shown();
 	
 	public static void renderBox(Renderer render, int x, int y, int w, int h, String name){
 		render.get().fillRect(x + 2, y + 2, w, h, 111);

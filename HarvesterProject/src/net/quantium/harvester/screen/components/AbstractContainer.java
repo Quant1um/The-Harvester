@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.quantium.harvester.input.InputService.Key;
+import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.Renderer;
-import net.quantium.harvester.screen.ScreenService;
 
 public class AbstractContainer<T extends Component> extends Component{
 	protected List<T> comps = new ArrayList<T>();
-	
 	protected int focused = -1;
 	
 	@Override
@@ -19,38 +18,23 @@ public class AbstractContainer<T extends Component> extends Component{
 	}
 	
 	@Override
-	public void onMouseClick(int x, int y, int button, boolean selectedNow, boolean first){
-		boolean sNow = false;
+	public void onMouseClick(int x, int y, MouseState button, boolean first){
 		int c = getIndexOn(x, y);
 		if(c >= 0){
 			if(focused != c){
 				focused = c;
 				comps.get(c).onSelect();
-				sNow = true;
 			}
-		}else{
+		}else
 			focused = -1;
-		}
 		if(focused >= 0 && focused < comps.size())
-			comps.get(focused).onMouseClick(x, y, button, sNow, first);
+			comps.get(focused).onMouseClick(x, y, button, first);
 	}
 	
 	@Override
-	public boolean onKeyPress(Key key, boolean first){
-		//boolean ff = false;
+	public void onKeyPress(Key key, boolean first){
 		if(focused >= 0 && focused < comps.size())
-			/*ff = */ comps.get(focused).onKeyPress(key, first);
-		/*
-		if(!ff && first){
-			if(key.code == KeyEvent.VK_UP){
-				focused--;
-				if(focused < 0) focused = comps.size() - 1;
-			}else if(key.code == KeyEvent.VK_DOWN){
-				focused++;
-				if(focused >= comps.size()) focused = 0;
-			}
-		}*/
-		return true;
+			comps.get(focused).onKeyPress(key, first);
 	}
 	
 	@Override
@@ -60,9 +44,15 @@ public class AbstractContainer<T extends Component> extends Component{
 	}
 	
 	@Override
-	public void update(ScreenService scr){
+	public void onKeyWrite(char key, boolean backspace, boolean submit) {
+		if(focused >= 0 && focused < comps.size())
+			comps.get(focused).onKeyWrite(key, backspace, submit);
+	}
+	
+	@Override
+	public void update(){
 		for(int i = 0; i < comps.size(); i++)
-			comps.get(i).update(scr);
+			comps.get(i).update();
 	}
 	
 	public int getIndexOn(int x, int y){
@@ -84,6 +74,14 @@ public class AbstractContainer<T extends Component> extends Component{
 		comps.add(c);
 	}
 	
+	public void add(int id, T c){
+		comps.add(id, c);
+	}
+	
+	public void addFirst(T c){
+		add(0, c);
+	}
+	
 	public void remove(T c){
 		focused = -1;
 		comps.remove(c);
@@ -96,15 +94,5 @@ public class AbstractContainer<T extends Component> extends Component{
 	
 	public void render(Renderer render){
 		render(render, false);
-	}
-	
-	public void onMouseClick(int x, int y, int button, boolean first){
-		onMouseClick(x, y, button, false, first);
-	}
-
-	@Override
-	public void onKeyWrite(char key, boolean backspace, boolean submit) {
-		if(focused >= 0 && focused < comps.size())
-			comps.get(focused).onKeyWrite(key, backspace, submit);
 	}
 }

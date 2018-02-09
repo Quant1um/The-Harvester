@@ -68,7 +68,7 @@ public class IOContainer{
 				file.createNewFile();
 			FileOutputStream f = new FileOutputStream(file);
 		    ObjectOutputStream o = new ObjectOutputStream(f);
-		    o.writeObject(map);
+		    o.writeObject(map); //todo possible crash concurrent (on game exit)
 		    o.close();
 		    f.close();
 		    System.gc();//dirty trick

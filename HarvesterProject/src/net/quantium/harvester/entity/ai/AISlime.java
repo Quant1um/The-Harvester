@@ -22,8 +22,8 @@ public class AISlime implements AIBehavior<SlimeEntity> {
 			
 			if((entity.world.player.x - entity.x) * (entity.world.player.x - entity.x) + (entity.world.player.y - entity.y) * (entity.world.player.y - entity.y) <= PLAYER_CHECK_DISTANCE * PLAYER_CHECK_DISTANCE){
 				
-					xx += AIEntity.getTargettedOffsetX(entity.world, entity.x >> 4, entity.y >> 4);
-					yy += AIEntity.getTargettedOffsetY(entity.world, entity.x >> 4, entity.y >> 4);
+					xx += AIEntity.getTargettedOffsetX(entity.world, entity.x >> 4, entity.y >> 4) * 3;
+					yy += AIEntity.getTargettedOffsetY(entity.world, entity.x >> 4, entity.y >> 4) * 3;
 					
 					if((entity.world.player.x - entity.x) * (entity.world.player.x - entity.x) + (entity.world.player.y - entity.y) * (entity.world.player.y - entity.y) > PLAYER_AIVALUE_DISTANCE * PLAYER_AIVALUE_DISTANCE){
 						xx += entity.world.player.x - entity.x;
@@ -38,6 +38,7 @@ public class AISlime implements AIBehavior<SlimeEntity> {
 			}
 			
 		}
+		
 		entity.move((int)Math.signum(xx), (int)Math.signum(yy));
 	}
 

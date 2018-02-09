@@ -2,6 +2,7 @@ package net.quantium.harvester.screen;
 
 import net.quantium.harvester.Main;
 import net.quantium.harvester.input.InputService.Key;
+import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.components.Button;
 import net.quantium.harvester.system.text.FontSize;
@@ -16,7 +17,7 @@ private Button back;
 		back = new Button(5, 5, 7, "back", 5, 1){
 
 			@Override
-			public void onClick(int button) {
+			public void onClick(MouseState button) {
 				service.back();
 			}
 			
@@ -30,7 +31,7 @@ private Button back;
 
 	@Override
 	public void update() {
-		back.update(service);
+		back.update();
 	}
 
 	@Override
@@ -61,13 +62,8 @@ private Button back;
 	}
 
 	@Override
-	public void dispose() {
-
-	}
-
-	@Override
-	public void onMouseClick(int x, int y, int button, boolean first) {
-		back.onMouseClick(x, y, button, true, first);
+	public void onMouseClick(int x, int y, MouseState button, boolean first) {
+		back.onMouseClick(x, y, button, first);
 	}
 
 	@Override

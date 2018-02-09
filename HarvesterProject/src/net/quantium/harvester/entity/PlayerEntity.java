@@ -3,13 +3,12 @@ package net.quantium.harvester.entity;
 import java.util.List;
 import java.util.Random;
 
-import com.sun.glass.events.KeyEvent;
-
 import net.quantium.harvester.ExternalUtils;
 import net.quantium.harvester.Main;
 import net.quantium.harvester.entity.hitbox.Hitbox;
 import net.quantium.harvester.entity.inventory.Inventory;
 import net.quantium.harvester.input.InputService.Key;
+import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.item.Item;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.item.ToolItem.ToolType;
@@ -81,10 +80,10 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 		
 		int shouldMoveX = 0;
 		int shouldMoveY = 0;
-		if(getScreenService().getInput().w.down) shouldMoveY--;
-		if(getScreenService().getInput().s.down) shouldMoveY++;
-		if(getScreenService().getInput().a.down) shouldMoveX--;
-		if(getScreenService().getInput().d.down) shouldMoveX++;
+		if(Main.getInstance().getInputService().w.isDown()) shouldMoveY--;
+		if(Main.getInstance().getInputService().s.isDown()) shouldMoveY++;
+		if(Main.getInstance().getInputService().a.isDown()) shouldMoveX--;
+		if(Main.getInstance().getInputService().d.isDown()) shouldMoveX++;
 		move(shouldMoveX, shouldMoveY);
 		if(shouldMoveX != 0 || shouldMoveY != 0) requestAnimation = true;
 		
@@ -147,7 +146,7 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 	}
 
 	@Override
-	public void onMouseClick(int x, int y, int button) {
+	public void onMouseClick(int x, int y, MouseState button, boolean first) {
 		int xx = x + this.getXOffset();
 		int yy = y + this.getYOffset();
 		intTime = 5;
@@ -155,18 +154,23 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 			if(interactionTime > 0) return;
 			interactionTime = 20;
 			
+			InteractionMode mode = InteractionMode.OTHER;
+			switch(button){
+				case LEFT: mode = InteractionMode.LEFT; break;
+				case RIGHT: mode = InteractionMode.RIGHT; break;
+				default: break;
+			}
+			
 			List<Entity> ents = world.interact(this, xx, yy);
 			for(Entity e : ents)
-				if(e.onInteract(world, this, button == 1 ? InteractionMode.LEFT : button == 3 ? InteractionMode.RIGHT : InteractionMode.OTHER, inventory.get(0))) return;
+				if(e.onInteract(world, this, mode, inventory.get(0))) return;
 			if(inventory.get(0) == null || Item.Registry.get(inventory.get(0).getItem()) == null || !Item.Registry.get(inventory.get(0).getItem()).
 					interact(world, xx, 
 							yy, 
 							this, 
-							button == 1 ? InteractionMode.LEFT : 
-							button == 3 ? InteractionMode.RIGHT : 
-								          InteractionMode.OTHER, 
+							mode,
 						    inventory.get(0))){
-				Tile.Registry.get(world.getTile(xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT)).onInteract(world, xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT, this, button == 1 ? InteractionMode.LEFT : button == 3 ? InteractionMode.RIGHT : InteractionMode.OTHER);
+				Tile.Registry.get(world.getTile(xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT)).onInteract(world, xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT, this, mode);
 				Tile.Registry.get(world.getTile(xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT)).hit(world, xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT, this, 1, ToolType.NONE);
 			}else{
 				if(requestedHitLevel > 0 && intTime > 0)
@@ -177,21 +181,21 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 
 	@Override
 	public void onKeyPress(Key key, boolean first) {
+		if(getScreenService().isScreenActive()) return;
 		
-		if(key.code == KeyEvent.VK_ESCAPE && first){
-			getScreenService().setScreen(new PauseScreen());
+		if(key == Main.getInstance().getInputService().escape && first){
+			getScreenService().setScreen(new PauseScreen());	
+			key.suppress();
 		}
 		
-		if(key.code == KeyEvent.VK_E && first){
+		if(key == Main.getInstance().getInputService().inventory && first){
 			getScreenService().setScreen(new InventoryScreen(inventory, null, null));
+			key.suppress();
 		}
 	}
 
 	@Override
-	public void onMouseWheel(int ticks) {
-		
-	}
-
+	public void onMouseWheel(int ticks) {}
 	@Override
 	public boolean onInteract(World world2, PlayerEntity playerEntity, InteractionMode im, ItemSlot item) {
 		return false;

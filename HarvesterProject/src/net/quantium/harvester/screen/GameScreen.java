@@ -1,7 +1,7 @@
 package net.quantium.harvester.screen;
 
 import net.quantium.harvester.Main;
-import net.quantium.harvester.input.InputService.Key;
+import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.components.Button;
@@ -24,44 +24,15 @@ public class GameScreen extends MenuScreen{
 			render.get().drawText(MainScreen.buttonCenterX + 3, 50 + i * 22 + Layer.BLOCK_SIZE - 3, FontSize.NORMAL, haveSaving ? name : " - ", 888, TextAlign.LEFT);
 		}
 		
-		container.render(render);
+		getContainer().render(render);
 	}
 
-	@Override
-	public void dispose() {
-		
-		
-	}
 
 	@Override
-	public void onMouseClick(int x, int y, int button, boolean first) {
-		container.onMouseClick(x, y, button, first);
-		
-	}
-
-	@Override
-	public void onKeyPress(Key key, boolean first) {
-		container.onKeyPress(key, first);
-		
-	}
-
-	@Override
-	public void onKeyWrite(char key, boolean backspace, boolean submit) {
-		container.onKeyWrite(key, backspace, submit);
-		
-	}
-
-	@Override
-	public void onMouseWheel(int ticks) {
-		container.onMouseWheel(ticks);
-	}
-
-	@Override
-	public void shown() {
-		container.add(new Button(5, 5, 7, "back", 5, 1){
-
+	public void init() {
+		getContainer().add(new Button(5, 5, 7, "back", 5, 1){
 			@Override
-			public void onClick(int button) {
+			public void onClick(MouseState button) {
 				service.back();
 			}
 			
@@ -77,31 +48,31 @@ public class GameScreen extends MenuScreen{
 			boolean haveSaving = name != null;
 			final int j = i;
 			if(haveSaving){
-				container.add(new Button(MainScreen.buttonCenterX + (MainScreen.buttonSize - 2) * Layer.BLOCK_SIZE - 1, 51 + i * 22, 2, "", 6){
+				getContainer().add(new Button(MainScreen.buttonCenterX + (MainScreen.buttonSize - 2) * Layer.BLOCK_SIZE - 1, 51 + i * 22, 2, "", 6){
 
 					@Override
-					public void onClick(int button) {
+					public void onClick(MouseState button) {
 						service.setScreen(new DeleteScreen(j));
 					}
 				
 				});
 				
-				container.add(new Button(MainScreen.buttonCenterX + (MainScreen.buttonSize - 4) * Layer.BLOCK_SIZE - 3, 51 + i * 22, 2, "", 7){
+				getContainer().add(new Button(MainScreen.buttonCenterX + (MainScreen.buttonSize - 4) * Layer.BLOCK_SIZE - 3, 51 + i * 22, 2, "", 7){
 
 					@Override
-					public void onClick(int button) {
-						Main.getInstance().session = Session.load(j);
-						if(Main.getInstance().session == null) return;
-						service.setScreen(Main.getInstance().session.getPlayer().died ? 
-										  new DeathScreen(Main.getInstance().session.getPlayer()) : null);
+					public void onClick(MouseState button) {
+						Main.getInstance().setSession(Session.load(j));
+						if(!Main.getInstance().hasSession()) return;
+						service.setScreen(Main.getInstance().getSession().getPlayer().died ? 
+										  new DeathScreen(Main.getInstance().getSession().getPlayer()) : null);
 					}
 				
 				});
 			}else{
-				container.add(new Button(MainScreen.buttonCenterX + (MainScreen.buttonSize - 2) * Layer.BLOCK_SIZE - 1, 51 + i * 22, 2, "", 0){
+				getContainer().add(new Button(MainScreen.buttonCenterX + (MainScreen.buttonSize - 2) * Layer.BLOCK_SIZE - 1, 51 + i * 22, 2, "", 0){
 
 					@Override
-					public void onClick(int button) {
+					public void onClick(MouseState button) {
 						service.setScreen(new CreateScreen(j));
 					}
 				

@@ -1,5 +1,7 @@
 package net.quantium.harvester.render;
 
+import java.util.Stack;
+
 import net.quantium.harvester.resources.ColorableImageContainer;
 import net.quantium.harvester.resources.ImageContainer;
 import net.quantium.harvester.resources.ResourceLoader;
@@ -13,16 +15,29 @@ public class Layer {
 	public static final int MIRRORFLAG_HORIZONTAL = 1;
 	public static final int MIRRORFLAG_VERTICAL = 2;
 	public static final int MIRRORFLAG_BOTH = 3;
-	
 	public static final int BLOCK_SIZE = 8;
-	
 	public static final int BLOCKS_ROWSIZE = 16;
+	public static final int MAX_STACK_SIZE = 128;
 	
 	private short data[];
 	private final int w, h;
-	
 	public int clipX0, clipY0, clipX1, clipY1;	
-	public int offsetX, offsetY;
+	
+	private Stack<Transform> transformStack = new Stack<Transform>();
+	private Transform transform = Transform.IDENTITY;
+	public Transform transform(){
+		return transform;
+	}
+	
+	public void push(){
+		if(transformStack.size() >= MAX_STACK_SIZE) 
+			throw new StackOverflowError();
+		transformStack.push(new Transform(transform));
+	}
+	
+	public void pop(){
+		transform = transformStack.pop();
+	}
 	
 	public Layer(int w, int h){
 		this.w = w;
@@ -45,11 +60,14 @@ public class Layer {
 	
 	public void put(int x, int y, int c){
 		if(c < 0) return;
-		
-		x -= offsetX;
-		y -= offsetY;
+
+		x -= transform.x;
+		y -= transform.y;
 		if(x < 0 || y < 0 || x >= w || y >= h) return;
 		if(x < clipX0 || y < clipY0 || x >= clipX1 || y >= clipY1) return;
+		
+		if(transform.colorTint < 999)
+			c = Color.multiply((short)c, transform.colorTint);
 		
 		if(c > 999)
 			c = Color.lerp(data[x + y * w], (short)(c % 1000), c / 1000);
@@ -58,8 +76,8 @@ public class Layer {
 	}
 	
 	public short get(int x, int y){
-		x -= offsetX;
-		y -= offsetY;
+		x -= transform.x;
+		y -= transform.y;
 		if(x < 0 || y < 0 || x >= w || y >= h) return 0;
 		return data[x + y * w];
 	}
@@ -159,15 +177,6 @@ public class Layer {
 		this.clipX1 = w;
 		this.clipY0 = 0;
 		this.clipY1 = h;
-	}
-	
-	public void resetOffset(){
-		this.offsetX = this.offsetY = 0;
-	}
-	
-	public void setOffset(int x, int y){
-		this.offsetX = x;
-		this.offsetY = y;
 	}
 	
 	public void draw(int x, int y, int tx, int ty, int w, int h, String sprId, int mirrorFlags){	
@@ -294,6 +303,6 @@ public class Layer {
 	
 	@Override
 	public String toString(){
-		return "Layer{Width=" + w + ", Height=" + h + ", OffsetX=" + offsetX + ", OffsetY=" + offsetY + ", Clip={" + clipX0 + ", " + clipY0 + ", " + clipX1 + ", " + clipY1 + "}}";
+		return "Layer{Width=" + w + ", Height=" + h + ", Transform=" + transform + ", Clip={" + clipX0 + ", " + clipY0 + ", " + clipX1 + ", " + clipY1 + "}}";
 	}
 }

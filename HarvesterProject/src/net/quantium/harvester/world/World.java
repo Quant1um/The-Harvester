@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.quantium.harvester.Main;
+import net.quantium.harvester.Main.DebugMode;
 import net.quantium.harvester.entity.MobEntity;
 import net.quantium.harvester.entity.CollidableTileEntity;
 import net.quantium.harvester.entity.DamageParticle;
@@ -34,7 +35,7 @@ public class World implements Serializable{
 	public static final int RENDERLAYER_ENTITY = 1;
 	public static final int RENDERLAYER_PARTICLE = 2;
 	
-	public static final int TIME_PER_TICK = 2;
+	public static final int TIME_PER_TICK = 20;
 	
 	public static final int ENTITY_TILE_COORDSCALE = 16;
 	public static final int ENTITY_TILE_COORDSHIFT = 4;
@@ -94,7 +95,8 @@ public class World implements Serializable{
 		
 		if((Main.getInstance().getCounter() & 7) == 0)
 			for(int i = 0; i < w * h; i++)
-				if(aiTargetMap[i] > 0) aiTargetMap[i] -= 5;
+				if(aiTargetMap[i] > 0) 
+					aiTargetMap[i] -= Math.min(5, aiTargetMap[i]);
 			
 		
 		if(Main.GLOBAL_RANDOM.nextInt(300) == 0) updateEntitySpawningCycle();
@@ -134,33 +136,33 @@ public class World implements Serializable{
 		final int OFFSCEEEN = 2;
 		switch(layer){
 			case RENDERLAYER_TILE: {
-				for(int i = (int)(render.get().offsetX / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; i <= (int)(Main.getInstance().getRenderWidth() + render.get().offsetX) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; i++)
-					for(int j = (int)(render.get().offsetY / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; j <= (int)(Main.getInstance().getRenderHeight() + render.get().offsetY) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; j++){
+				for(int i = (int)(render.get().transform().x / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; i <= (int)(Main.getInstance().getRenderWidth() + render.get().transform().x) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; i++)
+					for(int j = (int)(render.get().transform().y / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; j <= (int)(Main.getInstance().getRenderHeight() + render.get().transform().y) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; j++){
 						Tile.Registry.get(getTile(i, j)).render(render, this, i, j);
-						if(Main.getInstance().getDebugMode() == 2) render.get().drawText(i * 16, j * 16, FontSize.SMALL, String.valueOf(getTargetValue(i, j)), 833, TextAlign.LEFT);
-						if(Main.getInstance().getDebugMode() == 3) render.get().drawText(i * 16, j * 16, FontSize.SMALL, getMetadata(i, j, 0) + "; " + getMetadata(i, j, 1), 338, TextAlign.LEFT);
+						if(Main.getInstance().getDebugMode() == DebugMode.AI_HEATMAP) render.get().drawText(i * 16, j * 16, FontSize.SMALL, String.valueOf(getTargetValue(i, j)), 833, TextAlign.LEFT);
+						if(Main.getInstance().getDebugMode() == DebugMode.METADATA) render.get().drawText(i * 16, j * 16, FontSize.SMALL, getMetadata(i, j, 0) + "; " + getMetadata(i, j, 1), 338, TextAlign.LEFT);
 					}
 				return;
 			}
 			
 			case RENDERLAYER_ENTITY: {
-				List<Entity> ents = new ArrayList<Entity>();//getEntitiesIn((int)(render.get().offsetX / ENTITY_TILE_COORDSCALE) - OFFSCEEEN, (int)(render.get().offsetY / ENTITY_TILE_COORDSCALE) - OFFSCEEEN , (Main.getInstance().getRenderWidth() + render.get().offsetX) / ENTITY_TILE_COORDSCALE + OFFSCEEEN + 1, (Main.getInstance().getRenderHeight() + render.get().offsetY) / ENTITY_TILE_COORDSCALE + OFFSCEEEN + 1);
+				List<Entity> ents = new ArrayList<Entity>();//getEntitiesIn((int)(render.get().transform().x / ENTITY_TILE_COORDSCALE) - OFFSCEEEN, (int)(render.get().transform().y / ENTITY_TILE_COORDSCALE) - OFFSCEEEN , (Main.getInstance().getRenderWidth() + render.get().transform().x) / ENTITY_TILE_COORDSCALE + OFFSCEEEN + 1, (Main.getInstance().getRenderHeight() + render.get().transform().y) / ENTITY_TILE_COORDSCALE + OFFSCEEEN + 1);
 				
 				if(!player.died) ents.add(player);
 				
 				for(int i = 0; i < entities.size(); i++){
 					Entity e = entities.get(i);
-					if(e.x >= render.get().offsetX - OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
-					   e.y >= render.get().offsetY - OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
-					   e.x <= Main.getInstance().getRenderWidth() + render.get().offsetX + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
-					   e.y <= Main.getInstance().getRenderHeight() + render.get().offsetY + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE)
+					if(e.x >= render.get().transform().x - OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
+							   e.y >= render.get().transform().y - OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
+							   e.x <= Main.getInstance().getRenderWidth() + render.get().transform().x + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
+							   e.y <= Main.getInstance().getRenderHeight() + render.get().transform().y + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE)
 					ents.add(e);
 				}
 				
 				ents.sort(compatator);
 				for(Entity e : ents){
 					e.render(render);
-					if(Main.getInstance().getDebugMode() == 1){
+					if(Main.getInstance().getDebugMode() == DebugMode.HITBOX){
 						Hitbox hbox = e.hitbox;
 						render.get().drawRect(e.x + hbox.getOffsetX(), e.y + hbox.getOffsetY(), hbox.getWidth(), hbox.getHeight(), 911);
 						render.get().put(e.x, e.y, 119);
@@ -172,15 +174,14 @@ public class World implements Serializable{
 			
 			case RENDERLAYER_PARTICLE: {
 				
-				List<Entity> ents = new ArrayList<Entity>();//getEntitiesIn((int)(render.get().offsetX / ENTITY_TILE_COORDSCALE) - OFFSCEEEN, (int)(render.get().offsetY / ENTITY_TILE_COORDSCALE) - OFFSCEEEN , (Main.getInstance().getRenderWidth() + render.get().offsetX) / ENTITY_TILE_COORDSCALE + OFFSCEEEN + 1, (Main.getInstance().getRenderHeight() + render.get().offsetY) / ENTITY_TILE_COORDSCALE + OFFSCEEEN + 1);				
+				List<Entity> ents = new ArrayList<Entity>();		
 				for(ParticleEntity e : particles){
 					
-					if(e.x >= render.get().offsetX - OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
-					   e.y >= render.get().offsetY - OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
-					   e.x <= Main.getInstance().getRenderWidth() + render.get().offsetX + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
-					   e.y <= Main.getInstance().getRenderHeight() + render.get().offsetY + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE){
+					if(e.x >= render.get().transform().x - OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
+					   e.y >= render.get().transform().y - OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
+					   e.x <= Main.getInstance().getRenderWidth() + render.get().transform().x + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
+					   e.y <= Main.getInstance().getRenderHeight() + render.get().transform().y + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE)
 					ents.add(e);
-					}
 				}
 				ents.sort(compatator);
 				for(Entity e : ents){
@@ -411,6 +412,8 @@ public class World implements Serializable{
 	    return false;
 	}
 	
+	public static final int MOB_SPAWNING_BOUNDS_MIN = 20 * 16; 
+	public static final int MOB_SPAWNING_BOUNDS_MAX = 40 * 16; 
 	public void updateEntitySpawningCycle(){
 		if(player == null) return;
 		int ents = 1;
@@ -418,29 +421,29 @@ public class World implements Serializable{
 		for(int i = 0; i < entities.size(); i++){
 			if(entities.get(i) instanceof MobEntity && Main.GLOBAL_RANDOM.nextInt(3) == 0){
 				j++;
-				if(j >= 70){
+				if(j >= 20){
 					j = 0;
-					if(player == null || entities.get(i).sqrDistanceTo(player) > 16 * 16 * 50 * 50)
+					if(entities.get(i).sqrDistanceTo(player) > 16 * 16 * 50 * 50)
 						removeEntity(entities.get(i));
 				}
 			}
 		}
 		for(int i = 0; i < ents; i++){
-			int xx = genEntityPos(player.x, w * 16);
-			int yy = genEntityPos(player.y, h * 16);
+			int xx = genEntityPos(player.x);
+			int yy = genEntityPos(player.y);
 			Entity ee = makeEntity(player.x >> 4, player.y >> 4);
 			int attempts = 0;
 			while(!isTilePassableBy(ee, xx >> 4, yy >> 4)){
-				xx = genEntityPos(player.x, w * 16);
-				yy = genEntityPos(player.y, h * 16);
-				if(xx < 0 || yy < 0) return;
+				xx = genEntityPos(player.x);
+				yy = genEntityPos(player.y);
 				attempts++;
 				if(attempts > 10) return;
 			}
+			if(xx < 0 || yy < 0 || xx >= w * 16 || yy >= h * 16) return;
+			
 			ee.x = xx;
 			ee.y = yy;
-			addEntity(ee);
-			
+			addEntity(ee);		
 		}
 	}
 
@@ -450,21 +453,16 @@ public class World implements Serializable{
 		int height = getHeight(x, y);
 		
 		int seed = Main.GLOBAL_RANDOM.nextInt(10);
-		if(seed < 2 && moisture > 18) return new SlimeEntity(2);
-		if(seed < 4 && height > 27) return new SlimeEntity(3);
-		if(seed < 6 && height > 3) return new SlimeEntity(1);
+		if(seed < 3 && moisture > 10) return new SlimeEntity(2);
+		if(seed < 6 && height > 27) return new SlimeEntity(3);
+		if(seed < 9 && height > 3) return new SlimeEntity(1);
 		return new SlimeEntity(0);
 	}
 	
-	private int genEntityPos(int ply, int b){
-		int g = Main.GLOBAL_RANDOM.nextInt(b);
-		int attempts = 0;
-		while(Math.abs(ply - g) < 30 * 16){
-			g = Main.GLOBAL_RANDOM.nextInt(b);
-			attempts++;
-			if(attempts > 5) return -1;
-		}
-		return g;
+	private int genEntityPos(int ply){
+		return ply 
+				+ (Main.GLOBAL_RANDOM.nextBoolean() ? -1 : 1)
+				* (Main.GLOBAL_RANDOM.nextInt(MOB_SPAWNING_BOUNDS_MAX - MOB_SPAWNING_BOUNDS_MIN + 1) + MOB_SPAWNING_BOUNDS_MIN);
 	}
 	
 	public void throwItem(int xx, int yy, ItemSlot slot){

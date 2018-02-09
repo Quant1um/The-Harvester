@@ -6,6 +6,7 @@ import net.quantium.harvester.craft.Crafts;
 import net.quantium.harvester.entity.BuildableInfo;
 import net.quantium.harvester.entity.BuildableInfo.BuildableType;
 import net.quantium.harvester.entity.inventory.Inventory;
+import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.render.ColorBundle;
 import net.quantium.harvester.render.Renderer;
@@ -19,10 +20,10 @@ public class AnvilScreen extends InventoryScreen {
 	private HitType[] pattern = new HitType[3];
 	public void init(){
 		super.init();
-		container.addFirst(new Button(Main.getInstance().getRenderWidth() - 162, 200, 13, "create", 0){
+		getContainer().addFirst(new Button(Main.getInstance().getRenderWidth() - 162, 200, 13, "create", 0){
 
 			@Override
-			public void onClick(int button) {
+			public void onClick(MouseState button) {
 				if(additionalInventory.get(1) != null) return;
 				ItemSlot cc = Crafts.tryCraftOnAnvil(additionalInventory.get(0), pattern);
 				if(cc == null) return;
@@ -36,10 +37,10 @@ public class AnvilScreen extends InventoryScreen {
 				final int l = j;
 				final HitType hit = HitType.values()[j];
 				final int k = i;
-				container.addFirst(new Button(Main.getInstance().getRenderWidth() - 137 + i * 20, 120 + j * 20, 2, "", l + 21){
+				getContainer().addFirst(new Button(Main.getInstance().getRenderWidth() - 137 + i * 20, 120 + j * 20, 2, "", l + 21){
 
 					@Override
-					public void onClick(int button) {
+					public void onClick(MouseState button) {
 						pattern[k] = hit;
 					}	
 				});

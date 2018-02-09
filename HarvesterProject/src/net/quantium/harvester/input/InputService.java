@@ -7,26 +7,19 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import net.quantium.harvester.Main;
-import net.quantium.harvester.render.Layer;
 
 public class InputService implements KeyListener, MouseListener, MouseWheelListener, MouseMotionListener{
-	public Main main;
+	private Main main;
 	
-	public static final int BUTTON_UNDEFINED = 0;
-	public static final int BUTTON_LEFT = 1;
-	public static final int BUTTON_MIDDLE = 2;
-	public static final int BUTTON_RIGHT = 3;
-	public static final int BUTTON_RELEASED = 4;
-	
-	private boolean click = false;
 	private int x, y;
-	private int button;
+	private MouseState mouseState = MouseState.UNDEFINED;
 	
-	public Map<Integer, Key> keys = new HashMap<Integer, Key>();
+	private Map<Integer, Key> keys = new HashMap<Integer, Key>();
 	
 	public InputService(Main main){
 		this.main = main;
@@ -38,98 +31,55 @@ public class InputService implements KeyListener, MouseListener, MouseWheelListe
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent arg0) {
-		if(Main.getInstance().getScreenService().isScreenActive())
-			Main.getInstance().getScreenService().current().onMouseWheel(arg0.getWheelRotation());
-		if(main.session != null && !Main.getInstance().getScreenService().isScreenActive())
-			main.session.getSpectator().onMouseWheel(arg0.getWheelRotation());
+		main.onMouseWheel(arg0.getWheelRotation());
 	}
 
 	@Override
-	public void mouseClicked(MouseEvent arg0) {
-		
+	public void mouseClicked(MouseEvent arg0) {}
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {}
+
+	@Override
+	public void mousePressed(MouseEvent event) {
+		x = (event.getX() / Main.SCALE);
+		y = (event.getY() / Main.SCALE);
+		mouseState = MouseState.fromMouseEvent(event);
+		main.onMouseClick(x, y, mouseState, true);
 	}
 
 	@Override
-	public void mouseEntered(MouseEvent arg0) {
-		
+	public void mouseReleased(MouseEvent event) {
+		x = (event.getX() / Main.SCALE);
+		y = (event.getY() / Main.SCALE);
+		mouseState = MouseState.RELEASED;
 	}
 
 	@Override
-	public void mouseExited(MouseEvent arg0) {
-		
-	}
-
-	@Override
-	public void mousePressed(MouseEvent arg0) {
-		x = (arg0.getX() / Main.SCALE);
-		y = (arg0.getY() / Main.SCALE);
-		click = true;
-		button = arg0.getButton();
-		if(Main.getInstance().getScreenService().isScreenActive())
-			Main.getInstance().getScreenService().current().onMouseClick(x, y, button, true);
-		if(main.session != null && !Main.getInstance().getScreenService().isScreenActive())
-			main.session.getSpectator().onMouseClick(x, y, button);
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent arg0) {
-		x = (arg0.getX() / Main.SCALE);
-		y = (arg0.getY() / Main.SCALE);
-		click = false;
-		if(Main.getInstance().getScreenService().isScreenActive())
-			Main.getInstance().getScreenService().current().onMouseClick(x, y, BUTTON_RELEASED, true);
-		if(main.session != null && !Main.getInstance().getScreenService().isScreenActive())
-			main.session.getSpectator().onMouseClick(x, y, BUTTON_RELEASED);
-	}
-
-	@Override
-	public void keyPressed(KeyEvent arg0) {
-		if(keys.containsKey(arg0.getKeyCode())){
-			get(arg0.getKeyCode()).toggle(true, arg0.getKeyChar(), arg0.getModifiers());
-		}
-		
-		if(arg0.getKeyCode() == KeyEvent.VK_F5 && arg0.isControlDown())
-			Main.getInstance().nextDebugMode();
-		
-		if(Main.getInstance().getScreenService().isScreenActive()){
-			Main.getInstance().getScreenService().current().onKeyWrite(arg0.getKeyChar(), arg0.getKeyCode() == KeyEvent.VK_BACK_SPACE, arg0.getKeyCode() == KeyEvent.VK_ENTER);
-			if(keys.containsKey(arg0.getKeyCode())){
-				if(Main.getInstance().getScreenService().isScreenActive())
-					Main.getInstance().getScreenService().current().onKeyPress(get(arg0.getKeyCode()), true);
-				
+	public void keyPressed(KeyEvent event) {
+		if(keys.containsKey(event.getKeyCode())){
+			Key key = get(event.getKeyCode());
+			if(!key.down){
+				key.toggle(true, event.getKeyChar(), event.getModifiers());
+				main.onKeyPress(key, true);
 			}
-				
-		}else if(main.session != null && keys.containsKey(arg0.getKeyCode()) && !Main.getInstance().getScreenService().isScreenActive())
-			main.session.getSpectator().onKeyPress(get(arg0.getKeyCode()), true);
-	}
-	
-
-	public void keyHeld(Key key){
-		if(Main.getInstance().getScreenService().isScreenActive())
-			Main.getInstance().getScreenService().current().onKeyPress(key, false);
-		
-	}
-	
-	public void mouseHeld(){
-		if(Main.getInstance().getScreenService().isScreenActive())
-			Main.getInstance().getScreenService().current().onMouseClick(x, y, button, false);
-		if(main.session != null && !Main.getInstance().getScreenService().isScreenActive())
-			main.session.getSpectator().onMouseClick(x, y, button);
+		}
 	}
 	
 	@Override
-	public void keyReleased(KeyEvent arg0) {
-		if(keys.containsKey(arg0.getKeyCode())){
-			get(arg0.getKeyCode()).toggle(false, arg0.getKeyChar(), arg0.getModifiers());
-			if(Main.getInstance().getScreenService().isScreenActive())
-				Main.getInstance().getScreenService().current().onKeyPress(get(arg0.getKeyCode()), false);	
+	public void keyReleased(KeyEvent event) {
+		if(keys.containsKey(event.getKeyCode())){
+			Key key = get(event.getKeyCode());
+			if(key.down)
+				key.toggle(false, event.getKeyChar(), event.getModifiers());
 		}
 	}
 
 	@Override
-	public void keyTyped(KeyEvent arg0) {
-		
-	}
+	public void keyTyped(KeyEvent arg0) {}
 
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
@@ -155,18 +105,13 @@ public class InputService implements KeyListener, MouseListener, MouseWheelListe
 		return this.x >= x && this.x <= x + w && this.y >= y && this.y <= y + h;
 	}
 	
-	public boolean isMouseOverButton(int x, int y, int w){
-		return isMouseOverRectangle(x, y, w * Layer.BLOCK_SIZE, 2 * Layer.BLOCK_SIZE);
-	}
-
 	public void update() {
-		if(click) mouseHeld();
+		if(isClicked())
+			main.onMouseClick(x, y, mouseState, false);
 		for(Key key : keys.values()){
 			key.update();
-			if(key.clicked) keyHeld(key);
-			if(key.down) 
-				if(main.session != null && !Main.getInstance().getScreenService().isScreenActive())
-					main.session.getSpectator().onKeyPress(key, false);
+			if(key.down)
+				main.onKeyPress(key, false);
 		}
 	}
 	
@@ -175,29 +120,32 @@ public class InputService implements KeyListener, MouseListener, MouseWheelListe
 	}
 	
 	public boolean isClicked(){
-		return click;
+		return mouseState != MouseState.UNDEFINED && mouseState != MouseState.RELEASED;
 	}
 		
-	public final Key w = new Key (KeyEvent.VK_W);
-	public final Key s = new Key (KeyEvent.VK_S);
-	public final Key a = new Key (KeyEvent.VK_A);
-	public final Key d = new Key (KeyEvent.VK_D);
+	public Collection<Key> keys(){
+		return keys.values();
+	}
+	
+	public final Key w = new Key(KeyEvent.VK_W);
+	public final Key s = new Key(KeyEvent.VK_S);
+	public final Key a = new Key(KeyEvent.VK_A);
+	public final Key d = new Key(KeyEvent.VK_D);
 		
-	public final Key inventory = new Key (KeyEvent.VK_E);
-	public final Key escape = new Key (KeyEvent.VK_ESCAPE);
-	public final Key space = new Key (KeyEvent.VK_SPACE);
+	public final Key inventory = new Key(KeyEvent.VK_E);
+	public final Key escape = new Key(KeyEvent.VK_ESCAPE);
+	public final Key space = new Key(KeyEvent.VK_SPACE);
 		
-	public final Key left = new Key (KeyEvent.VK_LEFT);
-	public final Key right = new Key (KeyEvent.VK_RIGHT);
+	public final Key debug = new Key(KeyEvent.VK_F5);
 
 	public class Key{
 		public int presses, absorbs;
-		public boolean down, clicked;
+		private boolean down, clicked, suppressed;
 
 		public final int code;
 		
-		public char ch;
-		public int modifiers;
+		private char character;
+		private int modifiers;
 		
 		public Key(int code) {
 			this.code = code;
@@ -206,7 +154,7 @@ public class InputService implements KeyListener, MouseListener, MouseWheelListe
 
 		public void toggle(boolean pressed, char ch, int modifiers) {
 			this.modifiers = modifiers;
-			this.ch = ch;
+			this.character = ch;
 			
 			if (pressed != down) {
 				down = pressed;
@@ -216,7 +164,30 @@ public class InputService implements KeyListener, MouseListener, MouseWheelListe
 			}
 		}
 
+		public char getCharacter(){
+			return character;
+		}
+		
+		public int getModifiers(){
+			return modifiers;
+		}
+		
+		public boolean isDown(){
+			if(suppressed) return false;
+			return down;
+		}
+		
+		public boolean isClicked(){
+			if(suppressed) return false;
+			return clicked;
+		}
+		
+		public boolean isSuppressed(){
+			return suppressed;
+		}
+		
 		public void update() {
+			suppressed = false;
 			if (absorbs < presses) {
 				absorbs++;
 				clicked = true;
@@ -225,14 +196,18 @@ public class InputService implements KeyListener, MouseListener, MouseWheelListe
 			}
 		}
 		
+		public void suppress(){
+			suppressed = true;
+		}
+		
 		@Override
 		public String toString(){
-			return String.format("Key[code=%d, mod=%d, char=%s]", code, modifiers, ch);
+			return String.format("Key{Code=%d, Mod=%d, Char=%s}", code, modifiers, character);
 		}
 	}
 	
 	@Override
 	public String toString(){
-		return "InputService{Click=" + click + ", Button=" + button + ", X=" + x + ", Y=" + y + "}";
+		return "InputService{Mouse=" + mouseState + ", X=" + x + ", Y=" + y + "}";
 	}
 }
