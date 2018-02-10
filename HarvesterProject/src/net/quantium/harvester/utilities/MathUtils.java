@@ -1,8 +1,5 @@
 package net.quantium.harvester.utilities;
 
-/**
- * Utils from Project-Superposition
- */
 public class MathUtils {
 	
 	public static float square(float v){
@@ -20,5 +17,9 @@ public class MathUtils {
 		//http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoeC8wLjUpXjIqKHg8MC41KSsoc2luKCh4LTAuNSkqcGkvMC4xKSowLjEqZSooMS14KSsxKSooeD4wLjUpIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiLTExLjg5NzMzNTg1NzE5MTg4IiwiMTIuODk3MzM1ODU3MTkxNjciLCItNi42Mjc5MjI2NDM4NzAwNzUiLCI4LjYyNzkyMjY0Mzg3MDAyNyJdfV0-
 		if(t < l) return square(t / l);
 		return (float) (Math.sin((t - l) * Math.PI / s) * s * Math.E * (1 - t) + 1);
+	}
+	
+	public static int sign(int val){
+		return val > 0 ? 1 : val < 0 ? -1 : 0;
 	}
 }

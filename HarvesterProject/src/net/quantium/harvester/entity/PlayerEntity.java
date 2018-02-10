@@ -67,7 +67,7 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 	@Override
 	public void update() {
 		super.update();
-		if((Main.getInstance().getCounter() & 3) == 0) world.addTargetValue(x >> 4, y >> 4, 0);
+		if((Main.getInstance().getCounter() & 7) == 0) world.addTargetValue(x >> 4, y >> 4);
 		
 		if(intTime > 0){
 			intTime--;

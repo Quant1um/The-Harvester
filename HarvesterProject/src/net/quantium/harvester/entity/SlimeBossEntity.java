@@ -1,7 +1,7 @@
 package net.quantium.harvester.entity;
 
 import net.quantium.harvester.Main;
-import net.quantium.harvester.entity.ai.AISlimeBoss;
+import net.quantium.harvester.entity.ai.AISlime;
 import net.quantium.harvester.entity.hitbox.Hitbox;
 import net.quantium.harvester.render.Renderer;
 
@@ -21,7 +21,7 @@ public class SlimeBossEntity extends SlimeEntity {
 	
 	@Override
 	public void init() {
-		ai = new AISlimeBoss();
+		ai = new AISlime(this);
 		hitbox = new Hitbox(20, 10, -12, -3);
 	}
 	

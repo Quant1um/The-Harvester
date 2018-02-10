@@ -79,7 +79,7 @@ public class World implements Serializable{
 		this.moisture = new byte[w * h];
 		this.height = new byte[w * h];
 		this.entityTileCache = new List[w * h];
-		for(int i = 0; i < entityTileCache.length; i++)
+		for(int i = 0; i < w * h; i++)
 			this.entityTileCache[i] = new ArrayList<Entity>();
 		WorldGenerator.generate(this, this.seed);
 	}
@@ -95,8 +95,8 @@ public class World implements Serializable{
 		
 		if((Main.getInstance().getCounter() & 7) == 0)
 			for(int i = 0; i < w * h; i++)
-				if(aiTargetMap[i] > 0) 
-					aiTargetMap[i] -= Math.min(5, aiTargetMap[i]);
+				if(aiTargetMap[i] > Byte.MIN_VALUE) 
+					aiTargetMap[i]--;
 			
 		
 		if(Main.GLOBAL_RANDOM.nextInt(300) == 0) updateEntitySpawningCycle();
@@ -139,7 +139,17 @@ public class World implements Serializable{
 				for(int i = (int)(render.get().transform().x / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; i <= (int)(Main.getInstance().getRenderWidth() + render.get().transform().x) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; i++)
 					for(int j = (int)(render.get().transform().y / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; j <= (int)(Main.getInstance().getRenderHeight() + render.get().transform().y) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; j++){
 						Tile.Registry.get(getTile(i, j)).render(render, this, i, j);
-						if(Main.getInstance().getDebugMode() == DebugMode.AI_HEATMAP) render.get().drawText(i * 16, j * 16, FontSize.SMALL, String.valueOf(getTargetValue(i, j)), 833, TextAlign.LEFT);
+						if(Main.getInstance().getDebugMode() == DebugMode.AI_HEATMAP){
+							int color = 0;
+							int tval = getTargetValue(i, j);
+							if(tval < 0)
+								color = tval * 9 / Byte.MIN_VALUE;
+							else if(tval > 0)
+								color = (tval * 9 / Byte.MAX_VALUE) * 100;
+							else
+								color = 0;
+							render.get().drawRect(i * 16, j * 16, 16, 16, color);
+						}
 						if(Main.getInstance().getDebugMode() == DebugMode.METADATA) render.get().drawText(i * 16, j * 16, FontSize.SMALL, getMetadata(i, j, 0) + "; " + getMetadata(i, j, 1), 338, TextAlign.LEFT);
 					}
 				return;
@@ -254,14 +264,24 @@ public class World implements Serializable{
 		return 0;
 	}
 	
-	public void addTargetValue(int x, int y, int depth){
-		if(depth >= 3) return;
-		if(x >= 0 && y >= 0 && x < w && y < h){
-				aiTargetMap[x + y * w] += (3 - depth) * 3 - depth;
-			if(aiTargetMap[x + y * w] >= 100) aiTargetMap[x + y * w] = 100;
-			for(int i = -1; i < 2; i++)
-				for(int j = -1; j < 2; j++)
-					addTargetValue(x + i, y + j, depth + 1);
+	public static final int AIHEATMAP_MAX_VALUE = Byte.MAX_VALUE;
+	public static final int AIHEATMAP_RADIUS = 6;
+	public static final int AIHEATMAP_MAX_INCREMENT = 15;
+	private void addTargetValue(int x, int y, byte val){
+		if(x >= 0 && y >= 0 && x < w && y < h)
+			aiTargetMap[x + y * w] += Math.min(val, AIHEATMAP_MAX_VALUE - aiTargetMap[x + y * w]);
+	}
+	
+	public void addTargetValue(int x, int y){
+		final int RADIUS_SQUARED = AIHEATMAP_RADIUS * AIHEATMAP_RADIUS;
+		for(int i = -AIHEATMAP_RADIUS; i < AIHEATMAP_RADIUS; i++){
+			for(int j = -AIHEATMAP_RADIUS; j < AIHEATMAP_RADIUS; j++){
+				int d = i * i + j * j;
+				if(d <= RADIUS_SQUARED){
+					int val = (RADIUS_SQUARED - d) * AIHEATMAP_MAX_INCREMENT / RADIUS_SQUARED;
+					addTargetValue(x + i, y + j, (byte)val);
+				}
+			}
 		}
 	}
 	

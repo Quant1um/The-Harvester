@@ -12,7 +12,7 @@ import net.quantium.harvester.tile.Tile;
 import net.quantium.harvester.world.PassingInfo;
 import net.quantium.harvester.world.World;
 
-public class SlimeEntity extends MobEntity implements AIEntity {
+public class SlimeEntity extends MobEntity implements AIEntity<SlimeEntity> {
 
 	/**
 	 * 
@@ -40,7 +40,7 @@ public class SlimeEntity extends MobEntity implements AIEntity {
 	
 	@Override
 	public void init() {
-		ai = new AISlime();
+		ai = new AISlime(this);
 		hitbox = new Hitbox(8, 4, -12, -6);
 	}
 
@@ -107,7 +107,7 @@ public class SlimeEntity extends MobEntity implements AIEntity {
 			frame = 2;
 		}
 		if(jump > 15 && jump < 35){
-			ai.update(this);
+			ai.update();
 		}
 		jump++;
 	}
