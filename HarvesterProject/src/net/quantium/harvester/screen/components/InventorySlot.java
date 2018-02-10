@@ -18,7 +18,8 @@ public class InventorySlot extends Component implements IValueHolder<ItemSlot> {
 	}
 	
 	@Override
-	public void render(Renderer render, boolean focused) {
+	public void render(Renderer render) {
+		super.render(render);
 		render.get().renderPseudo3DRect(x, y, 2, 2, isMouseOver() ? 666 : 555, 444, 777, 666, true);
 		ItemSlot.renderItemSlot(render, x, y, getValue());
 	}

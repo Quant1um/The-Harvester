@@ -44,7 +44,8 @@ public abstract class Button extends Component {
 	}
 	
 	@Override
-	public void render(Renderer render, boolean focused) {
+	public void render(Renderer render) {
+		super.render(render);
 		boolean clicked = isClicked();
 		int color = isMouseOver() ? 666 : 555;
 		int offset = clicked ? 1 : 0;

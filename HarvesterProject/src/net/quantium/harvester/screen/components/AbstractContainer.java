@@ -12,19 +12,16 @@ public class AbstractContainer<T extends Component> extends Component{
 	protected T focused = null;
 	
 	@Override
-	public void render(Renderer render, boolean tfocused){
+	public void render(Renderer render){
 		for(int i = 0; i < comps.size(); i++)
-			comps.get(i).render(render, focused == comps.get(i));
+			comps.get(i).render(render);
 	}
 	
 	@Override
 	public void onMouseClick(int x, int y, MouseState button, boolean first){
 		T comp = getComponentOn(x, y);
 		if(comp != null){
-			if(focused != comp){
-				focused = comp;
-				comp.onSelect();
-			}
+			setFocused(comp);
 		}else
 			focused = null;
 		
@@ -69,6 +66,13 @@ public class AbstractContainer<T extends Component> extends Component{
 		return focused;
 	}
 	
+	public void setFocused(T comp){
+		if(this.focused == comp) return;
+		if(hasFocused()) focused.setFocused(false);
+		if(comp != null) comp.setFocused(true);
+		this.focused = comp;
+	}
+	
 	public boolean hasFocused(){
 		return focused != null;
 	}
@@ -89,9 +93,5 @@ public class AbstractContainer<T extends Component> extends Component{
 		if(comp == focused)
 			focused = null;
 		comps.remove(comp);
-	}
-	
-	public void render(Renderer render){
-		render(render, false);
 	}
 }

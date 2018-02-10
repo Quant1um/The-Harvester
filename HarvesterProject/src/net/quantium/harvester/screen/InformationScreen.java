@@ -5,12 +5,12 @@ import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.components.Button;
+import net.quantium.harvester.screen.components.Component;
 import net.quantium.harvester.text.FontSize;
 import net.quantium.harvester.text.TextAlign;
 
 public class InformationScreen extends MenuScreen {
-
-private Button back;
+	private Component back;
 	
 	@Override
 	public void init() {
@@ -19,12 +19,6 @@ private Button back;
 			@Override
 			public void onClick(MouseState button) {
 				service.back();
-			}
-			
-			@Override
-			public void render(Renderer render, boolean focused){
-				render.get().fillRect(x + MainScreen.shadowOffset, y + MainScreen.shadowOffset, w, h, 000);
-				super.render(render, focused);
 			}
 		};
 	}
@@ -58,7 +52,7 @@ private Button back;
 		render.get().drawText(xx, yy + 150, FontSize.NORMAL, "infoline13", 888, TextAlign.LEFT);
 		render.get().drawText(xx, yy + 160, FontSize.NORMAL, "infoline14", 888, TextAlign.LEFT);
 		
-		back.render(render, false);
+		back.render(render);
 	}
 
 	@Override
@@ -79,10 +73,5 @@ private Button back;
 	@Override
 	public void onMouseWheel(int ticks) {
 		back.onMouseWheel(ticks);
-	}
-
-	@Override
-	public void shown() {
-
 	}
 }

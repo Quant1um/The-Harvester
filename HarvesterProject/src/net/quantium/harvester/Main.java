@@ -79,6 +79,8 @@ public class Main extends Canvas implements IInputListener{
 	
 	private Session session;
 	private Settings settings = new Settings();
+	private int renderWidth, renderHeight;
+	
 	
 	private static Main _instance;
 	public static Main getInstance(){
@@ -94,7 +96,7 @@ public class Main extends Canvas implements IInputListener{
 		Session.updateNames();
 		
 		_instance = new Main();
-		_instance.settings.restore();
+		_instance.init();
 		_instance.setPreferredSize(new Dimension(_instance.getRenderWidth() * SCALE, _instance.getRenderHeight() * SCALE));
 		_instance.setMinimumSize(new Dimension(_instance.getRenderWidth() * SCALE, _instance.getRenderHeight() * SCALE));
 		_instance.setMaximumSize(new Dimension(_instance.getRenderWidth() * SCALE, _instance.getRenderHeight() * SCALE));
@@ -125,7 +127,6 @@ public class Main extends Canvas implements IInputListener{
 			
 		}));
 		
-		_instance.init();
 		_instance.run();
 	}
 	
@@ -143,6 +144,10 @@ public class Main extends Canvas implements IInputListener{
 				framesIncompleted = updatesIncompleted = 0;
 			}
 		});
+		
+		settings.restore();
+		renderWidth = settings.getWidth();
+		renderHeight = settings.getHeight();
 		
 		renderer = new Renderer(getRenderWidth(), getRenderHeight());
 		inputService = new InputService(this);
@@ -181,11 +186,11 @@ public class Main extends Canvas implements IInputListener{
 	}
 	
 	public int getRenderWidth(){
-		return settings.getWidth();
+		return renderWidth;
 	}
 
 	public int getRenderHeight(){
-		return settings.getHeight();
+		return renderHeight;
 	}
 	
 	public boolean useShadows(){

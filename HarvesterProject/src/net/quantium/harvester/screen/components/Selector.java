@@ -27,7 +27,8 @@ public class Selector extends Component implements IValueHolder<Integer>{
 	}
 	
 	@Override
-	public void render(Renderer render, boolean focused) {
+	public void render(Renderer render) {
+		super.render(render);
 		ColorBundle bnd = ColorBundle.get(-1, -1, -1, -1, -1, 888);
 		int lColor = lHover ? 666 : 555;
 		int lOffset = lClick > 0 ? 1 : 0;

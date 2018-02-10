@@ -17,7 +17,7 @@ public class DeathScreen extends IngameScreen {
 	@Override
 	protected void init() {
 		super.init();
-		getContainer().add(new Button(MainScreen.buttonCenterX, 111, MainScreen.buttonSize, "exitsave", 4){
+		getContainer().add(new Button(MenuScreen.BUTTON_CENTER_X, 111, MenuScreen.BUTTON_SIZE, "exitsave", 4){
 
 			@Override
 			public void onClick(MouseState button) {
@@ -25,7 +25,7 @@ public class DeathScreen extends IngameScreen {
 			}
 		});
 		
-		getContainer().add(new Button(MainScreen.buttonCenterX, 93, MainScreen.buttonSize, "respawn", 5, 1){
+		getContainer().add(new Button(MenuScreen.BUTTON_CENTER_X, 93, MenuScreen.BUTTON_SIZE, "respawn", 5, 1){
 
 			@Override
 			public void onClick(MouseState button) {
@@ -48,7 +48,7 @@ public class DeathScreen extends IngameScreen {
 
 	@Override
 	public void render(Renderer render) {
-		renderBox(render, MainScreen.buttonCenterX - 2, 80, MainScreen.buttonSize * Layer.BLOCK_SIZE + 4, 50, "death");
+		renderBox(render, MenuScreen.BUTTON_CENTER_X - 2, 80, MenuScreen.BUTTON_SIZE * Layer.BLOCK_SIZE + 4, 50, "death");
 		super.render(render);
 	}
 }

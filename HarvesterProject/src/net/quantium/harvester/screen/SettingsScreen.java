@@ -2,11 +2,10 @@ package net.quantium.harvester.screen;
 
 import net.quantium.harvester.Main;
 import net.quantium.harvester.data.Settings;
-import net.quantium.harvester.input.InputService.Key;
-import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.resources.ResourceLoader;
-import net.quantium.harvester.screen.components.Button;
+import net.quantium.harvester.screen.components.BackButton;
+import net.quantium.harvester.screen.components.Component;
 import net.quantium.harvester.screen.components.Selector;
 import net.quantium.harvester.screen.components.ToggleButton;
 import net.quantium.harvester.text.FontSize;
@@ -14,8 +13,6 @@ import net.quantium.harvester.text.Localization;
 import net.quantium.harvester.text.TextAlign;
 
 public class SettingsScreen extends MenuScreen {
-
-	
 	public static final String[] resolutionStrings;
 	
 	static{
@@ -29,52 +26,42 @@ public class SettingsScreen extends MenuScreen {
 	@Override
 	public void init() {
 		super.init();
-		getContainer().add(new Button(5, 5, 7, "back", 5, 1){
-
-			@Override
-			public void onClick(MouseState button) {
-				service.back();
-			}
-			
-			@Override
-			public void render(Renderer render, boolean focused){
-				render.get().fillRect(x + MainScreen.shadowOffset, y + MainScreen.shadowOffset, w, h, 000);
-				super.render(render, focused);
-			}
-		});
-		getContainer().add(new ToggleButton(MainScreen.buttonCenterX, 50, 20, "shadows", Main.getInstance().useShadows()){
+		Component back = new BackButton(5, 5);
+		Component shadows = new ToggleButton(MenuScreen.BUTTON_CENTER_X, 50, MenuScreen.BUTTON_SIZE, "shadows", Main.getInstance().useShadows()){
 
 			@Override
 			public void onValueChanged(Boolean value) {
 				Main.getInstance().getSettings().useShadows = value;
 			}
 			
-		});
+		};
 		
-		selector = new Selector(MainScreen.buttonCenterX + 9 * 8, 70, 11, resolutionStrings);
+		selector = new Selector(MenuScreen.BUTTON_CENTER_X + 9 * 8, 70, 11, resolutionStrings);
 		selector.setValue(Main.getInstance().getSettings().resolution);
-		getContainer().add(selector);
-		
 		String[] langs = new String[ResourceLoader.LocaleLoader.size()];
 		for(int i = 0; i < langs.length; i++)
 			langs[i] = ResourceLoader.LocaleLoader.get(i).getName();
-		language = new Selector(MainScreen.buttonCenterX + 9 * 8, 90, 11, langs){
+		language = new Selector(MenuScreen.BUTTON_CENTER_X + 9 * 8, 90, 11, langs){
 			
 			@Override
 			public void onValueChanged(Integer value){
 				Localization.setCurrentLocaleID(value);
 			}
-			
 		};
+		
 		language.setValue(Main.getInstance().getSettings().localization);
+		
+		getContainer().add(back);
+		getContainer().add(shadows);
+		getContainer().add(selector);
 		getContainer().add(language);
 	}
 
 	@Override
 	public void render(Renderer render) {
 		super.render(render);
-		render.get().drawText(MainScreen.buttonCenterX, 74, FontSize.NORMAL, "resolution", 888, TextAlign.LEFT);
-		render.get().drawText(MainScreen.buttonCenterX, 94, FontSize.NORMAL, "language", 888, TextAlign.LEFT);
+		render.get().drawText(MainScreen.BUTTON_CENTER_X, 74, FontSize.NORMAL, "resolution", 888, TextAlign.LEFT);
+		render.get().drawText(MainScreen.BUTTON_CENTER_X, 94, FontSize.NORMAL, "language", 888, TextAlign.LEFT);
 	}
 
 	@Override
@@ -84,30 +71,4 @@ public class SettingsScreen extends MenuScreen {
 		settings.localization = language.getValue();
 		settings.save();
 	}
-
-	@Override
-	public void onMouseClick(int x, int y, MouseState button, boolean first) {
-		getContainer().onMouseClick(x, y, button, first);
-	}
-
-	@Override
-	public void onKeyPress(Key key, boolean first) {
-		getContainer().onKeyPress(key, first);
-	}
-
-	@Override
-	public void onKeyWrite(char key, boolean backspace, boolean submit) {
-		getContainer().onKeyWrite(key, backspace, submit);
-	}
-
-	@Override
-	public void onMouseWheel(int ticks) {
-		getContainer().onMouseWheel(ticks);
-	}
-
-	@Override
-	public void shown() {
-		
-	}
-
 }

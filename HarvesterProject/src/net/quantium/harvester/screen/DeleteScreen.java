@@ -6,7 +6,9 @@ import net.quantium.harvester.data.Session;
 import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
+import net.quantium.harvester.screen.components.BackButton;
 import net.quantium.harvester.screen.components.Button;
+import net.quantium.harvester.screen.components.Component;
 import net.quantium.harvester.text.FontSize;
 import net.quantium.harvester.text.TextAlign;
 
@@ -21,31 +23,13 @@ public class DeleteScreen extends MenuScreen {
 	@Override
 	protected void init() {
 		super.init();
-		Button back = new Button(5, 5, 7, "back", 5, 1){
-
-			@Override
-			public void onClick(MouseState button) {
-				service.back();
-			}
-			
-			@Override
-			public void render(Renderer render, boolean focused){
-				render.get().fillRect(x + MainScreen.shadowOffset, y + MainScreen.shadowOffset, w, h, 000);
-				super.render(render, focused);
-			}
-		};
-		Button confirm = new Button((Main.getInstance().getRenderWidth() - 15 * Layer.BLOCK_SIZE) / 2, 130, 15, "confirm", 6){
+		Component back = new BackButton(5, 5);
+		Component confirm = new Button((Main.getInstance().getRenderWidth() - 15 * Layer.BLOCK_SIZE) / 2, 130, 15, "confirm", 6){
 
 			@Override
 			public void onClick(MouseState button) {
 				Session.delete(slot);
 				service.back(new GameScreen());
-			}
-			
-			@Override
-			public void render(Renderer render, boolean focused){
-				render.get().fillRect(x + MainScreen.shadowOffset, y + MainScreen.shadowOffset, w, h, 000);
-				super.render(render, focused);
 			}
 		};
 		getContainer().add(back);
@@ -59,7 +43,7 @@ public class DeleteScreen extends MenuScreen {
 		String text0 = "deleteconf";
 		String text1 = Session.getName(slot) + "?";
 		render.get().drawText(Main.getInstance().getRenderWidth() / 2, 100, FontSize.NORMAL, text0, 888, TextAlign.CENTER);
-		render.get().drawText(Main.getInstance().getRenderWidth() / 2, 110, FontSize.NORMAL, text1, 888, TextAlign.CENTER);
+		render.get().drawText(Main.getInstance().getRenderWidth() / 2, 110, FontSize.NORMAL, text1, 888, TextAlign.CENTER, false);
 		
 		getContainer().render(render);
 	}

@@ -18,8 +18,8 @@ public abstract class ToggleButton extends Button implements IValueHolder<Boolea
 	}
 	
 	@Override
-	public void render(Renderer render, boolean focused) {
-		super.render(render, focused);
+	public void render(Renderer render) {
+		super.render(render);
 		boolean clicked = isClicked();
 		int offset = clicked ? 1 : 0;
 		render.get().drawColored(x + 3 + offset, y + offset + Layer.BLOCK_SIZE - 4, 3, 0, 1, 1, ColorBundle.get(-1, value ? 161 : 611, value ? 383 : 833, value ? 484 : 844, value ? 595 : 955, -1), "gui", 0);

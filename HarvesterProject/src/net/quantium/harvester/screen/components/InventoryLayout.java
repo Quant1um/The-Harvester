@@ -42,8 +42,8 @@ public class InventoryLayout extends AbstractContainer<InventorySlot>{
 	}
 	
 	@Override
-	public void render(Renderer render, boolean tfocused){
-		super.render(render, tfocused);
+	public void render(Renderer render){
+		super.render(render);
 		if(isTwoSlotsSelected())
 			render.get().drawLine(selectedSlots[0].x + 8, 
 								  selectedSlots[0].y + 8, 

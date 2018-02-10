@@ -5,6 +5,7 @@ import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.components.Button;
+import net.quantium.harvester.screen.components.Component;
 import net.quantium.harvester.utilities.IOContainer;
 
 public class PauseScreen extends IngameScreen {
@@ -13,7 +14,16 @@ public class PauseScreen extends IngameScreen {
 	protected void init() {
 		super.init();
 		this.mustUpdateGame = false;
-		getContainer().add(new Button(MainScreen.buttonCenterX, 111, MainScreen.buttonSize, "exitsave", 4){
+		
+		Component back = new Button(MenuScreen.BUTTON_CENTER_X, 93, MenuScreen.BUTTON_SIZE, "backgame", 5, 1){
+
+			@Override
+			public void onClick(MouseState button) {
+				service.setScreen(null);
+			}
+		};
+		
+		Component save = new Button(MenuScreen.BUTTON_CENTER_X, 111, MenuScreen.BUTTON_SIZE, "exitsave", 4){
 
 			@Override
 			public void onClick(MouseState button) {
@@ -21,15 +31,10 @@ public class PauseScreen extends IngameScreen {
 				Main.getInstance().resetSession();
 				service.setScreen(new MainScreen());
 			}
-		});
+		};
 		
-		getContainer().add(new Button(MainScreen.buttonCenterX, 93, MainScreen.buttonSize, "backgame", 5, 1){
-
-			@Override
-			public void onClick(MouseState button) {
-				service.setScreen(null);
-			}
-		});
+		getContainer().add(back);
+		getContainer().add(save);
 	}
 
 	@Override
@@ -39,7 +44,7 @@ public class PauseScreen extends IngameScreen {
 
 	@Override
 	public void render(Renderer render) {
-		renderBox(render, MainScreen.buttonCenterX - 2, 80, MainScreen.buttonSize * Layer.BLOCK_SIZE + 4, 50, "pause");
+		renderBox(render, MenuScreen.BUTTON_CENTER_X - 2, 80, MenuScreen.BUTTON_SIZE * Layer.BLOCK_SIZE + 4, 50, "pause");
 		super.render(render);
 	}
 

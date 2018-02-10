@@ -12,7 +12,7 @@ public class ActiveInventorySlot extends InventorySlot {
 	}
 
 	@Override
-	public void render(Renderer render, boolean focused){
+	public void render(Renderer render){
 		render.get().renderPseudo3DRect(x, y, 2, 2, isMouseOver() ? 686 : 575, 464, 797, 686, true);
 		ItemSlot.renderItemSlot(render, x, y, getValue());
 	}

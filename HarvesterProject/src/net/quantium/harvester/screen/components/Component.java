@@ -8,6 +8,7 @@ import net.quantium.harvester.render.Renderer;
 
 public abstract class Component implements IInputListener {
 	protected int x, y, w, h;
+	private boolean focused;
 
 	public int getX() {
 		return x;
@@ -41,9 +42,24 @@ public abstract class Component implements IInputListener {
 		this.h = h;
 	}
 	
-	public abstract void render(Renderer render, boolean focused);
-	public abstract void update();
-	public void onSelect(){}
+	public boolean isFocused(){
+		return focused;
+	}
+	
+	void setFocused(boolean focused){
+		if(this.focused != focused){
+			this.focused = focused;
+			if(this.focused)
+				onFocused();
+			else
+				onBlurred();
+		}
+	}
+	
+	public void render(Renderer render){}
+	public void update(){}
+	public void onFocused(){}
+	public void onBlurred(){}
 	public void onKeyWrite(char key, boolean backspace, boolean submit){}
 	
 	@Override public void onMouseClick(int x, int y, MouseState button, boolean first){}

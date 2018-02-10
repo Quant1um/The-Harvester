@@ -37,9 +37,10 @@ public abstract class Screen implements IInputListener {
 	}
 	
 	public static void renderBox(Renderer render, int x, int y, int w, int h, String name){
-		render.get().fillRect(x + 2, y + 2, w, h, 111);
+		render.get().fillRect(x + 2, y + 2, w, h, 5111);
 		render.get().fillRect(x, y, w, h, 666);
 		render.get().drawRect(x, y, w, h, 555);
-		if(name != null) render.get().drawText(x + 3, y + 3, FontSize.NORMAL, name, 888, TextAlign.LEFT);
+		if(name != null) 
+			render.get().drawText(x + 3, y + 3, FontSize.NORMAL, name, 888, TextAlign.LEFT);
 	}
 }

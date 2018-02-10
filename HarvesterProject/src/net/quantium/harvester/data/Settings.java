@@ -8,8 +8,8 @@ public class Settings {
 			   								   {400, 250},
 			   								   {400, 300},
 			   								   {450, 300},
-			   								   {500, 350},
-			   								   {500, 400}};
+			   								   {450, 350},
+			   								   {450, 400}};
 	
 	public IOContainer container = new IOContainer("settings.dat");
 	public boolean useShadows;

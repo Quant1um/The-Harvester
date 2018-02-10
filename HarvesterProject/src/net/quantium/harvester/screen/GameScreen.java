@@ -5,6 +5,7 @@ import net.quantium.harvester.data.Session;
 import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
+import net.quantium.harvester.screen.components.BackButton;
 import net.quantium.harvester.screen.components.Button;
 import net.quantium.harvester.text.FontSize;
 import net.quantium.harvester.text.TextAlign;
@@ -16,12 +17,12 @@ public class GameScreen extends MenuScreen{
 		super.render(render);
 		
 		for(int i = 0; i < 7; i++){
-			render.get().fillRect(MainScreen.buttonCenterX + MainScreen.shadowOffset, 50 + i * 22 + MainScreen.shadowOffset, MainScreen.buttonSize * Layer.BLOCK_SIZE, 18, 000);
-			render.get().fillRect(MainScreen.buttonCenterX, 50 + i * 22, MainScreen.buttonSize * Layer.BLOCK_SIZE, 18, 666);
-			render.get().drawRect(MainScreen.buttonCenterX, 50 + i * 22, MainScreen.buttonSize * Layer.BLOCK_SIZE, 18, 555);
+			render.get().fillRect(MenuScreen.BUTTON_CENTER_X + MenuScreen.SHADOWS_OFFSET, 50 + i * 22 + MenuScreen.SHADOWS_OFFSET, MenuScreen.BUTTON_SIZE * Layer.BLOCK_SIZE, 18, 5000);
+			render.get().fillRect(MenuScreen.BUTTON_CENTER_X, 50 + i * 22, MenuScreen.BUTTON_SIZE * Layer.BLOCK_SIZE, 18, 666);
+			render.get().drawRect(MenuScreen.BUTTON_CENTER_X, 50 + i * 22, MenuScreen.BUTTON_SIZE * Layer.BLOCK_SIZE, 18, 555);
 			String name = Session.getName(i);
 			boolean haveSaving = name != null;
-			render.get().drawText(MainScreen.buttonCenterX + 3, 50 + i * 22 + Layer.BLOCK_SIZE - 3, FontSize.NORMAL, haveSaving ? name : " - ", 888, TextAlign.LEFT);
+			render.get().drawText(MenuScreen.BUTTON_CENTER_X + 3, 50 + i * 22 + Layer.BLOCK_SIZE - 3, FontSize.NORMAL, haveSaving ? name : " - ", 888, TextAlign.LEFT);
 		}
 		
 		getContainer().render(render);
@@ -30,25 +31,14 @@ public class GameScreen extends MenuScreen{
 
 	@Override
 	public void init() {
-		getContainer().add(new Button(5, 5, 7, "back", 5, 1){
-			@Override
-			public void onClick(MouseState button) {
-				service.back();
-			}
-			
-			@Override
-			public void render(Renderer render, boolean focused){
-				render.get().fillRect(x + MainScreen.shadowOffset, y + MainScreen.shadowOffset, w, h, 000);
-				super.render(render, focused);
-			}
-		});
+		getContainer().add(new BackButton(5, 5));
 		
 		for(int i = 0; i < 7; i++){
 			String name = Session.getName(i);
 			boolean haveSaving = name != null;
 			final int j = i;
 			if(haveSaving){
-				getContainer().add(new Button(MainScreen.buttonCenterX + (MainScreen.buttonSize - 2) * Layer.BLOCK_SIZE - 1, 51 + i * 22, 2, "", 6){
+				getContainer().add(new Button(MenuScreen.BUTTON_CENTER_X + (MenuScreen.BUTTON_SIZE - 2) * Layer.BLOCK_SIZE - 1, 51 + i * 22, 2, "", 6){
 
 					@Override
 					public void onClick(MouseState button) {
@@ -57,7 +47,7 @@ public class GameScreen extends MenuScreen{
 				
 				});
 				
-				getContainer().add(new Button(MainScreen.buttonCenterX + (MainScreen.buttonSize - 4) * Layer.BLOCK_SIZE - 3, 51 + i * 22, 2, "", 7){
+				getContainer().add(new Button(MenuScreen.BUTTON_CENTER_X + (MenuScreen.BUTTON_SIZE - 4) * Layer.BLOCK_SIZE - 3, 51 + i * 22, 2, "", 7){
 
 					@Override
 					public void onClick(MouseState button) {
@@ -69,7 +59,7 @@ public class GameScreen extends MenuScreen{
 				
 				});
 			}else{
-				getContainer().add(new Button(MainScreen.buttonCenterX + (MainScreen.buttonSize - 2) * Layer.BLOCK_SIZE - 1, 51 + i * 22, 2, "", 0){
+				getContainer().add(new Button(MenuScreen.BUTTON_CENTER_X + (MenuScreen.BUTTON_SIZE - 2) * Layer.BLOCK_SIZE - 1, 51 + i * 22, 2, "", 0){
 
 					@Override
 					public void onClick(MouseState button) {
