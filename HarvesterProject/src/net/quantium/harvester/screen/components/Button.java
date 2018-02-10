@@ -7,17 +7,18 @@ import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.ColorBundle;
 import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
-import net.quantium.harvester.system.text.FontSize;
-import net.quantium.harvester.system.text.TextAlign;
+import net.quantium.harvester.text.FontSize;
+import net.quantium.harvester.text.TextAlign;
 
 public abstract class Button extends Component {
-	private int click = 0;
+	public static final int REACT_TIME = 5;
 	
+	private int click = 0;
+	private MouseState button;
 	protected int color;
 	protected int icon;
 	protected String text;
 	protected int iconFlag = 0;
-	private MouseState button;
 	
 	public int getIconFlag() {
 		return iconFlag;
@@ -82,7 +83,7 @@ public abstract class Button extends Component {
 
 	@Override
 	public void onMouseClick(int x, int y, MouseState button, boolean first) {
-		click = 5;
+		click = REACT_TIME;
 		this.button = button;
 	}
 
@@ -94,9 +95,6 @@ public abstract class Button extends Component {
 		}
 	}
 
-	@Override
-	public void onMouseWheel(int ticks) {}
-	
 	@Override
 	public void update() {
 		if(click > 0){
@@ -114,6 +112,6 @@ public abstract class Button extends Component {
 	
 	@Override
 	public void onKeyWrite(char c, boolean backspace, boolean submit){
-		if(submit) click = 5;
+		if(submit) click = REACT_TIME;
 	}
 }

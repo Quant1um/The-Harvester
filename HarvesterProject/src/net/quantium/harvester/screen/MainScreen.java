@@ -6,8 +6,8 @@ import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.components.Button;
-import net.quantium.harvester.system.text.FontSize;
-import net.quantium.harvester.system.text.TextAlign;
+import net.quantium.harvester.text.FontSize;
+import net.quantium.harvester.text.TextAlign;
 
 public class MainScreen extends MenuScreen {
 

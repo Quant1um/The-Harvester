@@ -1,6 +1,7 @@
 package net.quantium.harvester.screen;
 
 import net.quantium.harvester.Main;
+import net.quantium.harvester.data.Settings;
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.Renderer;
@@ -8,10 +9,9 @@ import net.quantium.harvester.resources.ResourceLoader;
 import net.quantium.harvester.screen.components.Button;
 import net.quantium.harvester.screen.components.Selector;
 import net.quantium.harvester.screen.components.ToggleButton;
-import net.quantium.harvester.system.Settings;
-import net.quantium.harvester.system.text.FontSize;
-import net.quantium.harvester.system.text.Localization;
-import net.quantium.harvester.system.text.TextAlign;
+import net.quantium.harvester.text.FontSize;
+import net.quantium.harvester.text.Localization;
+import net.quantium.harvester.text.TextAlign;
 
 public class SettingsScreen extends MenuScreen {
 

@@ -41,7 +41,6 @@ public class InventorySlot extends Component implements IValueHolder<ItemSlot> {
 
 	@Override
 	public void setValue(ItemSlot value) {
-		onValueChanged(value);
 		inventory.set(slot, value);
 	}
 

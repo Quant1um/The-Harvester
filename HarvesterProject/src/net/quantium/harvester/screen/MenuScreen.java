@@ -3,8 +3,8 @@ package net.quantium.harvester.screen;
 import net.quantium.harvester.Main;
 import net.quantium.harvester.render.ColorBundle;
 import net.quantium.harvester.render.Renderer;
-import net.quantium.harvester.system.text.FontSize;
-import net.quantium.harvester.system.text.TextAlign;
+import net.quantium.harvester.text.FontSize;
+import net.quantium.harvester.text.TextAlign;
 
 public abstract class MenuScreen extends AbstractContainerScreen { 
 	private static final ColorBundle LIGHT_COLOR_BUNDLE = ColorBundle.get(-1, 222, 333, 444, 555, 666);

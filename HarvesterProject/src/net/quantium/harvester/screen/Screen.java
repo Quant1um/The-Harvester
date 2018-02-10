@@ -4,8 +4,8 @@ import net.quantium.harvester.input.IInputListener;
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.Renderer;
-import net.quantium.harvester.system.text.FontSize;
-import net.quantium.harvester.system.text.TextAlign;
+import net.quantium.harvester.text.FontSize;
+import net.quantium.harvester.text.TextAlign;
 
 public abstract class Screen implements IInputListener {
 	protected ScreenService service;

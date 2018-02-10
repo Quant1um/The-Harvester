@@ -3,7 +3,6 @@ package net.quantium.harvester.entity;
 import java.util.List;
 import java.util.Random;
 
-import net.quantium.harvester.ExternalUtils;
 import net.quantium.harvester.Main;
 import net.quantium.harvester.entity.hitbox.Hitbox;
 import net.quantium.harvester.entity.inventory.Inventory;
@@ -20,6 +19,7 @@ import net.quantium.harvester.screen.Screen;
 import net.quantium.harvester.screen.ScreenService;
 import net.quantium.harvester.tile.Tile;
 import net.quantium.harvester.tile.Tiles;
+import net.quantium.harvester.utilities.MathUtils;
 import net.quantium.harvester.world.PassingInfo;
 import net.quantium.harvester.world.World;
 
@@ -116,7 +116,7 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 		if(invincibleTime >= 20){}//todo: damage overlay
 		render.get().resetClip();
 
-		if(intCursor > 0) render.get().drawCircle(x + 2, y - hitbox.getHeight() / 2 - 9, (int)(INTERACTION_DISTANCE * World.ENTITY_TILE_COORDSCALE * ExternalUtils.easeInElastic(intCursor)), 999);
+		if(intCursor > 0) render.get().drawCircle(x + 2, y - hitbox.getHeight() / 2 - 9, (int)(INTERACTION_DISTANCE * World.ENTITY_TILE_COORDSCALE * MathUtils.easeInElastic(intCursor)), 999);
 	}
 
 	@Override

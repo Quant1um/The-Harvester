@@ -19,8 +19,8 @@ import net.quantium.harvester.entity.SlimeEntity;
 import net.quantium.harvester.entity.hitbox.Hitbox;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.render.Renderer;
-import net.quantium.harvester.system.text.FontSize;
-import net.quantium.harvester.system.text.TextAlign;
+import net.quantium.harvester.text.FontSize;
+import net.quantium.harvester.text.TextAlign;
 import net.quantium.harvester.tile.Tile;
 
 public class World implements Serializable{

@@ -18,6 +18,8 @@ import java.util.Random;
 
 import javax.swing.JFrame;
 
+import net.quantium.harvester.data.Session;
+import net.quantium.harvester.data.Settings;
 import net.quantium.harvester.entity.BuildableInfo;
 import net.quantium.harvester.input.IInputListener;
 import net.quantium.harvester.input.InputService;
@@ -29,14 +31,12 @@ import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.CrashScreen;
 import net.quantium.harvester.screen.MainScreen;
 import net.quantium.harvester.screen.ScreenService;
-import net.quantium.harvester.system.IOContainer;
-import net.quantium.harvester.system.Session;
-import net.quantium.harvester.system.Settings;
-import net.quantium.harvester.system.text.FontSize;
-import net.quantium.harvester.system.text.TextAlign;
+import net.quantium.harvester.text.FontSize;
+import net.quantium.harvester.text.TextAlign;
 import net.quantium.harvester.tile.Tiles;
 import net.quantium.harvester.timehook.TimeHook;
 import net.quantium.harvester.timehook.TimeHookManager;
+import net.quantium.harvester.utilities.IOContainer;
 
 //old and legacy and unreadable code
 //its has a lot of not-encapsulated variables

@@ -2,8 +2,8 @@ package net.quantium.harvester.screen;
 
 import net.quantium.harvester.Main;
 import net.quantium.harvester.render.Renderer;
-import net.quantium.harvester.system.text.FontSize;
-import net.quantium.harvester.system.text.TextAlign;
+import net.quantium.harvester.text.FontSize;
+import net.quantium.harvester.text.TextAlign;
 import net.quantium.harvester.timehook.TimeHook;
 import net.quantium.harvester.timehook.TimeHookManager;
 

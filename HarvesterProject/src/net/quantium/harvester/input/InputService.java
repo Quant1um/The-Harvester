@@ -56,6 +56,7 @@ public class InputService implements KeyListener, MouseListener, MouseWheelListe
 		x = (event.getX() / Main.SCALE);
 		y = (event.getY() / Main.SCALE);
 		mouseState = MouseState.RELEASED;
+		main.onMouseClick(x, y, mouseState, false);
 	}
 
 	@Override

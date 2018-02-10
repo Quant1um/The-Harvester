@@ -9,44 +9,45 @@ import net.quantium.harvester.render.Renderer;
 
 public class AbstractContainer<T extends Component> extends Component{
 	protected List<T> comps = new ArrayList<T>();
-	protected int focused = -1;
+	protected T focused = null;
 	
 	@Override
 	public void render(Renderer render, boolean tfocused){
 		for(int i = 0; i < comps.size(); i++)
-			comps.get(i).render(render, focused == i);
+			comps.get(i).render(render, focused == comps.get(i));
 	}
 	
 	@Override
 	public void onMouseClick(int x, int y, MouseState button, boolean first){
-		int c = getIndexOn(x, y);
-		if(c >= 0){
-			if(focused != c){
-				focused = c;
-				comps.get(c).onSelect();
+		T comp = getComponentOn(x, y);
+		if(comp != null){
+			if(focused != comp){
+				focused = comp;
+				comp.onSelect();
 			}
 		}else
-			focused = -1;
-		if(focused >= 0 && focused < comps.size())
-			comps.get(focused).onMouseClick(x, y, button, first);
+			focused = null;
+		
+		if(hasFocused())
+			focused.onMouseClick(x, y, button, first);
 	}
 	
 	@Override
 	public void onKeyPress(Key key, boolean first){
-		if(focused >= 0 && focused < comps.size())
-			comps.get(focused).onKeyPress(key, first);
+		if(hasFocused())
+			focused.onKeyPress(key, first);
 	}
 	
 	@Override
 	public void onMouseWheel(int ticks){
-		if(focused >= 0 && focused < comps.size())
-			comps.get(focused).onMouseWheel(ticks);
+		if(hasFocused())
+			focused.onMouseWheel(ticks);
 	}
 	
 	@Override
 	public void onKeyWrite(char key, boolean backspace, boolean submit) {
-		if(focused >= 0 && focused < comps.size())
-			comps.get(focused).onKeyWrite(key, backspace, submit);
+		if(hasFocused())
+			focused.onKeyWrite(key, backspace, submit);
 	}
 	
 	@Override
@@ -55,41 +56,39 @@ public class AbstractContainer<T extends Component> extends Component{
 			comps.get(i).update();
 	}
 	
-	public int getIndexOn(int x, int y){
+	public T getComponentOn(int x, int y){
 		for(int i = 0; i < comps.size(); i++){
-			Component c = comps.get(i);
+			T c = comps.get(i);
 			if(x >= c.getX() && y >= c.getY() && x <= c.getX() + c.getWidth() && y <= c.getY() + c.getHeight())
-				return i;
+				return c;
 		}
-		return -1;
-	}
-	
-	public Component getFocused(){
-		if(focused >= 0 && focused < comps.size())
-			return comps.get(focused);
 		return null;
 	}
 	
-	public void add(T c){
-		comps.add(c);
+	public T getFocused(){
+		return focused;
 	}
 	
-	public void add(int id, T c){
-		comps.add(id, c);
+	public boolean hasFocused(){
+		return focused != null;
 	}
 	
-	public void addFirst(T c){
-		add(0, c);
+	public void add(T comp){
+		comps.add(comp);
 	}
 	
-	public void remove(T c){
-		focused = -1;
-		comps.remove(c);
+	public void add(int id, T comp){
+		comps.add(id, comp);
 	}
-
-	@Override
-	public void onSelect() {
-		
+	
+	public void addFirst(T comp){
+		add(0, comp);
+	}
+	
+	public void remove(T comp){
+		if(comp == focused)
+			focused = null;
+		comps.remove(comp);
 	}
 	
 	public void render(Renderer render){

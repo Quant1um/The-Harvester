@@ -25,13 +25,12 @@ public class InventoryScreen extends IngameScreen {
 		this.additionalInventory = additionalInventory;
 		this.inventory = inventory;
 		this.behavior = behavior;
-		//System.out.println(this.isDual + ";" + this.behavior + ";" + this.additionalInventory + ";" + this.inventory + ";");
 	}
 	
 	@Override
 	protected void init() {
 		super.init();
-		InventoryLayout first = new InventoryLayout(0, 0, Main.getInstance().getRenderWidth(), Main.getInstance().getRenderHeight(), inventory);
+		InventoryLayout first = new InventoryLayout(0, 0, Main.getInstance().getRenderWidth(), Main.getInstance().getRenderHeight());
 		first.add(new ActiveInventorySlot(50 + EMPTYSPACE, 50 + EMPTYSPACE + 12, inventory, 0));
 		for(int i = 1; i < inventory.size(); i++){
 			int x = 50 + EMPTYSPACE + (i % SLOTS_PER_ROW) * EMPTYSPACE * 8;

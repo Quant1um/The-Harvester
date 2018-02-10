@@ -1,4 +1,4 @@
-package net.quantium.harvester.system.text;
+package net.quantium.harvester.text;
 
 import java.io.BufferedReader;
 import java.io.IOException;

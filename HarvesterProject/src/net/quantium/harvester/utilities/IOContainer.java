@@ -1,4 +1,4 @@
-package net.quantium.harvester.system;
+package net.quantium.harvester.utilities;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,12 +12,10 @@ import java.util.Map;
 import net.quantium.harvester.Main;
 
 public class IOContainer{
-	
-	private final String path;
-	
 	public static final String DATA_FOLDER = System.getProperty("user.home") + File.separator + Main.NAME;
 	
 	public static boolean isSaving;
+	private final String path;
 	
 	static{
 		if(!new File(DATA_FOLDER).exists())
@@ -33,7 +31,6 @@ public class IOContainer{
 		this.path = path;
 	}
 
-	
 	@SuppressWarnings("unchecked")
 	public void load(){
 		if(!new File(DATA_FOLDER + path).exists())
@@ -81,6 +78,5 @@ public class IOContainer{
 	public Map<String, Object> get(){
 		if(map == null) load();
 		return map;
-	}
-	
+	}	
 }

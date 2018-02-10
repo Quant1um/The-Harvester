@@ -37,8 +37,8 @@ public class WorldGenerator {
 	}
 	
 	private static byte get(byte b, byte c, byte d, Random rnd) {
-		if(b < -10) return Tiles.water;
-		if(b < -1) return Tiles.sand;
+		if(b < -7) return Tiles.water;
+		if(b < 2) return Tiles.sand;
 		if(b < 39){
 			if(rnd.nextInt(70) == 0) return Tiles.littleStone;
 			return Tiles.grass;

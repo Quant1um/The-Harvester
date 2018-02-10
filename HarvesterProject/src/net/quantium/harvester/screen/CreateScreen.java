@@ -1,13 +1,13 @@
 package net.quantium.harvester.screen;
 
 import net.quantium.harvester.Main;
+import net.quantium.harvester.data.Session;
 import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.components.Button;
 import net.quantium.harvester.screen.components.InputField;
 import net.quantium.harvester.screen.components.Selector;
-import net.quantium.harvester.system.Session;
 
 public class CreateScreen extends MenuScreen{
 	private final int slot;
@@ -41,8 +41,8 @@ public class CreateScreen extends MenuScreen{
 
 			@Override
 			public void onClick(MouseState button) {
-				if(name.text.length() > 0){
-					Session session = new Session(slot, name.text, sizes[size.getValue()], true);
+				if(name.getValue().length() > 0){
+					Session session = new Session(slot, name.getValue(), sizes[size.getValue()], true);
 					session.save();
 					Main.getInstance().setSession(session);
 					service.setScreen(null);

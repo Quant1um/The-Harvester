@@ -1,9 +1,9 @@
-package net.quantium.harvester;
+package net.quantium.harvester.utilities;
 
 /**
  * Utils from Project-Superposition
  */
-public class ExternalUtils {
+public class MathUtils {
 	
 	public static float square(float v){
 		return v * v;

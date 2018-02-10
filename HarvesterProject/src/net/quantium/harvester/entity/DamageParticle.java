@@ -1,8 +1,8 @@
 package net.quantium.harvester.entity;
 
 import net.quantium.harvester.render.Renderer;
-import net.quantium.harvester.system.text.FontSize;
-import net.quantium.harvester.system.text.TextAlign;
+import net.quantium.harvester.text.FontSize;
+import net.quantium.harvester.text.TextAlign;
 
 public class DamageParticle extends ParticleEntity {
 

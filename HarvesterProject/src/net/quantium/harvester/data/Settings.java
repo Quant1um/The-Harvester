@@ -1,6 +1,7 @@
-package net.quantium.harvester.system;
+package net.quantium.harvester.data;
 
-import net.quantium.harvester.system.text.Localization;
+import net.quantium.harvester.text.Localization;
+import net.quantium.harvester.utilities.IOContainer;
 
 public class Settings {
 	public static final int[][] resolutions = {{350, 225},

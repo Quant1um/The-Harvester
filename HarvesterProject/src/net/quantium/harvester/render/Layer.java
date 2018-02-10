@@ -5,10 +5,10 @@ import java.util.Stack;
 import net.quantium.harvester.resources.ColorableImageContainer;
 import net.quantium.harvester.resources.ImageContainer;
 import net.quantium.harvester.resources.ResourceLoader;
-import net.quantium.harvester.system.text.FontSize;
-import net.quantium.harvester.system.text.Locale;
-import net.quantium.harvester.system.text.Localization;
-import net.quantium.harvester.system.text.TextAlign;
+import net.quantium.harvester.text.FontSize;
+import net.quantium.harvester.text.Locale;
+import net.quantium.harvester.text.Localization;
+import net.quantium.harvester.text.TextAlign;
 
 public class Layer {
 	public static final int MIRRORFLAG_NONE = 0;

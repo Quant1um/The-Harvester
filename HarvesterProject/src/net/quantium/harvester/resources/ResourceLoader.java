@@ -7,7 +7,7 @@ import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
 
-import net.quantium.harvester.system.text.Locale;
+import net.quantium.harvester.text.Locale;
 
 public class ResourceLoader {
 	public static class ImageLoader{

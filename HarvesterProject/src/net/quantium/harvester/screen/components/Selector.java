@@ -8,8 +8,8 @@ import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.ColorBundle;
 import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
-import net.quantium.harvester.system.text.FontSize;
-import net.quantium.harvester.system.text.TextAlign;
+import net.quantium.harvester.text.FontSize;
+import net.quantium.harvester.text.TextAlign;
 
 public class Selector extends Component implements IValueHolder<Integer>{
 	

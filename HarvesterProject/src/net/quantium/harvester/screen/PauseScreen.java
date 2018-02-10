@@ -5,7 +5,7 @@ import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.components.Button;
-import net.quantium.harvester.system.IOContainer;
+import net.quantium.harvester.utilities.IOContainer;
 
 public class PauseScreen extends IngameScreen {
 
