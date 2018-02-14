@@ -3,6 +3,7 @@ package net.quantium.harvester.screen;
 import net.quantium.harvester.Main;
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.input.MouseState;
+import net.quantium.harvester.input.TextModifiers;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.components.Button;
 import net.quantium.harvester.screen.components.Component;
@@ -66,8 +67,8 @@ public class InformationScreen extends MenuScreen {
 	}
 
 	@Override
-	public void onKeyWrite(char key, boolean backspace, boolean submit) {
-		back.onKeyWrite(key, backspace, submit);
+	public void onTextInput(char key, TextModifiers mod) {
+		back.onTextInput(key, mod);
 	}
 
 	@Override

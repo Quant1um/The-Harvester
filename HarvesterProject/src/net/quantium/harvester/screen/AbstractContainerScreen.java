@@ -2,6 +2,7 @@ package net.quantium.harvester.screen;
 
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.input.MouseState;
+import net.quantium.harvester.input.TextModifiers;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.components.Container;
 
@@ -34,8 +35,8 @@ public abstract class AbstractContainerScreen extends Screen {
 	}
 
 	@Override
-	public void onKeyWrite(char key, boolean backspace, boolean submit) {
-		container.onKeyWrite(key, backspace, submit);
+	public void onTextInput(char character, TextModifiers mod) {
+		container.onTextInput(character, mod);
 	}
 
 	@Override

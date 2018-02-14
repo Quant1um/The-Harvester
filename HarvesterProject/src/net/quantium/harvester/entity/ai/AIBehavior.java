@@ -1,5 +1,6 @@
 package net.quantium.harvester.entity.ai;
 
+import net.quantium.harvester.Main;
 import net.quantium.harvester.entity.Entity;
 import net.quantium.harvester.utilities.MathUtils;
 import net.quantium.harvester.world.World;
@@ -21,36 +22,38 @@ public abstract class AIBehavior<T extends Entity> {
 	
 	public abstract void update();
 	
-	private static final int HEATMAP_THRESHOLD = 6;
+	private static final int DISTANCE_THRESHOLD = 8;
+	private static final int DISTANCE_CHECK_OFFSET = 4;
+	
 	private int getHeatmapOffset(int x, int y){
 		World world = getWorld();
-		int cx = getEntity().x >> 4;
-		int cy = getEntity().y >> 4;
 		
-		int a = world.getTargetValue(cx - x, cy - y);
-		int b = world.getTargetValue(cx + x, cy + y);
-		int diff = b - a;
+		if(world.player == null)
+			return Main.GLOBAL_RANDOM.nextInt(3) - 1;
 		
-		int ply = 0;
-		if(world.player != null)
-			ply = x * (world.player.x - getEntity().x) + y * (world.player.y - getEntity().y);
-	
+		int cx = getEntity().x;
+		int cy = getEntity().y;
+		
+		int a = world.player.sqrDistanceTo(cx - x * DISTANCE_CHECK_OFFSET, cy - y * DISTANCE_CHECK_OFFSET);
+		int b = world.player.sqrDistanceTo(cx + x * DISTANCE_CHECK_OFFSET, cy + y * DISTANCE_CHECK_OFFSET);
+		int diff = a - b;
+		
 		int desired = 0;
-		if(Math.abs(diff) > HEATMAP_THRESHOLD)
+		if(Math.abs(diff) > DISTANCE_THRESHOLD)
 			desired = MathUtils.sign(diff);
 		else
-			desired = MathUtils.sign(ply);
+			return Main.GLOBAL_RANDOM.nextInt(3) - 1;
 		
-		if(!world.isTilePassableBy(getEntity(), cx + desired * x, cy + desired * y))
+		if(!world.isTilePassableBy(getEntity(), (cx >> 4) + desired * x, (cy >> 4) + desired * y))
 			return 0;
 		return desired;
 	}
 	
-	protected int getHeatmapOffsetX(){
+	public int getHeatmapOffsetX(){
 		return getHeatmapOffset(1, 0);
 	}
 	
-	protected int getHeatmapOffsetY(){
+	public int getHeatmapOffsetY(){
 		return getHeatmapOffset(0, 1);
 	}
 }

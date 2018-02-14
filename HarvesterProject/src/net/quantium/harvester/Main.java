@@ -22,9 +22,11 @@ import net.quantium.harvester.data.Session;
 import net.quantium.harvester.data.Settings;
 import net.quantium.harvester.entity.BuildableInfo;
 import net.quantium.harvester.input.IInputListener;
+import net.quantium.harvester.input.ITextListener;
 import net.quantium.harvester.input.InputService;
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.input.MouseState;
+import net.quantium.harvester.input.TextModifiers;
 import net.quantium.harvester.item.Items;
 import net.quantium.harvester.render.ColorBundle;
 import net.quantium.harvester.render.Renderer;
@@ -44,7 +46,7 @@ import net.quantium.harvester.utilities.IOContainer;
 //                 uncommented ununderstandable code
 //                 invalid abstractions
 //                 useless stuff
-public class Main extends Canvas implements IInputListener{
+public class Main extends Canvas implements IInputListener, ITextListener{
 	
 	/**
 	 * 
@@ -381,7 +383,13 @@ public class Main extends Canvas implements IInputListener{
 			screenService.current().onMouseWheel(ticks);
 	}
 	
+	@Override
+	public void onTextInput(char character, TextModifiers mod) {
+		if(screenService.isScreenActive())
+			screenService.current().onTextInput(character, mod);
+	}
+	
 	public enum DebugMode{
-		NONE, HITBOX, AI_HEATMAP, METADATA, GUI_INPUT
+		NONE, HITBOX, METADATA, GUI_INPUT
 	}
 }

@@ -66,11 +66,6 @@ public class Selector extends Component implements IValueHolder<Integer>{
 	}
 
 	@Override
-	public void onKeyWrite(char key, boolean backspace, boolean submit) {
-
-	}
-
-	@Override
 	public void onMouseWheel(int ticks) {
 		value += ticks;
 		if(value < 0) value = names.length - 1;

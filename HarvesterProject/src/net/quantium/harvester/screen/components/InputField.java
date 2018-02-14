@@ -5,6 +5,7 @@ import com.sun.glass.events.KeyEvent;
 import net.quantium.harvester.Main;
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.input.MouseState;
+import net.quantium.harvester.input.TextModifiers;
 import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.text.FontSize;
@@ -68,8 +69,8 @@ public class InputField extends Component implements IValueHolder<String>{
 	}
 
 	@Override
-	public void onKeyWrite(char key, boolean backspace, boolean submit) {
-		if(!backspace){
+	public void onTextInput(char key, TextModifiers mod) {
+		if(mod != TextModifiers.BACKSPACE){
 			if(cursor < w / Layer.BLOCK_SIZE && Localization.isPresent(FontSize.NORMAL, Character.toLowerCase(key))){
 				value = value.substring(0, cursor) + Character.toLowerCase(key) + value.substring(cursor, value.length());
 				cursor++;

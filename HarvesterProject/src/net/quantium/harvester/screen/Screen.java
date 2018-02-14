@@ -1,13 +1,15 @@
 package net.quantium.harvester.screen;
 
 import net.quantium.harvester.input.IInputListener;
+import net.quantium.harvester.input.ITextListener;
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.input.MouseState;
+import net.quantium.harvester.input.TextModifiers;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.text.FontSize;
 import net.quantium.harvester.text.TextAlign;
 
-public abstract class Screen implements IInputListener {
+public abstract class Screen implements IInputListener, ITextListener {
 	protected ScreenService service;
 	protected Screen parent;
 	
@@ -26,7 +28,7 @@ public abstract class Screen implements IInputListener {
 	@Override public void onMouseClick(int x, int y, MouseState button, boolean first){}
 	@Override public void onKeyPress(Key key, boolean first){}
 	@Override public void onMouseWheel(int ticks){}
-	public void onKeyWrite(char key, boolean backspace, boolean submit){}
+	@Override public void onTextInput(char character, TextModifiers mod){}
 	
 	public void initialize(ScreenService service, Screen parent){
 		if(isInitialized) return;

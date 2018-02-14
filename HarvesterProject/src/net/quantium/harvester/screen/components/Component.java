@@ -2,11 +2,13 @@ package net.quantium.harvester.screen.components;
 
 import net.quantium.harvester.Main;
 import net.quantium.harvester.input.IInputListener;
+import net.quantium.harvester.input.ITextListener;
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.input.MouseState;
+import net.quantium.harvester.input.TextModifiers;
 import net.quantium.harvester.render.Renderer;
 
-public abstract class Component implements IInputListener {
+public abstract class Component implements IInputListener, ITextListener {
 	protected int x, y, w, h;
 	private boolean focused;
 
@@ -60,12 +62,12 @@ public abstract class Component implements IInputListener {
 	public void update(){}
 	public void onFocused(){}
 	public void onBlurred(){}
-	public void onKeyWrite(char key, boolean backspace, boolean submit){}
-	
+
 	@Override public void onMouseClick(int x, int y, MouseState button, boolean first){}
 	@Override public void onKeyPress(Key key, boolean first){}
 	@Override public void onMouseWheel(int ticks){}
-
+	@Override public void onTextInput(char character, TextModifiers mod){}
+	
 	public boolean isMouseOver(){
 		return Main.getInstance().getInputService().isMouseOverRectangle(x, y, w, h);
 	}

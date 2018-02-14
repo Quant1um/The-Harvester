@@ -23,20 +23,19 @@ public class SlimeEntity extends MobEntity implements AIEntity<SlimeEntity> {
 	protected int jump;
 
 	protected int frame = 1;
-	protected int type = 0;
+	public final SlimeType type;
 	
-	public static final int[] damage = {1, 1, 2, 2, 2};
 	public static final int[] yOffset = {0, 2, 1};
+	
 	@Override
 	public AIBehavior<SlimeEntity> behavior() {
 		return ai;
 	}
 
-	public SlimeEntity(int type){
+	public SlimeEntity(SlimeType type){
 		this.type = type;
-		health = maxHealth = 8 + damage[type] * 2;
+		this.maxHealth = this.health = type.health;
 	}
-
 	
 	@Override
 	public void init() {
@@ -46,14 +45,15 @@ public class SlimeEntity extends MobEntity implements AIEntity<SlimeEntity> {
 
 	@Override
 	public void render(Renderer render) {
-		render.get().draw(x - 16, y - yOffset[frame] - 16, frame * 2, 33 + type * 2, 2, 2, "sheet0", 0);
+		render.get().draw(x - 16, y - yOffset[frame] - 16, frame * 2, 33 + type.spriteOffset * 2, 2, 2, "sheet0", 0);
 		if(invincibleTime >= 20){} //todo
+		//render.get().drawLine(x - 8, y - 8, x - 8 + ai.getHeatmapOffsetX() * 16, y - 8 + ai.getHeatmapOffsetY() * 16, 990);
 	}
 
 	@Override
 	public void bump(Entity ent) {
 		if(ent instanceof PlayerEntity){
-			((LivingEntity) ent).hit(damage[type]);
+			((LivingEntity) ent).hit(type.damage);
 		}
 	}
 
@@ -121,6 +121,21 @@ public class SlimeEntity extends MobEntity implements AIEntity<SlimeEntity> {
 			e.y = y;
 			world.addEntity(e);
 			world.player.slimesKilled = 0;
+		}
+	}
+	
+	public enum SlimeType{
+		JELLY(1, 8, 0),
+		GRASS(1, 14, 1),
+		WATER(2, 10, 2),
+		DARKIE(3, 16, 3);
+		
+		public final int damage, health, spriteOffset;
+		
+		private SlimeType(int damage, int health, int offset){
+			this.damage = damage;
+			this.health = health;
+			this.spriteOffset = offset;
 		}
 	}
 }

@@ -67,4 +67,8 @@ public abstract class Entity implements Serializable, Comparable<Entity>{
 	public int sqrDistanceTo(Entity e){
 		return (x - e.x) * (x - e.x) + (y - e.y) * (y - e.y);
 	}
+	
+	public int sqrDistanceTo(int x, int y){
+		return (this.x - x) * (this.x - x) + (this.y - y) * (this.y - y);
+	}
 }

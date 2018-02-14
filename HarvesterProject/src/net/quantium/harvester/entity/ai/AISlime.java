@@ -34,10 +34,6 @@ public class AISlime extends AIBehavior<SlimeEntity> {
 					xx += getHeatmapOffsetX() * 2;
 					yy += getHeatmapOffsetY() * 2;
 					
-					if(sqrDist > PLAYER_AIVALUE_DISTANCE * PLAYER_AIVALUE_DISTANCE){
-						xx += world.player.x - entity.x;
-						yy += world.player.y - entity.y;
-					}
 			}else{
 				if(entity.world.time > 60000){
 					xx += world.w * 8 - entity.x;

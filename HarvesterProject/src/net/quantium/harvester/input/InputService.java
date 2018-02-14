@@ -68,6 +68,17 @@ public class InputService implements KeyListener, MouseListener, MouseWheelListe
 				main.onKeyPress(key, true);
 			}
 		}
+		
+		if(Character.isDefined(event.getKeyChar())){
+			TextModifiers mod;
+			switch(event.getKeyCode()){
+				case KeyEvent.VK_ENTER:      mod = TextModifiers.SUBMIT; break;
+				case KeyEvent.VK_BACK_SPACE: mod = TextModifiers.BACKSPACE; break;
+				default:                     mod = TextModifiers.NONE; break;
+			
+			}
+			main.onTextInput(event.getKeyChar(), mod);
+		}
 	}
 	
 	@Override

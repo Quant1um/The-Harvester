@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.input.MouseState;
+import net.quantium.harvester.input.TextModifiers;
 import net.quantium.harvester.render.Renderer;
 
 public class AbstractContainer<T extends Component> extends Component{
@@ -42,9 +43,9 @@ public class AbstractContainer<T extends Component> extends Component{
 	}
 	
 	@Override
-	public void onKeyWrite(char key, boolean backspace, boolean submit) {
+	public void onTextInput(char key, TextModifiers mod) {
 		if(hasFocused())
-			focused.onKeyWrite(key, backspace, submit);
+			focused.onTextInput(key, mod);
 	}
 	
 	@Override

@@ -16,6 +16,7 @@ import net.quantium.harvester.entity.ItemEntity;
 import net.quantium.harvester.entity.ParticleEntity;
 import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.entity.SlimeEntity;
+import net.quantium.harvester.entity.SlimeEntity.SlimeType;
 import net.quantium.harvester.entity.hitbox.Hitbox;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.render.Renderer;
@@ -35,7 +36,7 @@ public class World implements Serializable{
 	public static final int RENDERLAYER_ENTITY = 1;
 	public static final int RENDERLAYER_PARTICLE = 2;
 	
-	public static final int TIME_PER_TICK = 20;
+	public static final int TIME_PER_TICK = 2;
 	
 	public static final int ENTITY_TILE_COORDSCALE = 16;
 	public static final int ENTITY_TILE_COORDSHIFT = 4;
@@ -46,8 +47,6 @@ public class World implements Serializable{
 	public byte[] temperature;
 	public byte[] moisture;
 	public byte[] height;
-	
-	public transient byte[] aiTargetMap;
 	
 	public transient List<Entity>[] entityTileCache;
 	
@@ -73,7 +72,6 @@ public class World implements Serializable{
 		this.seed = Main.GLOBAL_RANDOM.nextInt(Integer.MAX_VALUE);
 		this.h = h;
 		this.map = new byte[w * h];
-		this.aiTargetMap = new byte[w * h];
 		this.meta = new short[w * h * METADATA_LAYERS];
 		this.temperature = new byte[w * h];
 		this.moisture = new byte[w * h];
@@ -93,17 +91,11 @@ public class World implements Serializable{
 				randomTick(this, j % w, j / w);
 		}
 		
-		if((Main.getInstance().getCounter() & 7) == 0)
-			for(int i = 0; i < w * h; i++)
-				if(aiTargetMap[i] > Byte.MIN_VALUE) 
-					aiTargetMap[i]--;
-			
-		
 		if(Main.GLOBAL_RANDOM.nextInt(300) == 0) updateEntitySpawningCycle();
 		
 		for(int i = 0; i < entities.size(); i++){
 			Entity e = entities.get(i);
-			if((e.x - player.x) * (e.x - player.x) + (e.y - player.y) * (e.y - player.y) < 100 * 16 * 100 * 16){
+			if(player == null || e.sqrDistanceTo(player) < 50 * 50 * 16 * 16){
 				int preX = e.x;
 				int preY = e.y;
 				e.update();
@@ -139,17 +131,6 @@ public class World implements Serializable{
 				for(int i = (int)(render.get().transform().x / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; i <= (int)(Main.getInstance().getRenderWidth() + render.get().transform().x) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; i++)
 					for(int j = (int)(render.get().transform().y / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; j <= (int)(Main.getInstance().getRenderHeight() + render.get().transform().y) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; j++){
 						Tile.Registry.get(getTile(i, j)).render(render, this, i, j);
-						if(Main.getInstance().getDebugMode() == DebugMode.AI_HEATMAP){
-							int color = 0;
-							int tval = getTargetValue(i, j);
-							if(tval < 0)
-								color = tval * 9 / Byte.MIN_VALUE;
-							else if(tval > 0)
-								color = (tval * 9 / Byte.MAX_VALUE) * 100;
-							else
-								color = 0;
-							render.get().drawRect(i * 16, j * 16, 16, 16, color);
-						}
 						if(Main.getInstance().getDebugMode() == DebugMode.METADATA) render.get().drawText(i * 16, j * 16, FontSize.SMALL, getMetadata(i, j, 0) + "; " + getMetadata(i, j, 1), 338, TextAlign.LEFT);
 					}
 				return;
@@ -256,33 +237,6 @@ public class World implements Serializable{
 	public void setTile(int x, int y, byte b){
 		if(x >= 0 && y >= 0 && x < w && y < h)
 			map[x + y * w] = b;
-	}
-	
-	public byte getTargetValue(int x, int y){
-		if(x >= 0 && y >= 0 && x < w && y < h)
-			return aiTargetMap[x + y * w];
-		return 0;
-	}
-	
-	public static final int AIHEATMAP_MAX_VALUE = Byte.MAX_VALUE;
-	public static final int AIHEATMAP_RADIUS = 6;
-	public static final int AIHEATMAP_MAX_INCREMENT = 15;
-	private void addTargetValue(int x, int y, byte val){
-		if(x >= 0 && y >= 0 && x < w && y < h)
-			aiTargetMap[x + y * w] += Math.min(val, AIHEATMAP_MAX_VALUE - aiTargetMap[x + y * w]);
-	}
-	
-	public void addTargetValue(int x, int y){
-		final int RADIUS_SQUARED = AIHEATMAP_RADIUS * AIHEATMAP_RADIUS;
-		for(int i = -AIHEATMAP_RADIUS; i < AIHEATMAP_RADIUS; i++){
-			for(int j = -AIHEATMAP_RADIUS; j < AIHEATMAP_RADIUS; j++){
-				int d = i * i + j * j;
-				if(d <= RADIUS_SQUARED){
-					int val = (RADIUS_SQUARED - d) * AIHEATMAP_MAX_INCREMENT / RADIUS_SQUARED;
-					addTargetValue(x + i, y + j, (byte)val);
-				}
-			}
-		}
 	}
 	
 	public byte getTemperature(int x, int y){
@@ -473,10 +427,10 @@ public class World implements Serializable{
 		int height = getHeight(x, y);
 		
 		int seed = Main.GLOBAL_RANDOM.nextInt(10);
-		if(seed < 3 && moisture > 10) return new SlimeEntity(2);
-		if(seed < 6 && height > 27) return new SlimeEntity(3);
-		if(seed < 9 && height > 3) return new SlimeEntity(1);
-		return new SlimeEntity(0);
+		if(seed < 5 && moisture > 10) return new SlimeEntity(SlimeType.WATER);
+		if(seed < 2 && height > 27) return new SlimeEntity(SlimeType.DARKIE);
+		if(seed < 9 && height > 7) return new SlimeEntity(SlimeType.GRASS);
+		return new SlimeEntity(SlimeType.JELLY);
 	}
 	
 	private int genEntityPos(int ply){

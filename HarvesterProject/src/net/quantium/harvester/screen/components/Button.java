@@ -110,9 +110,4 @@ public abstract class Button extends Component {
 	}
 	
 	public abstract void onClick(MouseState button);
-	
-	@Override
-	public void onKeyWrite(char c, boolean backspace, boolean submit){
-		if(submit) click = REACT_TIME;
-	}
 }

@@ -15,7 +15,7 @@ public class SlimeBossEntity extends SlimeEntity {
 	public boolean readyToEject = false;
 	
 	public SlimeBossEntity() {
-		super(0);
+		super(SlimeType.DARKIE);
 		health = maxHealth = 100;
 	}
 	

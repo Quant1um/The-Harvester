@@ -113,8 +113,6 @@ public class Session {
 			session.world = (World) io.get().get("world");
 			session.player = (PlayerEntity) io.get().get("player");
 			session.world.player = session.player;
-			
-			session.world.aiTargetMap = new byte[session.world.w * session.world.h];
 			session.world.entityTileCache = new List[session.world.w * session.world.h];
 			for(int i = 0; i < session.world.entityTileCache.length; i++)
 				session.world.entityTileCache[i] = new ArrayList<Entity>();
