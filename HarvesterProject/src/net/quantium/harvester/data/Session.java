@@ -4,12 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import net.quantium.harvester.Main;
-import net.quantium.harvester.entity.Entity;
 import net.quantium.harvester.entity.ISpectator;
 import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.render.Renderer;
@@ -94,7 +91,6 @@ public class Session {
 		return player;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static Session load(int slot){
 		if(slot < 0 && slot >= 7) return null;
 		try{
@@ -111,15 +107,10 @@ public class Session {
 			int size = (int) io.get().get("size");
 			Session session = new Session(slot, name, size, false);
 			session.world = (World) io.get().get("world");
+			session.world.restore();
 			session.player = (PlayerEntity) io.get().get("player");
 			session.world.player = session.player;
-			session.world.entityTileCache = new List[session.world.w * session.world.h];
-			for(int i = 0; i < session.world.entityTileCache.length; i++)
-				session.world.entityTileCache[i] = new ArrayList<Entity>();
-			for(Entity e : session.world.entities){
-				e.init();
-				session.world.cacheEntity(e.x >> World.ENTITY_TILE_COORDSHIFT, e.y >> World.ENTITY_TILE_COORDSHIFT, e);
-			}
+
 			session.world.player.init();
 			return session;
 		}catch(Exception e){

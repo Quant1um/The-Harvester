@@ -50,6 +50,6 @@ public class PauseScreen extends IngameScreen {
 
 	@Override
 	public void shown() {
-		if(!IOContainer.isSaving) Main.getInstance().getSession().save();
+		if(!IOContainer.isSaving()) Main.getInstance().getSession().save();
 	}
 }

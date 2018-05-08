@@ -4,11 +4,10 @@ import java.util.Random;
 
 import net.quantium.harvester.Main;
 import net.quantium.harvester.entity.hitbox.Hitbox;
-import net.quantium.harvester.item.Item;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.item.Items;
-import net.quantium.harvester.item.ToolItem;
-import net.quantium.harvester.item.ToolItem.ToolType;
+import net.quantium.harvester.item.instances.ToolItem;
+import net.quantium.harvester.item.instances.ToolItem.ToolType;
 import net.quantium.harvester.render.Color;
 import net.quantium.harvester.render.ColorBundle;
 import net.quantium.harvester.render.Renderer;
@@ -82,8 +81,8 @@ public class TreeEntity extends LivingEntity {
 
 	@Override
 	public boolean onInteract(World world2, PlayerEntity playerEntity, InteractionMode im, ItemSlot item) {
-		if(item != null && Item.Registry.get(item.item) instanceof ToolItem && ((ToolItem)Item.Registry.get(item.item)).getToolType() == ToolType.AXE){
-			this.hit(((ToolItem)Item.Registry.get(item.item)).getPower());
+		if(item != null && item.getItem() instanceof ToolItem && ((ToolItem)item.getItem()).getToolType() == ToolType.AXE){
+			this.hit(((ToolItem)item.getItem()).getPower());
 		}else{
 			this.hit(1);
 		}
@@ -94,6 +93,7 @@ public class TreeEntity extends LivingEntity {
 
 	@Override
 	public void onDied() {
+		super.onDied();
 		world.throwItem(x, y, new ItemSlot(Items.wood, 0, Main.GLOBAL_RANDOM.nextInt(5) + 1));
 	}
 }

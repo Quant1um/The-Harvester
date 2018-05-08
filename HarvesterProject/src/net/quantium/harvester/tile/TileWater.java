@@ -6,7 +6,7 @@ import net.quantium.harvester.entity.Entity;
 import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.entity.SlimeBossEntity;
 import net.quantium.harvester.entity.Entity.InteractionMode;
-import net.quantium.harvester.item.ToolItem.ToolType;
+import net.quantium.harvester.item.instances.ToolItem.ToolType;
 import net.quantium.harvester.render.ColorBundle;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.world.World;
@@ -43,15 +43,11 @@ public class TileWater extends Tile{
 
 	@Override
 	public boolean isConnectable(World w, int x, int y, int xx, int yy) {
-		Tile t = Tile.Registry.get(w.getTile(xx, yy));
-		return t instanceof TileWater;
+		return w.getTile(xx, yy) instanceof TileWater;
 	}
 
 	@Override
 	public void hit(World world, int i, int j, PlayerEntity playerEntity, int damage, ToolType type) {
 		
 	}
-
-	
-	
 }

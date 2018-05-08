@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 import javax.imageio.ImageIO;
 
@@ -56,6 +57,10 @@ public class ResourceLoader {
 			return locales.get(i);
 		}
 
+		public static Iterator<Locale> iterator(){
+			return locales.iterator();
+		}
+		
 		public static int size() {
 			return locales.size();
 		}

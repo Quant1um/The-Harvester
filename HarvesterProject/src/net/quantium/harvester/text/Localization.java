@@ -1,10 +1,20 @@
 package net.quantium.harvester.text;
 
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import net.quantium.harvester.resources.ResourceLoader;
 
 public class Localization {
 	private static int currentLocale = 0;
-
+	
+	private static final EnumMap<FontSize, Map<Character, Locale>> charLocaleMap = new EnumMap<>(FontSize.class);
+	static{
+		for(FontSize font : FontSize.values())
+			charLocaleMap.put(font, new HashMap<>());
+	}
 	
 	public static int getCurrentLocaleID() {
 		return currentLocale;
@@ -14,17 +24,32 @@ public class Localization {
 		return ResourceLoader.LocaleLoader.get(currentLocale);
 	}
 
+	public static Locale getLocaleWhereCharacterPresents(FontSize size, char c){
+		if(charLocaleMap.get(size).containsKey(c)) 
+			return charLocaleMap.get(size).get(c);
+		
+		Locale loc = null;
+		Iterator<Locale> it = ResourceLoader.LocaleLoader.iterator();
+		while(it.hasNext())
+		{
+			Locale _loc = it.next();
+			if(_loc.isPresent(size, c)){
+				loc = _loc;
+				break;
+			}
+		}
+		
+		charLocaleMap.get(size).put(c, loc);
+		return loc;
+	}
+	
 	public static int getWidth(FontSize font, char c){
-			if(getCurrentLocale().isPresent(font, c))
-				return getCurrentLocale().getWidth(font, c);
-			else if(Locale.DEFAULT.isPresent(font, c))
-				return Locale.DEFAULT.getWidth(font, c);
-			else
-				return 0;
+		if(!isPresent(font, c)) return 0;
+		return getLocaleWhereCharacterPresents(font, c).getWidth(font, c);
 	}
 
 	public static boolean isPresent(FontSize font, char c) {
-		return Locale.DEFAULT.isPresent(font, c) || getCurrentLocale().isPresent(font, c);
+		return getLocaleWhereCharacterPresents(font, c) != null;	
 	}
 	
 	public static int getWidth(FontSize font, String s, boolean localize){

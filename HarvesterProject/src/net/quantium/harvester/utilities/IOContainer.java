@@ -1,5 +1,6 @@
 package net.quantium.harvester.utilities;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,7 +15,7 @@ import net.quantium.harvester.Main;
 public class IOContainer{
 	public static final String DATA_FOLDER = System.getProperty("user.home") + File.separator + Main.NAME;
 	
-	public static boolean isSaving;
+	private static volatile boolean isSaving;
 	private final String path;
 	
 	static{
@@ -59,24 +60,46 @@ public class IOContainer{
 	
 	public void saveSynchronized(){
 		isSaving = true;
+		
+		FileOutputStream tempFileOut = null;
+		ObjectOutputStream objectOut = null;
+		
 		try {
 			File file = new File(DATA_FOLDER + path);
-			if(!file.exists())
+			if(!file.exists()){
 				file.createNewFile();
-			FileOutputStream f = new FileOutputStream(file);
-		    ObjectOutputStream o = new ObjectOutputStream(f);
-		    o.writeObject(map); //todo possible crash concurrent (on game exit)
-		    o.close();
-		    f.close();
-		    System.gc();//dirty trick
+			}
+			
+			tempFileOut = new FileOutputStream(file);
+			objectOut = new ObjectOutputStream(tempFileOut);
+			objectOut.writeObject(map); //todo possible crash concurrent (on game exit)
 	    } catch (IOException e) {
 	    	e.printStackTrace();
+		} finally {
+			close(tempFileOut);
+			close(objectOut);
+			
 		}
+		
 		isSaving = false;
 	}
 	
+	private static void close(Closeable closeable) {
+		if(closeable == null)
+			return;
+		
+		try{
+			closeable.close();
+			System.gc(); //dirty trick
+		}catch(Throwable ignored){}		
+	}
+
 	public Map<String, Object> get(){
 		if(map == null) load();
 		return map;
 	}	
+	
+	public static final boolean isSaving(){
+		return isSaving;
+	}
 }

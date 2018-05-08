@@ -1,6 +1,9 @@
-package net.quantium.harvester.entity;
+package net.quantium.harvester.entity.buildable;
 
-import net.quantium.harvester.entity.BuildableInfo.BuildableType;
+import net.quantium.harvester.entity.Entity;
+import net.quantium.harvester.entity.PlayerEntity;
+import net.quantium.harvester.entity.buildable.BuildableInfo.BuildableBehavior;
+import net.quantium.harvester.entity.buildable.BuildableInfo.BuildableType;
 import net.quantium.harvester.entity.hitbox.Hitbox;
 import net.quantium.harvester.entity.inventory.Inventory;
 import net.quantium.harvester.item.ItemSlot;
@@ -17,15 +20,20 @@ public class BuildableEntity extends Entity {
 	public final BuildableType type;
 	
 	protected int clicks = 0;
-	public Inventory inventory;
+	public final Inventory inventory;
 	
-	public int data0;
+	public final Object container;
 	
 	public BuildableEntity(BuildableType type){
 		this.type = type;
-		inventory = new Inventory(BuildableInfo.Registry.get(type).inventorySize);
+		this.inventory = new Inventory(getBehaviour().inventorySize);
+		this.container = getBehaviour().instantiateContainer();
 	}
 
+	public BuildableBehavior getBehaviour(){
+		return BuildableInfo.Registry.get(type);
+	}
+	
 	@Override
 	public void init() {
 		hitbox = new Hitbox(16, 5, -8, -3);
@@ -34,7 +42,7 @@ public class BuildableEntity extends Entity {
 	@Override
 	public void update() {
 		if(clicks > 0) clicks--;
-		BuildableInfo.Registry.get(type).update(this);
+		getBehaviour().update(this);
 	}
 
 	@Override

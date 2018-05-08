@@ -6,18 +6,17 @@ import java.util.Random;
 import net.quantium.harvester.Main;
 import net.quantium.harvester.entity.hitbox.Hitbox;
 import net.quantium.harvester.entity.inventory.Inventory;
+import net.quantium.harvester.input.InputService;
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.input.MouseState;
-import net.quantium.harvester.item.Item;
 import net.quantium.harvester.item.ItemSlot;
-import net.quantium.harvester.item.ToolItem.ToolType;
+import net.quantium.harvester.item.instances.ToolItem.ToolType;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.DeathScreen;
 import net.quantium.harvester.screen.InventoryScreen;
 import net.quantium.harvester.screen.PauseScreen;
 import net.quantium.harvester.screen.Screen;
 import net.quantium.harvester.screen.ScreenService;
-import net.quantium.harvester.tile.Tile;
 import net.quantium.harvester.tile.Tiles;
 import net.quantium.harvester.utilities.MathUtils;
 import net.quantium.harvester.world.PassingInfo;
@@ -41,16 +40,13 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 	private int walking = 0;
 	private int moveX, moveY;
 	private int interactionTime;
-	public Inventory inventory = new Inventory(16);
+	public final Inventory inventory = new Inventory(16);
 
-	private boolean requestAnimation;
-	
 	private int requestedHitLevel;
 	private ToolType requestedHitTool;
 	
 	private int spawnX = -1, spawnY = -1;
-	
-	public boolean died;
+	private boolean died;
 	
 	int slimesKilled = 0;
 	
@@ -78,18 +74,15 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 		
 		int shouldMoveX = 0;
 		int shouldMoveY = 0;
-		if(Main.getInstance().getInputService().w.isDown()) shouldMoveY--;
-		if(Main.getInstance().getInputService().s.isDown()) shouldMoveY++;
-		if(Main.getInstance().getInputService().a.isDown()) shouldMoveX--;
-		if(Main.getInstance().getInputService().d.isDown()) shouldMoveX++;
-		move(shouldMoveX, shouldMoveY);
-		if(shouldMoveX != 0 || shouldMoveY != 0) requestAnimation = true;
-		
-		if(requestAnimation){
+		if(input().w.isDown()) shouldMoveY--;
+		if(input().s.isDown()) shouldMoveY++;
+		if(input().a.isDown()) shouldMoveX--;
+		if(input().d.isDown()) shouldMoveX++;
+		if(shouldMoveX != 0 || shouldMoveY != 0){
+			move(shouldMoveX, shouldMoveY);
 			walkFrame++;
 			walkFrame = walkFrame % 40;
 			walking = 5;
-			requestAnimation = false;
 		}
 		
 		if(intTime > 0){
@@ -111,7 +104,8 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 			render.get().clipY1 = y - hitbox.getHeight() + 5 - getYOffset();	
 		}
 		render.get().draw(x - hitbox.getWidth() / 2, y - hitbox.getHeight() - 18 + offset, o0 + (walking > 0 ? walkFrame / 10 * 2 : 0), 16, 2, 3, "sheet0", direction == 0 ? 1 : 0);
-		if(invincibleTime >= 20){}//todo: damage overlay
+		if(invincibleTime >= 20)
+			render.get().drawTinted(x - hitbox.getWidth() / 2, y - hitbox.getHeight() - 18 + offset, o0 + (walking > 0 ? walkFrame / 10 * 2 : 0), 16, 2, 3, DAMAGE_TINT_COLOR, "sheet0", direction == 0 ? 1 : 0);
 		render.get().resetClip();
 
 		if(intCursor > 0) render.get().drawCircle(x + 2, y - hitbox.getHeight() / 2 - 9, (int)(INTERACTION_DISTANCE * World.ENTITY_TILE_COORDSCALE * MathUtils.easeInElastic(intCursor)), 999);
@@ -162,32 +156,32 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 			List<Entity> ents = world.interact(this, xx, yy);
 			for(Entity e : ents)
 				if(e.onInteract(world, this, mode, inventory.get(0))) return;
-			if(inventory.get(0) == null || Item.Registry.get(inventory.get(0).getItem()) == null || !Item.Registry.get(inventory.get(0).getItem()).
+			if(inventory.get(0) == null || inventory.get(0).getItem() == null || !inventory.get(0).getItem().
 					interact(world, xx, 
 							yy, 
 							this, 
 							mode,
 						    inventory.get(0))){
-				Tile.Registry.get(world.getTile(xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT)).onInteract(world, xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT, this, mode);
-				Tile.Registry.get(world.getTile(xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT)).hit(world, xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT, this, 1, ToolType.NONE);
+				world.getTile(xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT).onInteract(world, xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT, this, mode);
+				world.getTile(xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT).hit(world, xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT, this, 1, ToolType.NONE);
 			}else{
 				if(requestedHitLevel > 0 && intTime > 0)
-					Tile.Registry.get(world.getTile(xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT)).hit(world, xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT, this, requestedHitLevel, requestedHitTool);
+				world.getTile(xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT).hit(world, xx >> World.ENTITY_TILE_COORDSHIFT, yy >> World.ENTITY_TILE_COORDSHIFT, this, requestedHitLevel, requestedHitTool);
 			}
 		}
 	}
 
 	@Override
 	public void onKeyPress(Key key, boolean first) {
-		if(getScreenService().isScreenActive()) return;
+		if(screen().isScreenActive()) return;
 		
-		if(key == Main.getInstance().getInputService().escape && first){
-			getScreenService().setScreen(new PauseScreen());	
+		if(key == input().escape && first){
+			screen().setScreen(new PauseScreen());	
 			key.suppress();
 		}
 		
-		if(key == Main.getInstance().getInputService().inventory && first){
-			getScreenService().setScreen(new InventoryScreen(inventory, null, null));
+		if(key == input().inventory && first){
+			screen().setScreen(new InventoryScreen(inventory, null, null));
 			key.suppress();
 		}
 	}
@@ -217,14 +211,14 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 		PassingInfo infy = world.tryPass(this, 0, yy);
 		if(infx.isPassed()){
 			moveX += xx;
-			Tile.Registry.get(infx.getSteppedOn()).onInteract(world, infx.getTileX(), infx.getTileY(), this, InteractionMode.STEP);
+			infx.getSteppedOn().onInteract(world, infx.getTileX(), infx.getTileY(), this, InteractionMode.STEP);
 			
 		}else
 			for(int i = 0; i < infx.getBumped().size(); i++)
 				this.bump(infx.getBumped().get(i));
 		if(infy.isPassed()){
 			moveY += yy;
-			Tile.Registry.get(infy.getSteppedOn()).onInteract(world, infy.getTileX(), infy.getTileY(), this, InteractionMode.STEP);
+			infy.getSteppedOn().onInteract(world, infy.getTileX(), infy.getTileY(), this, InteractionMode.STEP);
 			
 		}else
 			for(int i = 0; i < infy.getBumped().size(); i++)
@@ -237,21 +231,27 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 	}
 
 	public void openScreen(Screen screen) {
-		getScreenService().setScreen(screen);
+		screen().setScreen(screen);
 	}
 
-	private ScreenService getScreenService() {
+	private ScreenService screen() {
 		return Main.getInstance().getScreenService();
 	}
 
+	private InputService input(){
+		return Main.getInstance().getInputService();
+	}
+	
 	@Override
 	public void onDied() {
+		super.onDied();
 		openScreen(new DeathScreen(this));
-		for(int i = 0; i < inventory.size(); i++)
+		for(int i = 0; i < inventory.size(); i++){
 			if(inventory.get(i) != null){
 				world.throwItem(x, y, inventory.get(i));
 				inventory.set(i, null);
 			}
+		}
 	}
 	
 	@Override
@@ -308,9 +308,13 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 	public String toString(){
 		return "PlayerEntity{InteractionTime=" + intTime + ", InteractionCursor=" + intCursor + ", WalkFrame=" + walkFrame + 
 				", Direction=" + direction + ", Walking=" + walking + ", MoveX=" + moveX + ", MoveY=" + moveY + 
-				", InteractionCooldown=" + interactionTime + ", RequestAnimation=" + requestAnimation + ", Inventory=" + inventory + 
+				", InteractionCooldown=" + interactionTime + ", Inventory=" + inventory + 
 				", RequestedHitLevel=" + requestedHitLevel + ", RequestedHitTool=" + requestedHitTool + ", SpawnX=" + spawnX + ", SpawnY=" + spawnY + 
 				", Health=" + health + ", MaxHealth=" + maxHealth + ", InvicibleTime=" + invincibleTime + ", SlimesKilled=" + slimesKilled + 
 				", X=" + x + ", Y= " + y + "}";
+	}
+
+	public boolean isDied() {
+		return this.died;
 	}
 }

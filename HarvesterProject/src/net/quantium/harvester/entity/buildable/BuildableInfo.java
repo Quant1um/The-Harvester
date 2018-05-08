@@ -1,12 +1,15 @@
-package net.quantium.harvester.entity;
+package net.quantium.harvester.entity.buildable;
+
+import java.util.EnumMap;
 
 import net.quantium.harvester.Main;
 import net.quantium.harvester.entity.Entity.InteractionMode;
+import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.entity.inventory.Inventory;
-import net.quantium.harvester.item.FuelItem;
-import net.quantium.harvester.item.Item;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.item.Items;
+import net.quantium.harvester.item.instances.FuelItem;
+import net.quantium.harvester.item.instances.Item;
 import net.quantium.harvester.screen.AnvilScreen;
 import net.quantium.harvester.screen.FurnaceScreen;
 import net.quantium.harvester.screen.InventoryScreen;
@@ -16,15 +19,16 @@ import net.quantium.harvester.world.World;
 
 public class BuildableInfo {
 	public static class Registry{
-		private static BuildableBehavior[] registry = new BuildableBehavior[BuildableType.values().length];
+		private static final EnumMap<BuildableType, BuildableBehavior> registry = new EnumMap<>(BuildableType.class);
 
 		public static void register(BuildableType type, BuildableBehavior meta){
-			if(registry[type.ordinal()] != null) throw new java.lang.IllegalStateException("Buildable info for type " + type + " already registered!");
-			registry[type.ordinal()] = meta;
+			if(registry.containsKey(type)) 
+				throw new java.lang.IllegalStateException("Buildable info for type " + type + " already registered!");
+			registry.put(type, meta);
 		}
 		
 		public static BuildableBehavior get(BuildableType type){
-			return registry[type.ordinal()];
+			return registry.get(type);
 		}
 	}
 	
@@ -33,20 +37,35 @@ public class BuildableInfo {
 		public final int inventorySize;
 		public final int boxHeight;
 		public final String name;
-		public final byte item;
+		public final Item item;
 		public final int spriteOffset;
+		public final Class<?> containerClass;
 		
-		public BuildableBehavior(String name, int inventorySize, int boxHeight, byte item, int spriteOffset) {
+		public BuildableBehavior(String name, int inventorySize, int boxHeight, Item item, int spriteOffset) {
+			this(name, inventorySize, boxHeight, item, spriteOffset, null);
+		}
+		
+		public BuildableBehavior(String name, int inventorySize, int boxHeight, Item item, int spriteOffset, Class<?> containerClass) {
 			this.inventorySize = inventorySize;
 			this.boxHeight = boxHeight;
 			this.name = name;
 			this.item = item;
 			this.spriteOffset = spriteOffset;
+			this.containerClass = containerClass;
 		}
+		
 		public abstract void onInteract(World world, PlayerEntity playerEntity, InteractionMode im, ItemSlot item, BuildableEntity ent);
 		public abstract InventorySlot[] getLayout(Inventory inventory);
 		public abstract void update(BuildableEntity e);
 		public abstract ItemSlot[] getRequiredItems();
+		
+		public Object instantiateContainer() {
+			try {
+				return containerClass == null ? null : containerClass.newInstance();
+			} catch (InstantiationException | IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 	
 	public static void register(){
@@ -114,7 +133,7 @@ public class BuildableInfo {
 			}
 		});
 		
-		Registry.register(BuildableType.FURNACE, new BuildableBehavior("furnace", 3, 75, Items.alloyFurnace, 2){
+		Registry.register(BuildableType.FURNACE, new BuildableBehavior("furnace", 3, 75, Items.alloyFurnace, 2, FurnaceContainer.class){
 
 			@Override
 			public void onInteract(World world, PlayerEntity playerEntity, InteractionMode im, ItemSlot item, BuildableEntity ent) {
@@ -130,13 +149,14 @@ public class BuildableInfo {
 
 			@Override
 			public void update(BuildableEntity e) {
-				if(e.data0 > 0 && Main.getInstance().getCounter() % 40 == 0) e.data0--;
-				if(e.data0 < 500 && e.inventory.get(2) != null){
-					if(Item.Registry.get(e.inventory.get(2).item) instanceof FuelItem){
-						int ccc = ((FuelItem) Item.Registry.get(e.inventory.get(2).item)).getFuelValue();
+				FurnaceContainer container = (FurnaceContainer) e.container;
+				if(container.fuel > 0 && Main.getInstance().getCounter() % 40 == 0) container.fuel--;
+				if(container.fuel< 500 && e.inventory.get(2) != null){
+					if(e.inventory.get(2).getItem() instanceof FuelItem){
+						int ccc = ((FuelItem) e.inventory.get(2).getItem()).getFuelValue();
 						if(Main.getInstance().getCounter() % 50 == 0 && e.inventory.get(2).consume(1)){
-							e.data0 += ccc;
-							if(e.data0 > 500) e.data0 = 500;
+							container.fuel += ccc;
+							if(container.fuel > 500) container.fuel = 500;
 						}
 					}
 				}
@@ -174,7 +194,7 @@ public class BuildableInfo {
 			public ItemSlot[] getRequiredItems() {
 				return new ItemSlot[]{
 						new ItemSlot(Items.iron,   0, 4),
-						new ItemSlot(Items.lead, 0, 2),
+						new ItemSlot(Items.lead,   0, 2),
 						new ItemSlot(Items.wood,   0, 6),
 						new ItemSlot(Items.rock,   0, 4),
 						new ItemSlot(Items.wood,   0, 2),

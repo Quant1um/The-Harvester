@@ -1,4 +1,4 @@
-package net.quantium.harvester.item;
+package net.quantium.harvester.item.instances;
 
 public class FuelItem extends AbstractItem {
 

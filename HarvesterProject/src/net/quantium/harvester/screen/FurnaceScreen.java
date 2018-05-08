@@ -2,9 +2,10 @@ package net.quantium.harvester.screen;
 
 import net.quantium.harvester.Main;
 import net.quantium.harvester.craft.Crafts;
-import net.quantium.harvester.entity.BuildableEntity;
-import net.quantium.harvester.entity.BuildableInfo;
-import net.quantium.harvester.entity.BuildableInfo.BuildableType;
+import net.quantium.harvester.entity.buildable.BuildableEntity;
+import net.quantium.harvester.entity.buildable.BuildableInfo;
+import net.quantium.harvester.entity.buildable.BuildableInfo.BuildableType;
+import net.quantium.harvester.entity.buildable.FurnaceContainer;
 import net.quantium.harvester.entity.inventory.Inventory;
 import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.item.ItemSlot;
@@ -41,7 +42,7 @@ public class FurnaceScreen extends InventoryScreen {
 		super.render(render);
 		render.get().drawColored(Main.getInstance().getRenderWidth() - 122, 65, 3, 4, 4, 2, ColorBundle.get(-1, -1, -1, -1, -1, 888), "gui", 0);
 		render.get().fillRect(Main.getInstance().getRenderWidth() - 160, 100, 100, 2, 444);
-		render.get().fillRect(Main.getInstance().getRenderWidth() - 160, 100, entity.data0 / 5, 2, 822);
+		render.get().fillRect(Main.getInstance().getRenderWidth() - 160, 100, ((FurnaceContainer)entity.container).fuel / 5, 2, 822);
 	}
 	
 	@Override

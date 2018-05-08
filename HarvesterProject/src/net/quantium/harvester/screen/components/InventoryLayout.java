@@ -85,11 +85,11 @@ public class InventoryLayout extends AbstractContainer<InventorySlot>{
 					return;
 				}
 				if(is1 != null){
-					if(is0.consume(1)) is1.count += 1;
+					if(is0.consume(1)) is1.setCount(is1.getCount() + 1);
 				}else{
 					if(is0.consume(1)){
 						ItemSlot temp = is0.copy();
-						is0.count = 1;
+						is0.setCount(1);
 						second.setValue(temp);
 					}
 				}

@@ -14,24 +14,20 @@ import java.util.Map;
 import net.quantium.harvester.Main;
 
 public class InputService implements KeyListener, MouseListener, MouseWheelListener, MouseMotionListener{
-	private Main main;
+	private IInputListener listener;
 	
 	private int x, y;
 	private MouseState mouseState = MouseState.UNDEFINED;
 	
 	private Map<Integer, Key> keys = new HashMap<Integer, Key>();
 	
-	public InputService(Main main){
-		this.main = main;
-		main.addKeyListener(this);
-		main.addMouseListener(this);
-		main.addMouseWheelListener(this);
-		main.addMouseMotionListener(this);
+	public InputService(IInputListener listener){
+		this.listener = listener;
 	}
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent arg0) {
-		main.onMouseWheel(arg0.getWheelRotation());
+		listener.onMouseWheel(arg0.getWheelRotation());
 	}
 
 	@Override
@@ -48,7 +44,7 @@ public class InputService implements KeyListener, MouseListener, MouseWheelListe
 		x = (event.getX() / Main.SCALE);
 		y = (event.getY() / Main.SCALE);
 		mouseState = MouseState.fromMouseEvent(event);
-		main.onMouseClick(x, y, mouseState, true);
+		listener.onMouseClick(x, y, mouseState, true);
 	}
 
 	@Override
@@ -56,7 +52,7 @@ public class InputService implements KeyListener, MouseListener, MouseWheelListe
 		x = (event.getX() / Main.SCALE);
 		y = (event.getY() / Main.SCALE);
 		mouseState = MouseState.RELEASED;
-		main.onMouseClick(x, y, mouseState, false);
+		listener.onMouseClick(x, y, mouseState, false);
 	}
 
 	@Override
@@ -65,19 +61,21 @@ public class InputService implements KeyListener, MouseListener, MouseWheelListe
 			Key key = get(event.getKeyCode());
 			if(!key.down){
 				key.toggle(true, event.getKeyChar(), event.getModifiers());
-				main.onKeyPress(key, true);
+				listener.onKeyPress(key, true);
 			}
 		}
 		
-		if(Character.isDefined(event.getKeyChar())){
-			TextModifiers mod;
-			switch(event.getKeyCode()){
-				case KeyEvent.VK_ENTER:      mod = TextModifiers.SUBMIT; break;
-				case KeyEvent.VK_BACK_SPACE: mod = TextModifiers.BACKSPACE; break;
-				default:                     mod = TextModifiers.NONE; break;
+		if(listener instanceof ITextListener){
+			if(Character.isDefined(event.getKeyChar())){
+				TextModifiers mod;
+				switch(event.getKeyCode()){
+					case KeyEvent.VK_ENTER:      mod = TextModifiers.SUBMIT; break;
+					case KeyEvent.VK_BACK_SPACE: mod = TextModifiers.BACKSPACE; break;
+					default:                     mod = TextModifiers.NONE; break;
 			
+				}	
+				((ITextListener) listener).onTextInput(event.getKeyChar(), mod);
 			}
-			main.onTextInput(event.getKeyChar(), mod);
 		}
 	}
 	
@@ -119,11 +117,11 @@ public class InputService implements KeyListener, MouseListener, MouseWheelListe
 	
 	public void update() {
 		if(isClicked())
-			main.onMouseClick(x, y, mouseState, false);
+			listener.onMouseClick(x, y, mouseState, false);
 		for(Key key : keys.values()){
 			key.update();
 			if(key.down)
-				main.onKeyPress(key, false);
+				listener.onKeyPress(key, false);
 		}
 	}
 	

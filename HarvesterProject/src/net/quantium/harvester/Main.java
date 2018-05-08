@@ -20,14 +20,13 @@ import javax.swing.JFrame;
 
 import net.quantium.harvester.data.Session;
 import net.quantium.harvester.data.Settings;
-import net.quantium.harvester.entity.BuildableInfo;
+import net.quantium.harvester.entity.buildable.BuildableInfo;
 import net.quantium.harvester.input.IInputListener;
 import net.quantium.harvester.input.ITextListener;
 import net.quantium.harvester.input.InputService;
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.input.TextModifiers;
-import net.quantium.harvester.item.Items;
 import net.quantium.harvester.render.ColorBundle;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.screen.CrashScreen;
@@ -35,7 +34,6 @@ import net.quantium.harvester.screen.MainScreen;
 import net.quantium.harvester.screen.ScreenService;
 import net.quantium.harvester.text.FontSize;
 import net.quantium.harvester.text.TextAlign;
-import net.quantium.harvester.tile.Tiles;
 import net.quantium.harvester.timehook.TimeHook;
 import net.quantium.harvester.timehook.TimeHookManager;
 import net.quantium.harvester.utilities.IOContainer;
@@ -92,8 +90,6 @@ public class Main extends Canvas implements IInputListener, ITextListener{
 	public static void main(String[] args){
 		System.setProperty("sun.java2d.opengl", "True");
 		
-		Tiles.register();
-		Items.register();
 		BuildableInfo.register();
 		Session.updateNames();
 		
@@ -156,6 +152,11 @@ public class Main extends Canvas implements IInputListener, ITextListener{
 		screenService = new ScreenService();
 		
 		screenService.setScreen(new MainScreen());
+		
+		addKeyListener(inputService);
+		addMouseListener(inputService);
+		addMouseWheelListener(inputService);
+		addMouseMotionListener(inputService);
 	}
 	
 	private void run(){
@@ -265,7 +266,7 @@ public class Main extends Canvas implements IInputListener, ITextListener{
 				session.render(renderer);
 				if(session.getWorld().player != null){
 					for(int i = 0; i < session.getWorld().player.getMaxHealth(); i++){
-						boolean has = session.getWorld().player.health > i;
+						boolean has = session.getWorld().player.getHealth() > i;
 						renderer.get().drawColored(3 + i * 11, getRenderHeight() - 16, 0, 10, 2, 2, ColorBundle.get(-1, -1, -1, has ? 833 : 333, has ? 722 : 222, -1), "gui", 0);
 					}
 				}
@@ -302,7 +303,7 @@ public class Main extends Canvas implements IInputListener, ITextListener{
 			}
 		}
 		
-		if(IOContainer.isSaving){
+		if(IOContainer.isSaving()){
 			renderer.get().drawColored(getRenderWidth() - 20 + 1, 4 + 1, ((counter / 30) % 5) * 2, 14, 2, 2, ColorBundle.get(-1, -1, -1, -1, 000, 000), "gui", 0);
 			renderer.get().drawColored(getRenderWidth() - 20, 4, ((counter / 30) % 5) * 2, 14, 2, 2, ColorBundle.get(-1, -1, -1, -1, 669, 888), "gui", 0);
 		}
@@ -390,6 +391,6 @@ public class Main extends Canvas implements IInputListener, ITextListener{
 	}
 	
 	public enum DebugMode{
-		NONE, HITBOX, METADATA, GUI_INPUT
+		NONE, HITBOX, METADATA, AITARGET, GUI_INPUT
 	}
 }

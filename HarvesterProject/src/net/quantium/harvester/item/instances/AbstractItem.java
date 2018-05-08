@@ -1,7 +1,8 @@
-package net.quantium.harvester.item;
+package net.quantium.harvester.item.instances;
 
 import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.entity.Entity.InteractionMode;
+import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.world.World;
 
 public class AbstractItem extends Item{
@@ -51,5 +52,4 @@ public class AbstractItem extends Item{
 	public boolean interact(World w, int x, int y, PlayerEntity ply, InteractionMode mode, ItemSlot slot) {
 		return false;
 	}
-
 }

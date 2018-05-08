@@ -6,19 +6,25 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map.Entry;
 
 import net.quantium.harvester.resources.ResourceLoader;
 
 public class Locale {
 	private String sheet = "font";
-	private String[] charsetsInfo = new String[3];
-	private int[][] widthInfo = new int[3][0];
+	private EnumMap<FontSize, String> charsetsInfo = new EnumMap<>(FontSize.class);
+	private EnumMap<FontSize, HashMap<Character, Integer>> widthInfo = new EnumMap<>(FontSize.class);
 	private String name = "unnamed";
 	protected Hashtable<String, String> translation = new Hashtable<String, String>();
 	
 	public Locale(String infoFile) throws IOException, URISyntaxException, NullPointerException{
+		for(FontSize font : FontSize.values())
+			widthInfo.put(font, new HashMap<>());
+		
 		List<String> list = new ArrayList<String>();
 		InputStreamReader in = new InputStreamReader(ResourceLoader.class.getResourceAsStream(infoFile),
 		          StandardCharsets.UTF_8);
@@ -41,60 +47,47 @@ public class Locale {
 						this.name = value;
 					else if(name.equalsIgnoreCase("localeInfo.sheet"))
 						this.sheet = value;
-					else if(name.equalsIgnoreCase("localeInfo.charsetLow")){
-						this.charsetsInfo[0] = value;
-						this.widthInfo[0] = new int[value.length()];
-						for(int j = 0; j < value.length(); j++){
-							this.widthInfo[0][j] = 4; 
-						}
-					}else if(name.equalsIgnoreCase("localeInfo.charsetMedium")){
-						this.charsetsInfo[1] = value;
-						this.widthInfo[1] = new int[value.length()];
-						for(int j = 0; j < value.length(); j++){
-							this.widthInfo[1][j] = 6; 
-						}
-					}else if(name.equalsIgnoreCase("localeInfo.charsetHigh")){
-						this.charsetsInfo[2] = value;
-						this.widthInfo[2] = new int[value.length()];
-						for(int j = 0; j < value.length(); j++){
-							this.widthInfo[2][j] = 17; 
-						}
-					}else if(name.toLowerCase().startsWith("localeinfo.widthlow.")){
+					else if(name.equalsIgnoreCase("localeInfo.charsetSmall")){
+						this.charsetsInfo.put(FontSize.SMALL, value);
+					}else if(name.equalsIgnoreCase("localeInfo.charsetNormal")){
+						this.charsetsInfo.put(FontSize.NORMAL, value);
+					}else if(name.equalsIgnoreCase("localeInfo.charsetBig")){
+						this.charsetsInfo.put(FontSize.BIG, value);
+					}else if(name.toLowerCase().startsWith("localeinfo.widthsmall.")){
 						char val = name.charAt(name.length() - 1);
-						int idx = this.charsetsInfo[0].indexOf(val);
-						if(idx >= 0)
-							try{
-								this.widthInfo[0][idx] = Integer.parseInt(value);
-							}catch(NumberFormatException e){
-								e.printStackTrace();
-							}
-					}else if(name.toLowerCase().startsWith("localeinfo.widthmedium.")){
+						int width = Integer.parseInt(value);
+						this.widthInfo.get(FontSize.SMALL).put(val, width);
+					}else if(name.toLowerCase().startsWith("localeinfo.widthnormal.")){
 						char val = name.charAt(name.length() - 1);
-						int idx = this.charsetsInfo[1].indexOf(val);
-						if(idx >= 0)
-							try{
-								this.widthInfo[1][idx] = Integer.parseInt(value);
-							}catch(NumberFormatException e){
-								e.printStackTrace();
-							}
-					}else if(name.toLowerCase().startsWith("localeinfo.widthhigh.")){
+						int width = Integer.parseInt(value);
+						this.widthInfo.get(FontSize.NORMAL).put(val, width);
+					}else if(name.toLowerCase().startsWith("localeinfo.widthbig.")){
 						char val = name.charAt(name.length() - 1);
-						int idx = this.charsetsInfo[2].indexOf(val);
-						if(idx >= 0)
-							try{
-								this.widthInfo[2][idx] = Integer.parseInt(value);
-							}catch(NumberFormatException e){
-								e.printStackTrace();
-							}
+						int width = Integer.parseInt(value);
+						this.widthInfo.get(FontSize.BIG).put(val, width);
 					}else{
 						translation.put(name, value);
 					}
 				}
 			}
 		}
-		System.out.println("Loaded locale: " + name);
 	}
 	
+	@SuppressWarnings("unused")
+	private void dump() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("=== LOCALE DUMP ").append(getName().toUpperCase()).append(" ===\n");
+		for(FontSize font : FontSize.values()){
+			builder.append(font.name() + ": \n");
+			builder.append("\t").append("CHARSET: ").append(getCharsetInfo(font)).append("\n");
+			builder.append("\t").append("WIDTHS: ").append("\n");
+			for(Entry<Character, Integer> entry : this.widthInfo.get(font).entrySet())
+				builder.append("\t\t").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+		}
+		builder.append("=== END OF LOCALE DUMP ===\n");
+		System.out.println(builder.toString());
+	}
+
 	public static final Locale DEFAULT;
 	static{
 		try {
@@ -115,8 +108,8 @@ public class Locale {
 		return name;
 	}
 
-	public String getCharsetInfo(int i) {
-		return charsetsInfo[i];
+	public String getCharsetInfo(FontSize size) {
+		return charsetsInfo.get(size);
 	}
 
 	public String getSheet() {
@@ -134,15 +127,16 @@ public class Locale {
 	
 	public int getWidth(FontSize font, char c){
 		if(isPresent(font, c)){
-			int idx = charsetsInfo[font.ordinal()].indexOf(Character.toLowerCase(c));
-			return widthInfo[font.ordinal()][idx];
+			if(widthInfo.get(font).containsKey(c))
+				return widthInfo.get(font).get(c);
+			return font.defaultWidth;
 		}
 		return 0;
 	}
 
 	public boolean isPresent(FontSize font, char c) {
-		if(charsetsInfo[font.ordinal()] == null) return false;
-		return charsetsInfo[font.ordinal()].indexOf(Character.toLowerCase(c)) >= 0;
+		if(charsetsInfo.get(font) == null) return false;
+		return charsetsInfo.get(font).indexOf(Character.toLowerCase(c)) >= 0;
 	}
 	
 	public int getWidth(FontSize font, String s){

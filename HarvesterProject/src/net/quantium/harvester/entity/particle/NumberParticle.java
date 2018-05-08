@@ -1,26 +1,27 @@
-package net.quantium.harvester.entity;
+package net.quantium.harvester.entity.particle;
 
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.text.FontSize;
 import net.quantium.harvester.text.TextAlign;
 
-public class DamageParticle extends ParticleEntity {
+public class NumberParticle extends ParticleEntity {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private int damage;
-	
+	private final int number, color;
 	private float yy;
 	
-	public DamageParticle(int damage){
-		this.damage = damage;
+	public NumberParticle(int number, int color){
+		this.number = number;
+		this.color = color;
 	}
 	
 	@Override
-	public void particleUpdate() {
+	public void update() {
+		super.update();
 		yy += 0.45f;
 		if(yy >= 24) remove();	
 	}
@@ -32,9 +33,6 @@ public class DamageParticle extends ParticleEntity {
 
 	@Override
 	public void render(Renderer render) {
-		render.get().drawText(x, (int) (y - yy), FontSize.NORMAL, String.valueOf(damage), (int)(9 - (yy / 3)) * 1000 + 810, TextAlign.LEFT, false);
+		render.get().drawText(x, (int) (y - yy), FontSize.NORMAL, String.valueOf(number), (int)(9 - (yy / 3)) * 1000 + this.color, TextAlign.LEFT, false);
 	}
-
-	@Override
-	public void bump(Entity ent) {}
 }

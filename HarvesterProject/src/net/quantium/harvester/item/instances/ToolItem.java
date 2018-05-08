@@ -1,15 +1,15 @@
-package net.quantium.harvester.item;
+package net.quantium.harvester.item.instances;
 
 import net.quantium.harvester.Main;
 import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.entity.Entity.InteractionMode;
+import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.world.World;
 
 public class ToolItem extends AbstractItem {
 	private ToolType type;
 	private int durability;
-	public int level;
-	
+	public final int level;
 	
 	public ToolItem(String name, int iconX, int iconY, int power, ToolType type, int durability, int level) {
 		super(name, iconX, iconY, 1, power);

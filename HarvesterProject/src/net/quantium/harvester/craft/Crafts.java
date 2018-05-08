@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.quantium.harvester.craft.AnvilCraft.HitType;
-import net.quantium.harvester.entity.BuildableEntity;
+import net.quantium.harvester.entity.buildable.BuildableEntity;
+import net.quantium.harvester.entity.buildable.FurnaceContainer;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.item.Items;
 
-//import net.quantium.pr01.item.Items;
-
 public class Crafts {
-	public static List<WorkbenchCraft> craft = new ArrayList<WorkbenchCraft>();
-	public static List<AnvilCraft> anvil = new ArrayList<AnvilCraft>();
-	public static List<FurnaceCraft> furnace = new ArrayList<FurnaceCraft>();
+	public static final List<WorkbenchCraft> craft = new ArrayList<WorkbenchCraft>();
+	public static final List<AnvilCraft> anvil = new ArrayList<AnvilCraft>();
+	public static final List<FurnaceCraft> furnace = new ArrayList<FurnaceCraft>();
 	
 	static{
 		craft.add(new WorkbenchCraft(new ItemSlot(Items.chest, 0, 1), new ItemSlot[]{new ItemSlot(Items.iron, 0, 1), new ItemSlot(Items.wood, 0, 15)}));
@@ -114,9 +113,10 @@ public class Crafts {
 		if(itemSlot == null) return null;
 		for(int i = 0; i < furnace.size(); i++){
 			FurnaceCraft c = furnace.get(i);
-			if(c.getPower() <= e.data0 && itemSlot.equalsIgnoreCount(c.getNeeded()))
+			FurnaceContainer container = (FurnaceContainer) e.container;
+			if(c.getPower() <= container.fuel && itemSlot.equalsIgnoreCount(c.getNeeded()))
 				if(itemSlot.consume(c.getNeeded().getCount())){
-					e.data0 -= c.getPower();
+					container.fuel -= c.getPower();
 					return c.getResult().copy();
 				}
 		}

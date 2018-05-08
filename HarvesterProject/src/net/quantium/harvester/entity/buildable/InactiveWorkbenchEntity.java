@@ -1,6 +1,8 @@
-package net.quantium.harvester.entity;
+package net.quantium.harvester.entity.buildable;
 
-import net.quantium.harvester.entity.BuildableInfo.BuildableType;
+import net.quantium.harvester.entity.Entity;
+import net.quantium.harvester.entity.PlayerEntity;
+import net.quantium.harvester.entity.buildable.BuildableInfo.BuildableType;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.item.Items;
 import net.quantium.harvester.render.Renderer;

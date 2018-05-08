@@ -5,7 +5,6 @@ import java.io.Serializable;
 import net.quantium.harvester.entity.hitbox.Hitbox;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.render.Renderer;
-import net.quantium.harvester.tile.Tile;
 import net.quantium.harvester.world.PassingInfo;
 import net.quantium.harvester.world.World;
 
@@ -30,7 +29,7 @@ public abstract class Entity implements Serializable, Comparable<Entity>{
 	public abstract boolean isPassable(Entity ent);
 	
 	public void remove(){
-		removed = true;
+		this.removed = true;
 	}
 	
 	public void move(int xx, int yy){
@@ -38,13 +37,13 @@ public abstract class Entity implements Serializable, Comparable<Entity>{
 		PassingInfo infy = world.tryPass(this, 0, yy);
 		if(infx.isPassed()){
 			x += xx;
-			Tile.Registry.get(infx.getSteppedOn()).onInteract(world, infx.getTileX(), infx.getTileY(), this, InteractionMode.STEP);
+			infx.getSteppedOn().onInteract(world, infx.getTileX(), infx.getTileY(), this, InteractionMode.STEP);
 			for(Entity e : infx.getBumped())
 				e.bump(this);
 		}
 		if(infy.isPassed()){
 			y += yy;
-			Tile.Registry.get(infy.getSteppedOn()).onInteract(world, infy.getTileX(), infy.getTileY(), this, InteractionMode.STEP);
+			infy.getSteppedOn().onInteract(world, infy.getTileX(), infy.getTileY(), this, InteractionMode.STEP);
 			for(Entity e : infy.getBumped())
 				e.bump(this);
 		}

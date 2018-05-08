@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import net.quantium.harvester.Main;
 import net.quantium.harvester.Main.DebugMode;
+import net.quantium.harvester.item.instances.Item;
+import net.quantium.harvester.item.instances.ToolItem;
 import net.quantium.harvester.render.Layer;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.text.FontSize;
@@ -14,9 +16,10 @@ public class ItemSlot implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public byte item;
-	public int meta;
-	public int count;
+	
+	private byte item;
+	private int meta;
+	private int count;
 	
 	public ItemSlot(byte item, int meta, int count) {
 		this.item = item;
@@ -24,21 +27,46 @@ public class ItemSlot implements Serializable{
 		this.count = count;
 	}
 	
-	public byte getItem() {
-		return item;
+	public ItemSlot(Item item, int meta, int count) {
+		this(item.getId(), meta, count);
 	}
-	public void setItem(byte item) {
+	
+	public ItemSlot(Item item, int count) {
+		this(item, 0, count);
+	}
+	
+	public ItemSlot(Item item) {
+		this(item, 0, 1);
+	}
+	
+	public byte getItemId() {
+		return this.item;
+	}
+	
+	public void setItemId(byte item) {
 		this.item = item;
 	}
-	public int getMeta() {
-		return meta;
+	
+	public Item getItem(){
+		return Item.Registry.get(getItemId());
 	}
+	
+	public void setItem(Item item){
+		setItemId(item.getId());
+	}
+	
+	public int getMeta() {
+		return this.meta;
+	}
+	
 	public void setMeta(int meta) {
 		this.meta = meta;
 	}
+	
 	public int getCount() {
 		return count;
 	}
+	
 	public void setCount(int count) {
 		if(count > Item.Registry.get(item).getMaxSizeInSlot()) count = Item.Registry.get(item).getMaxSizeInSlot();
 			this.count = count;
@@ -59,14 +87,15 @@ public class ItemSlot implements Serializable{
 	public boolean equalsIgnoreCount(Object e){
 		if(e instanceof ItemSlot){
 			ItemSlot i = (ItemSlot) e;
-			return i.getItem() == getItem() && i.getMeta() == getMeta();
+			return i.getItemId() == getItemId() && 
+				   i.getMeta() == getMeta();
 		}
 		return false;
 	}
 	
 	public static void renderItemSlot(Renderer render, int x, int y, ItemSlot item){
 		if(item == null) return;
-		Item itemd = Item.Registry.get(item.getItem());
+		Item itemd = item.getItem();
 		if(itemd == null) return;
 		render.get().draw(x, y, itemd.getIconX() * 2, itemd.getIconY() * 2, 2, 2, "sheet0", 0);
 		if(item.getCount() > 1){
@@ -74,14 +103,19 @@ public class ItemSlot implements Serializable{
 			render.get().drawText(x + 2 * Layer.BLOCK_SIZE,     y + 2 * Layer.BLOCK_SIZE - 4, FontSize.NORMAL, String.valueOf(item.getCount()), 777, TextAlign.RIGHT);
 		}else if(itemd instanceof ToolItem){
 			int percentage = 100 - (int)(((float)item.getMeta() / ((ToolItem) itemd).getDurability()) * 100f);
-			String ss = percentage >= 97 ? "s" : percentage >= 85 ? "a" : percentage >= 60 ? "b" : percentage >= 35 ? "c" : percentage >= 10 ? "d" : "f";
+			String ss = percentage >= 97 ? "s" : 
+						percentage >= 85 ? "a" : 
+					    percentage >= 60 ? "b" : 
+					    percentage >= 35 ? "c" : 
+					    percentage >= 10 ? "d" : 
+					    				   "f";
 			
 			render.get().drawText(x + 2 * Layer.BLOCK_SIZE + 1, y + 2 * Layer.BLOCK_SIZE - 8 + 1, FontSize.NORMAL, ss, 000, TextAlign.RIGHT);
 			render.get().drawText(x + 2 * Layer.BLOCK_SIZE,     y + 2 * Layer.BLOCK_SIZE - 8, FontSize.NORMAL, ss, 777, TextAlign.RIGHT);
 		}
-		if(Main.getInstance().getDebugMode() == DebugMode.METADATA){
+		
+		if(Main.getInstance().getDebugMode() == DebugMode.METADATA)
 			render.get().drawText(x, y, FontSize.SMALL, String.valueOf(item.meta), 358, TextAlign.LEFT);
-		}
 	}
 	
 	public static MergedItem merge(ItemSlot it0, ItemSlot it1){
@@ -152,5 +186,4 @@ public class ItemSlot implements Serializable{
 	public String toString(){
 		return "Item{" + (Item.Registry.get(item) == null ? "null" : Item.Registry.get(item).getName()) + ", Count=" + count + ", Meta=" + meta + "}";
 	}
-	
 }

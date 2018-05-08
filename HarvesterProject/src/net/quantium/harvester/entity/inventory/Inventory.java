@@ -66,7 +66,7 @@ public class Inventory implements Serializable{
 	
 	public int indexOf(ItemSlot slot){
 		for(int i = 0; i < size(); i++){
-			if(get(i) != null && get(i).getItem() == slot.item && get(i).getMeta() == slot.getMeta())
+			if(get(i) != null && get(i).getItem() == slot.getItem() && get(i).getMeta() == slot.getMeta())
 				return i;
 		}
 		return -1;

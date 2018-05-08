@@ -3,14 +3,8 @@ package net.quantium.harvester.entity;
 import net.quantium.harvester.entity.ai.AIBehavior;
 import net.quantium.harvester.entity.ai.AISlime;
 import net.quantium.harvester.entity.hitbox.Hitbox;
-import net.quantium.harvester.item.Item;
-import net.quantium.harvester.item.ItemSlot;
-import net.quantium.harvester.item.ToolItem;
-import net.quantium.harvester.item.ToolItem.ToolType;
 import net.quantium.harvester.render.Renderer;
-import net.quantium.harvester.tile.Tile;
 import net.quantium.harvester.world.PassingInfo;
-import net.quantium.harvester.world.World;
 
 public class SlimeEntity extends MobEntity implements AIEntity<SlimeEntity> {
 
@@ -46,15 +40,15 @@ public class SlimeEntity extends MobEntity implements AIEntity<SlimeEntity> {
 	@Override
 	public void render(Renderer render) {
 		render.get().draw(x - 16, y - yOffset[frame] - 16, frame * 2, 33 + type.spriteOffset * 2, 2, 2, "sheet0", 0);
-		if(invincibleTime >= 20){} //todo
+		if(invincibleTime >= 20)
+			render.get().drawTinted(x - 16, y - yOffset[frame] - 16, frame * 2, 33 + type.spriteOffset * 2, 2, 2, DAMAGE_TINT_COLOR, "sheet0", 0);
 		//render.get().drawLine(x - 8, y - 8, x - 8 + ai.getHeatmapOffsetX() * 16, y - 8 + ai.getHeatmapOffsetY() * 16, 990);
 	}
 
 	@Override
 	public void bump(Entity ent) {
-		if(ent instanceof PlayerEntity){
+		if(ent instanceof PlayerEntity)
 			((LivingEntity) ent).hit(type.damage);
-		}
 	}
 
 	@Override
@@ -62,29 +56,19 @@ public class SlimeEntity extends MobEntity implements AIEntity<SlimeEntity> {
 		return false;
 	}
 
-	@Override
-	public boolean onInteract(World world2, PlayerEntity playerEntity, InteractionMode im, ItemSlot active) {
-		if(active != null && ((Item.Registry.get(active.getItem()) instanceof ToolItem) && ((ToolItem) Item.Registry.get(active.getItem())).getToolType() == ToolType.DAGGER))
-			hit(((ToolItem) Item.Registry.get(active.getItem())).level * 2 + 2);
-		else
-			hit(active != null ? Item.Registry.get(active.getItem()).getPower() : 1);
-		return true;
-	}
-	
-
 	public void move(int xx, int yy){
 		PassingInfo infx = world.tryPass(this, xx, 0);
 		PassingInfo infy = world.tryPass(this, 0, yy);
 		if(infx.isPassed()){
 			x += xx;
-			Tile.Registry.get(infx.getSteppedOn()).onInteract(world, infx.getTileX(), infx.getTileY(), this, InteractionMode.STEP);
+			infx.getSteppedOn().onInteract(world, infx.getTileX(), infx.getTileY(), this, InteractionMode.STEP);
 			
 		}else
 			for(Entity e : infx.getBumped())
 				e.bump(this);
 		if(infy.isPassed()){
 			y += yy;
-			Tile.Registry.get(infy.getSteppedOn()).onInteract(world, infy.getTileX(), infy.getTileY(), this, InteractionMode.STEP);
+			infy.getSteppedOn().onInteract(world, infy.getTileX(), infy.getTileY(), this, InteractionMode.STEP);
 		}else
 			for(Entity e : infy.getBumped())
 				e.bump(this);
@@ -114,6 +98,7 @@ public class SlimeEntity extends MobEntity implements AIEntity<SlimeEntity> {
 
 	@Override
 	public void onDied() {
+		super.onDied();
 		world.player.slimesKilled++;
 		if(world.player.slimesKilled >= 100){
 			SlimeBossEntity e = new SlimeBossEntity();

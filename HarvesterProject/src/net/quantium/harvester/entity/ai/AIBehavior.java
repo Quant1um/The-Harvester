@@ -22,39 +22,28 @@ public abstract class AIBehavior<T extends Entity> {
 	
 	public abstract void update();
 	
-	private static final int DISTANCE_THRESHOLD = 8;
-	private static final int DISTANCE_CHECK_OFFSET = 4;
-	
-	private int getHeatmapOffset(int x, int y){
-		World world = getWorld();
-		
-		if(world.player == null)
-			return Main.GLOBAL_RANDOM.nextInt(3) - 1;
-		
-		int cx = getEntity().x;
-		int cy = getEntity().y;
-		
-		int a = world.player.sqrDistanceTo(cx - x * DISTANCE_CHECK_OFFSET, cy - y * DISTANCE_CHECK_OFFSET);
-		int b = world.player.sqrDistanceTo(cx + x * DISTANCE_CHECK_OFFSET, cy + y * DISTANCE_CHECK_OFFSET);
-		int diff = a - b;
-		
-		int desired = 0;
-		if(Math.abs(diff) > DISTANCE_THRESHOLD)
-			desired = MathUtils.sign(diff);
-		else
-			return Main.GLOBAL_RANDOM.nextInt(3) - 1;
-		
-		if(!world.isTilePassableBy(getEntity(), (cx >> 4) + desired * x, (cy >> 4) + desired * y))
-			return 0;
-		return desired;
-	}
-	
 	public int getHeatmapOffsetX(){
-		return getHeatmapOffset(1, 0);
+		int x = getEntity().x >> World.ENTITY_TILE_COORDSHIFT;
+		int y = getEntity().y >> World.ENTITY_TILE_COORDSHIFT;
+		int diff = getWorld().getAITarget(x + 1, y) - getWorld().getAITarget(x - 1, y);
+		if(diff == 0){
+			if(getWorld().player == null)
+				return Main.GLOBAL_RANDOM.nextInt(3) - 1;
+			return MathUtils.sign(getWorld().player.x - getEntity().x);
+		}
+		return diff;
 	}
 	
 	public int getHeatmapOffsetY(){
-		return getHeatmapOffset(0, 1);
+		int x = getEntity().x >> World.ENTITY_TILE_COORDSHIFT;
+		int y = getEntity().y >> World.ENTITY_TILE_COORDSHIFT;
+		int diff = getWorld().getAITarget(x, y + 1) - getWorld().getAITarget(x, y - 1);
+		if(diff == 0){
+			if(getWorld().player == null)
+				return Main.GLOBAL_RANDOM.nextInt(3) - 1;
+			return MathUtils.sign(getWorld().player.y - getEntity().y);
+		}
+		return diff;
 	}
 }
 

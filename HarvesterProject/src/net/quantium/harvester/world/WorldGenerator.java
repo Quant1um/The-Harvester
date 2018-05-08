@@ -8,6 +8,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import net.quantium.harvester.entity.TreeEntity;
+import net.quantium.harvester.tile.Tile;
 import net.quantium.harvester.tile.Tiles;
 import net.quantium.harvester.world.SimplexNoise.SimplexOctave;
 
@@ -21,7 +22,7 @@ public class WorldGenerator {
 				world.height	  [x + y * world.w] = (byte) (noise.octavedNoise(x +       0, y +       0, world.w, world.h) * 127);
 				world.temperature [x + y * world.w] = (byte) (noise.octavedNoise(x + world.w, y - world.h, world.w, world.h) * 127);
 				world.moisture	  [x + y * world.w] = (byte) (noise.octavedNoise(x - world.w, y + world.h, world.w, world.h) * 127);
-				world.map		  [x + y * world.w] = get(world.height[x + y * world.w], world.temperature[x + y * world.w], world.moisture[x + y * world.w], rnd);
+				world.map		  [x + y * world.w] = get(world.height[x + y * world.w], world.temperature[x + y * world.w], world.moisture[x + y * world.w], rnd).getId();
 				
 				if(world.height[x + y * world.w] > 3 && world.height[x + y * world.w] < 35)
 					if((world.moisture[x + y * world.w] > 20 && world.height[x + y * world.w] > 15 && rnd.nextInt(15) == 0) || rnd.nextInt(100) == 0){
@@ -30,42 +31,41 @@ public class WorldGenerator {
 						tree.y = y * 16;
 						world.addEntity(tree);
 					}
-				if(world.map[x + y * world.w] == Tiles.littleStone){
+				if(world.map[x + y * world.w] == Tiles.littleStone.getId()){
 					world.meta[x + y * world.w] = (short) rnd.nextInt(32);
 				}
 			}
 	}
 	
-	private static byte get(byte b, byte c, byte d, Random rnd) {
+	private static Tile get(byte b, byte c, byte d, Random rnd) {
 		if(b < -7) return Tiles.water;
 		if(b < 2) return Tiles.sand;
 		if(b < 39){
 			if(rnd.nextInt(70) == 0) return Tiles.littleStone;
 			return Tiles.grass;
 		}
-		if(d > 20 && rnd.nextInt(150) == 0) return (byte) (Tiles.gemPurple);
-		if(d < 25 && rnd.nextInt(200) == 0) return (byte) (Tiles.gemGreen);
-		if(c > 20 && rnd.nextInt(220) == 0) return (byte) (Tiles.gemBlue);
-		if(c < 25 && rnd.nextInt(280) == 0) return (byte) (Tiles.gemRed);
-		if(rnd.nextInt(40) == 0) return (byte) (Tiles.oreCoal);
-		if(rnd.nextInt(60) == 0) return (byte) (Tiles.oreCopper);
-		if(rnd.nextInt(140) == 0) return (byte) (Tiles.oreGold);
-		if(rnd.nextInt(90) == 0) return (byte) (Tiles.oreIron);
-		if(rnd.nextInt(100) == 0) return (byte) (Tiles.orePlumbum);
+		if(d > 20 && rnd.nextInt(150) == 0) return Tiles.gemPurple;
+		if(d < 25 && rnd.nextInt(200) == 0) return Tiles.gemGreen;
+		if(c > 20 && rnd.nextInt(220) == 0) return Tiles.gemBlue;
+		if(c < 25 && rnd.nextInt(280) == 0) return Tiles.gemRed;
+		if(rnd.nextInt(40) == 0) return Tiles.oreCoal;
+		if(rnd.nextInt(60) == 0) return Tiles.oreCopper;
+		if(rnd.nextInt(140) == 0) return Tiles.oreGold;
+		if(rnd.nextInt(90) == 0) return Tiles.oreIron;
+		if(rnd.nextInt(100) == 0) return Tiles.orePlumbum;
 		return Tiles.rock;
 	}
 	
 	public static void main(String[] args){
 		int w = 256;
 		int h = 256;
-		Tiles.register();
 		
 		BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 		World ww = new World(w, h);
 		int[] pixels = new int[w * h];
 		for(int i = 0; i < w; i++)
 			for(int j = 0; j < h; j++){
-				switch(ww.getTile(i, j)){
+				switch(ww.getTileId(i, j)){
 					case 0: pixels[i + j * w] = 0x555555; break;
 					case 1: pixels[i + j * w] = 0x0000AA; break;
 					case 2: pixels[i + j * w] = 0xFFAA00; break;

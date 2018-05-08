@@ -3,7 +3,7 @@ package net.quantium.harvester.screen;
 import com.sun.glass.events.KeyEvent;
 
 import net.quantium.harvester.Main;
-import net.quantium.harvester.entity.BuildableInfo.BuildableBehavior;
+import net.quantium.harvester.entity.buildable.BuildableInfo.BuildableBehavior;
 import net.quantium.harvester.entity.inventory.Inventory;
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.render.Renderer;

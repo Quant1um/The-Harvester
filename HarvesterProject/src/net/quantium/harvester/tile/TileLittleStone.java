@@ -3,7 +3,7 @@ package net.quantium.harvester.tile;
 import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.item.Items;
-import net.quantium.harvester.item.ToolItem.ToolType;
+import net.quantium.harvester.item.instances.ToolItem.ToolType;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.world.World;
 

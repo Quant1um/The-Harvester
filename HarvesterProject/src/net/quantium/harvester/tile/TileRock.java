@@ -5,7 +5,7 @@ import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.entity.Entity.InteractionMode;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.item.Items;
-import net.quantium.harvester.item.ToolItem.ToolType;
+import net.quantium.harvester.item.instances.ToolItem.ToolType;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.world.World;
 
@@ -49,8 +49,7 @@ public class TileRock extends Tile{
 	
 	@Override
 	public boolean isConnectable(World w, int x, int y, int xx, int yy) {
-		Tile t = Tile.Registry.get(w.getTile(xx, yy));
-		return t instanceof TileRock;
+		return w.getTile(xx, yy) instanceof TileRock;
 	}
 
 	@Override

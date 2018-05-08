@@ -195,6 +195,23 @@ public class Layer {
 		}
 	}
 	
+	public void drawTinted(int x, int y, int tx, int ty, int w, int h, int color, String sprId, int mirrorFlags){	
+		boolean mirrorH = (mirrorFlags & MIRRORFLAG_HORIZONTAL) != 0;
+		boolean mirrorV = (mirrorFlags & MIRRORFLAG_VERTICAL) != 0;
+		
+		ImageContainer cc = ResourceLoader.ImageLoader.get(sprId);
+		if(cc == null) throw new RuntimeException("Render error: can\'t find sprite " + sprId);
+		
+		for(int i = 0; i < w * BLOCK_SIZE; i++){
+			int xx = mirrorH ? w * BLOCK_SIZE - i - 1 : i;
+			for(int j = 0; j < h * BLOCK_SIZE; j++){
+				int yy = mirrorV ? h * BLOCK_SIZE - j - 1 : j;
+				if(cc.get(tx * BLOCK_SIZE + xx, ty * BLOCK_SIZE + yy) > 0)
+					put(x + i, y + j, color);
+			}
+		}
+	}
+	
 	public void drawColored(int x, int y, int tx, int ty, int w, int h, ColorBundle colorBundle, String sprId, int mirrorFlags){
 		boolean mirrorH = (mirrorFlags & MIRRORFLAG_HORIZONTAL) != 0;
 		boolean mirrorV = (mirrorFlags & MIRRORFLAG_VERTICAL) != 0;
@@ -243,7 +260,9 @@ public class Layer {
 		int sumwidth = 0;
 		for(int i = 0; i < text.length(); i++){
 			char c = text.charAt(i);
-			int idx = loc.getCharsetInfo(font.ordinal()) == null ? -1 : loc.getCharsetInfo(font.ordinal()).indexOf(c);
+			Locale charLoc = Localization.getLocaleWhereCharacterPresents(font, c);
+			if(charLoc == null || charLoc.getCharsetInfo(font) == null) continue;
+			int idx = charLoc.getCharsetInfo(font).indexOf(c);
 			
 			int ix, iy;
 			if(idx >= 0){
@@ -252,19 +271,8 @@ public class Layer {
 					case BIG: ix = idx % (BLOCKS_ROWSIZE / 2) * 2; iy = 7 + idx / (BLOCKS_ROWSIZE / 2) * 2; break;
 					default: ix = idx % BLOCKS_ROWSIZE; iy = 3 + idx / BLOCKS_ROWSIZE; break;
 				}
-				drawColored(x + sumwidth, y, ix, iy, bwidth, bwidth, bundle, loc.getSheet(), 0);
-				sumwidth += loc.getWidth(font, c);
-			}else{
-				int idxx = Locale.DEFAULT.getCharsetInfo(font.ordinal()).indexOf(c);
-				switch(font){
-					case SMALL: ix = idxx % BLOCKS_ROWSIZE; iy = idxx / BLOCKS_ROWSIZE; break;
-					case BIG: ix = idxx % (BLOCKS_ROWSIZE / 2) * 2; iy = 7 + idxx / (BLOCKS_ROWSIZE / 2) * 2; break;
-					default: ix = idxx % BLOCKS_ROWSIZE; iy = 3 + idxx / BLOCKS_ROWSIZE; break;
-				}
-				if(idxx >= 0){
-					drawColored(x + sumwidth, y, ix, iy, bwidth, bwidth, bundle, Locale.DEFAULT.getSheet(), 0);
-					sumwidth += Locale.DEFAULT.getWidth(font, c);
-				}
+				drawColored(x + sumwidth, y, ix, iy, bwidth, bwidth, bundle, charLoc.getSheet(), 0);
+				sumwidth += charLoc.getWidth(font, c);
 			}
 		}
 	}

@@ -1,12 +1,12 @@
 localeInfo.name=English
-localeInfo.charsetLow=abcdefghijklmnopqrstuvwxyz0123456789()- 
-localeInfo.charsetMedium=abcdefghijklmnopqrstuvwxyz0123456789()-+=!?.,:/ 
-localeInfo.charsetHigh=abcdefghijklmnopqrstuvwxyz 
+localeInfo.charsetSmall=abcdefghijklmnopqrstuvwxyz0123456789()- 
+localeInfo.charsetNormal=abcdefghijklmnopqrstuvwxyz0123456789()-+=!?.,:/ 
+localeInfo.charsetBig=abcdefghijklmnopqrstuvwxyz 
 localeInfo.sheet=font.png
-localeInfo.widthLow.m=6
-localeInfo.widthLow.w=6
-localeInfo.widthLow.n=5
-localeInfo.widthMedium.w=8
+localeInfo.widthSmall.m=6
+localeInfo.widthSmall.w=6
+localeInfo.widthSmall.n=5
+localeInfo.widthNormal.w=8
 gold=gold
 infoalphaversion=this is just an alpha version of game
 infocreatedby=created by datarush (quantiumassembly)

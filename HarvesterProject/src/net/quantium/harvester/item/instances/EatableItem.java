@@ -1,10 +1,17 @@
-package net.quantium.harvester.item;
+package net.quantium.harvester.item.instances;
 
 import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.entity.Entity.InteractionMode;
+import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.world.World;
 
-public abstract class EatableItem extends Item {
+public class EatableItem extends AbstractItem {
+
+	protected final int heal;
+	public EatableItem(String name, int iconX, int iconY, int maxSize, int heal) {
+		super(name, iconX, iconY, maxSize, 1);
+		this.heal = heal;
+	}
 
 	@Override
 	public ItemType getType() {
@@ -18,11 +25,13 @@ public abstract class EatableItem extends Item {
 
 	@Override
 	public boolean interact(World w, int x, int y, PlayerEntity ply, InteractionMode mode, ItemSlot slot) {
-		if(ply.health < ply.getMaxHealth()) 
+		if(ply.getHealth() < ply.getMaxHealth()) 
 			if(slot.consume(1))
-				ply.health = Math.max(ply.getMaxHealth(), ply.health + getHeal());
+				ply.heal(getHeal());
 		return false;
 	}
 
-	public abstract int getHeal();
+	public int getHeal(){
+		return this.heal;
+	}
 }

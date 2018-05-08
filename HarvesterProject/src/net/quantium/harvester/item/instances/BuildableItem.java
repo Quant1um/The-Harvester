@@ -1,10 +1,11 @@
-package net.quantium.harvester.item;
+package net.quantium.harvester.item.instances;
 
-import net.quantium.harvester.entity.BuildableEntity;
-import net.quantium.harvester.entity.BuildableInfo;
-import net.quantium.harvester.entity.BuildableInfo.BuildableType;
 import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.entity.Entity.InteractionMode;
+import net.quantium.harvester.entity.buildable.BuildableEntity;
+import net.quantium.harvester.entity.buildable.BuildableInfo;
+import net.quantium.harvester.entity.buildable.BuildableInfo.BuildableType;
+import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.world.World;
 
 public class BuildableItem extends Item {

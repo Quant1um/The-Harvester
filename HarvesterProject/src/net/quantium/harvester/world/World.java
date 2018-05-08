@@ -2,27 +2,31 @@ package net.quantium.harvester.world;
 
 import java.awt.Rectangle;
 import java.io.Serializable;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Queue;
 
 import net.quantium.harvester.Main;
 import net.quantium.harvester.Main.DebugMode;
 import net.quantium.harvester.entity.MobEntity;
 import net.quantium.harvester.entity.CollidableTileEntity;
-import net.quantium.harvester.entity.DamageParticle;
 import net.quantium.harvester.entity.Entity;
 import net.quantium.harvester.entity.ItemEntity;
-import net.quantium.harvester.entity.ParticleEntity;
 import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.entity.SlimeEntity;
 import net.quantium.harvester.entity.SlimeEntity.SlimeType;
 import net.quantium.harvester.entity.hitbox.Hitbox;
+import net.quantium.harvester.entity.particle.NumberParticle;
+import net.quantium.harvester.entity.particle.DotParticle;
+import net.quantium.harvester.entity.particle.ParticleEntity;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.text.FontSize;
 import net.quantium.harvester.text.TextAlign;
 import net.quantium.harvester.tile.Tile;
+import net.quantium.harvester.tile.Tiles;
 
 public class World implements Serializable{
 	/**
@@ -47,17 +51,18 @@ public class World implements Serializable{
 	public byte[] temperature;
 	public byte[] moisture;
 	public byte[] height;
+	public transient byte[] aiTargetMap;
 	
-	public transient List<Entity>[] entityTileCache;
+	private transient List<Entity>[] entityTileCache;
 	
 	public int time = 0; //max = 86400
 	
-	public List<Entity> entities = new ArrayList<Entity>();
-	private List<ParticleEntity> particles = new ArrayList<ParticleEntity>();
+	private final List<Entity> entities = new ArrayList<Entity>();
+	private final List<ParticleEntity> particles = new ArrayList<ParticleEntity>();
 	
-	public int w, h;
+	public final int w, h;
 	public transient PlayerEntity player;
-	public int seed;
+	public final int seed;
 	
 	private transient Comparator<Entity> compatator = new Comparator<Entity>() {
 		  public int compare(Entity a, Entity b) {
@@ -75,6 +80,7 @@ public class World implements Serializable{
 		this.meta = new short[w * h * METADATA_LAYERS];
 		this.temperature = new byte[w * h];
 		this.moisture = new byte[w * h];
+		this.aiTargetMap = new byte[w * h];
 		this.height = new byte[w * h];
 		this.entityTileCache = new List[w * h];
 		for(int i = 0; i < w * h; i++)
@@ -85,7 +91,7 @@ public class World implements Serializable{
 	public void update(){
 		time += TIME_PER_TICK;
 		if(time >= 86400) time = 0;
-		for(int i = 0; i < w * h / 150; i++){
+		for(int i = 0; i < w * h / 120; i++){
 			int j = Main.GLOBAL_RANDOM.nextInt(w * h);
 			Tile.Registry.get(map[j]).
 				randomTick(this, j % w, j / w);
@@ -95,17 +101,15 @@ public class World implements Serializable{
 		
 		for(int i = 0; i < entities.size(); i++){
 			Entity e = entities.get(i);
-			if(player == null || e.sqrDistanceTo(player) < 50 * 50 * 16 * 16){
-				int preX = e.x;
-				int preY = e.y;
-				e.update();
-				if(e.removed) this.removeEntity(e);
-				if(preX >> ENTITY_TILE_COORDSHIFT != e.x >> ENTITY_TILE_COORDSHIFT || preY >> ENTITY_TILE_COORDSHIFT != e.y >> ENTITY_TILE_COORDSHIFT)
-					recacheEntity(preX >> ENTITY_TILE_COORDSHIFT, preY >> ENTITY_TILE_COORDSHIFT, e.x >> ENTITY_TILE_COORDSHIFT, e.y >> ENTITY_TILE_COORDSHIFT, e);
-			}
+			int preX = e.x;
+			int preY = e.y;
+			e.update();
+			if(e.removed) this.removeEntity(e);
+			if(preX >> ENTITY_TILE_COORDSHIFT != e.x >> ENTITY_TILE_COORDSHIFT || preY >> ENTITY_TILE_COORDSHIFT != e.y >> ENTITY_TILE_COORDSHIFT)
+				recacheEntity(preX >> ENTITY_TILE_COORDSHIFT, preY >> ENTITY_TILE_COORDSHIFT, e.x >> ENTITY_TILE_COORDSHIFT, e.y >> ENTITY_TILE_COORDSHIFT, e);
 		}
 		
-		if(!player.died){
+		if(!player.isDied()){
 			int preX = player.x;
 			int preY = player.y;
 			player.update();
@@ -113,6 +117,7 @@ public class World implements Serializable{
 			player.refetchPosition();
 			if((preX >> ENTITY_TILE_COORDSHIFT) != (player.x >> ENTITY_TILE_COORDSHIFT) || (preY >> ENTITY_TILE_COORDSHIFT) != (player.y >> ENTITY_TILE_COORDSHIFT)){
 				recacheEntity((preX >> ENTITY_TILE_COORDSHIFT), (preY >> ENTITY_TILE_COORDSHIFT), (player.x >> ENTITY_TILE_COORDSHIFT), (player.y >> ENTITY_TILE_COORDSHIFT), player);
+				updateAITargetMap((player.x >> ENTITY_TILE_COORDSHIFT), (player.y >> ENTITY_TILE_COORDSHIFT));
 			}
 		}
 		for(int i = 0; i < particles.size(); i++){
@@ -123,6 +128,51 @@ public class World implements Serializable{
 			
 	}
 	
+	//breadth first search node that used in updateAITargetMap(int, int)
+	private static class BFSNode{
+		public final int x;
+		public final int y;
+		public final int depth;
+		
+		public BFSNode(int x, int y, int depth) {
+			this.x = x;
+			this.y = y;
+			this.depth = depth;
+		}
+	}
+	
+	private static final int MAX_DEPTH = 5;
+	private void updateAITargetMap(int x, int y) {
+		for(int i = 0; i < w * h; i++){
+			if(this.aiTargetMap[i] > 0)
+				this.aiTargetMap[i]--;
+		}
+		
+		Queue<BFSNode> queue = new ArrayDeque<>();
+		queue.offer(new BFSNode(x, y, 0));
+		
+		while(!queue.isEmpty()){
+			BFSNode node = queue.poll();
+			if(node.depth >= MAX_DEPTH) continue;
+			
+			byte val = (byte) (MAX_DEPTH - node.depth);
+			if(val > this.aiTargetMap[node.x + node.y * w])
+				this.aiTargetMap[node.x + node.y * w] = val;
+			
+			if(isViableAINode(node.x - 1, node.y)) queue.offer(new BFSNode(node.x - 1, node.y, node.depth + 1));
+			if(isViableAINode(node.x, node.y - 1)) queue.offer(new BFSNode(node.x, node.y - 1, node.depth + 1));
+			if(isViableAINode(node.x, node.y + 1)) queue.offer(new BFSNode(node.x, node.y + 1, node.depth + 1));
+			if(isViableAINode(node.x + 1, node.y)) queue.offer(new BFSNode(node.x + 1, node.y, node.depth + 1));
+		}
+	}
+
+	private boolean isViableAINode(int x, int y) {
+		if(x < 0 || x >= w || y < 0 || y >= h) return false;
+	
+		Tile tile = getTile(x, y);
+		return tile != Tiles.water && tile.isPassable(this, x, y, this.player);
+	}
+
 	public void renderLayer(Renderer render, int layer){
 		
 		final int OFFSCEEEN = 2;
@@ -130,8 +180,12 @@ public class World implements Serializable{
 			case RENDERLAYER_TILE: {
 				for(int i = (int)(render.get().transform().x / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; i <= (int)(Main.getInstance().getRenderWidth() + render.get().transform().x) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; i++)
 					for(int j = (int)(render.get().transform().y / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; j <= (int)(Main.getInstance().getRenderHeight() + render.get().transform().y) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; j++){
-						Tile.Registry.get(getTile(i, j)).render(render, this, i, j);
-						if(Main.getInstance().getDebugMode() == DebugMode.METADATA) render.get().drawText(i * 16, j * 16, FontSize.SMALL, getMetadata(i, j, 0) + "; " + getMetadata(i, j, 1), 338, TextAlign.LEFT);
+						getTile(i, j).render(render, this, i, j);
+						switch(Main.getInstance().getDebugMode()){
+							case METADATA: render.get().drawText(i * 16, j * 16, FontSize.SMALL, getMetadata(i, j, 0) + "; " + getMetadata(i, j, 1), 338, TextAlign.LEFT); break;
+							case AITARGET: render.get().drawText(i * 16, j * 16, FontSize.SMALL, String.valueOf(this.aiTargetMap[i + j * w]), 833, TextAlign.LEFT); break;
+							default: break;
+						}
 					}
 				return;
 			}
@@ -139,7 +193,7 @@ public class World implements Serializable{
 			case RENDERLAYER_ENTITY: {
 				List<Entity> ents = new ArrayList<Entity>();//getEntitiesIn((int)(render.get().transform().x / ENTITY_TILE_COORDSCALE) - OFFSCEEEN, (int)(render.get().transform().y / ENTITY_TILE_COORDSCALE) - OFFSCEEEN , (Main.getInstance().getRenderWidth() + render.get().transform().x) / ENTITY_TILE_COORDSCALE + OFFSCEEEN + 1, (Main.getInstance().getRenderHeight() + render.get().transform().y) / ENTITY_TILE_COORDSCALE + OFFSCEEEN + 1);
 				
-				if(!player.died) ents.add(player);
+				if(!player.isDied()) ents.add(player);
 				
 				for(int i = 0; i < entities.size(); i++){
 					Entity e = entities.get(i);
@@ -228,15 +282,23 @@ public class World implements Serializable{
 		this.entityTileCache[lx + ly * w].remove(e);
 	}
 	
-	public byte getTile(int x, int y){
+	public byte getTileId(int x, int y){
 		if(x >= 0 && y >= 0 && x < w && y < h)
 			return map[x + y * w];
-		return 0;
+		return Tiles.rock.getId();
 	}
 	
-	public void setTile(int x, int y, byte b){
+	public void setTileId(int x, int y, byte b){
 		if(x >= 0 && y >= 0 && x < w && y < h)
 			map[x + y * w] = b;
+	}
+	
+	public Tile getTile(int x, int y){
+		return Tile.Registry.get(getTileId(x, y));
+	}
+	
+	public void setTile(int x, int y, Tile tile){
+		setTileId(x, y, tile.getId());
 	}
 	
 	public byte getTemperature(int x, int y){
@@ -283,6 +345,13 @@ public class World implements Serializable{
 			height[x + y * w] = b;
 	}
 	
+
+	public int getAITarget(int x, int y) {
+		if(x >= 0 && y >= 0 && x < w && y < h)
+			return this.aiTargetMap[x + y * w];
+		return 0;
+	}
+	
 	public List<Entity> getEntitiesOn(int x, int y){
 		if(x >= 0 && y >= 0 && x < w && y < h)
 			return entityTileCache[x + y * w];
@@ -306,7 +375,7 @@ public class World implements Serializable{
 	
 	public PassingInfo tryPass(Entity e, int xx, int yy){
 		boolean canPass = true;
-		if(xx != 0 && yy != 0) throw new RuntimeException("trypass works only along one axis(for good collision check)  uwu");
+		if(xx != 0 && yy != 0) throw new RuntimeException("trypass works only along one axis(for good collision check) uwu");
 		int ex = xx + e.x;
 		int ey = yy + e.y;
 		List<Entity> ents = getEntitiesIn((ex >> ENTITY_TILE_COORDSHIFT) - 1, (ey >> ENTITY_TILE_COORDSHIFT) - 1, 3, 3);
@@ -360,7 +429,7 @@ public class World implements Serializable{
 	}
 	
 	public boolean isTilePassableBy(Entity e, int x, int y){
-		return Tile.Registry.get(getTile(x, y)).isPassable(this, x, y, e);
+		return getTile(x, y).isPassable(this, x, y, e);
 	}
 	
 	public static boolean isRectanglesIntersects(int x, int y, int w, int h, int xx, int yy, int ww, int hh, Rectangle output){
@@ -388,16 +457,19 @@ public class World implements Serializable{
 	
 	public static final int MOB_SPAWNING_BOUNDS_MIN = 20 * 16; 
 	public static final int MOB_SPAWNING_BOUNDS_MAX = 40 * 16; 
+	
 	public void updateEntitySpawningCycle(){
+		final int PLAYER_ENTITY_SAFE_REMOVAL_DIST = 16 * 16 * 30 * 30;
+		
 		if(player == null) return;
 		int ents = 1;
 		int j = 0;
 		for(int i = 0; i < entities.size(); i++){
-			if(entities.get(i) instanceof MobEntity && Main.GLOBAL_RANDOM.nextInt(3) == 0){
+			if(entities.get(i) instanceof MobEntity){
 				j++;
 				if(j >= 20){
 					j = 0;
-					if(entities.get(i).sqrDistanceTo(player) > 16 * 16 * 50 * 50)
+					if(entities.get(i).sqrDistanceTo(player) > PLAYER_ENTITY_SAFE_REMOVAL_DIST )
 						removeEntity(entities.get(i));
 				}
 			}
@@ -441,8 +513,8 @@ public class World implements Serializable{
 	
 	public void throwItem(int xx, int yy, ItemSlot slot){
 		ItemSlot single = slot.copy();
-		single.count = 1;
-		for(int i = 0; i < slot.count; i++){
+		single.setCount(1);
+		for(int i = 0; i < slot.getCount(); i++){
 			float fx = (float)(Main.GLOBAL_RANDOM.nextGaussian() * 0.8f);
 			float fy = (float)(Main.GLOBAL_RANDOM.nextGaussian() * 0.8f);
 			ItemEntity ie = new ItemEntity(single, fx, fy);
@@ -453,7 +525,21 @@ public class World implements Serializable{
 	}
 
 	public void damageParticle(int xx, int yy, int damage){
-		DamageParticle ie = new DamageParticle(damage);
+		NumberParticle ie = new NumberParticle(damage, 810);
+		ie.x = xx;
+		ie.y = yy;
+		addEntity(ie);
+	}
+	
+	public void healParticle(int xx, int yy, int hp) {
+		NumberParticle ie = new NumberParticle(hp, 180);
+		ie.x = xx;
+		ie.y = yy;
+		addEntity(ie);
+	}
+	
+	public void dotParticle(int xx, int yy, int color, DotParticle.IBehaviour behaviour){
+		DotParticle ie = new DotParticle(color, behaviour);
 		ie.x = xx;
 		ie.y = yy;
 		addEntity(ie);
@@ -462,5 +548,18 @@ public class World implements Serializable{
 	@Override
 	public String toString(){
 		return "World{Width=" + w + ", Height=" + h + ", Seed=" + seed + "}";
+	}
+
+	@SuppressWarnings("unchecked")
+	public void restore() {
+		this.aiTargetMap = new byte[w * h];
+		this.entityTileCache = new List[w * h];
+		for(int i = 0; i < w * h; i++)
+			this.entityTileCache[i] = new ArrayList<Entity>();
+		
+		for(Entity e : entities){
+			e.init();
+			cacheEntity(e.x >> World.ENTITY_TILE_COORDSHIFT, e.y >> World.ENTITY_TILE_COORDSHIFT, e);
+		}
 	}
 }

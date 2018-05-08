@@ -28,7 +28,8 @@ public class SlimeBossEntity extends SlimeEntity {
 	@Override
 	public void render(Renderer render){
 		render.get().draw(x - 16, y - yOffset[frame] * 3 - 16, frame * 4 + 6, 33 + (readyToEject ? 4 : 0), 4, 4, "sheet0", 0);
-		if(invincibleTime >= 20){} //todo: draw damage overlay
+		if(invincibleTime >= 20)
+			render.get().drawTinted(x - 16, y - yOffset[frame] * 3 - 16, frame * 4 + 6, 33 + (readyToEject ? 4 : 0), 4, 4, DAMAGE_TINT_COLOR, "sheet0", 0);
 	}
 	
 	@Override
