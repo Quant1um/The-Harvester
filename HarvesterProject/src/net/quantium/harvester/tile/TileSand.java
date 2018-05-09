@@ -1,8 +1,8 @@
 package net.quantium.harvester.tile;
 
 import net.quantium.harvester.entity.Entity;
-import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.entity.Entity.InteractionMode;
+import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.item.instances.ToolItem.ToolType;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.world.World;
@@ -71,7 +71,7 @@ public class TileSand extends Tile{
 		if(type != ToolType.SHOVEL) return;
 		world.setMetadata(j, i, 1, (byte) (world.getMetadata(i, j, 1) + damage));
 		if(world.getMetadata(i, j, 1) + damage >= 200){
-			world.setTile(i, j, Tiles.water);
+			world.setTile(i, j, Tile.water);
 		}
 	}
 }

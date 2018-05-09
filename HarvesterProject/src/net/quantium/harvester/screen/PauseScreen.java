@@ -27,8 +27,8 @@ public class PauseScreen extends IngameScreen {
 
 			@Override
 			public void onClick(MouseState button) {
-				Main.getInstance().getSession().save();
-				Main.getInstance().resetSession();
+				Main.instance().getSession().save();
+				Main.instance().resetSession();
 				service.setScreen(new MainScreen());
 			}
 		};
@@ -50,6 +50,6 @@ public class PauseScreen extends IngameScreen {
 
 	@Override
 	public void shown() {
-		if(!IOContainer.isSaving()) Main.getInstance().getSession().save();
+		if(!IOContainer.isSaving()) Main.instance().getSession().save();
 	}
 }

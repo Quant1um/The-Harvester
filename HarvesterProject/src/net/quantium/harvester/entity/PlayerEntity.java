@@ -17,7 +17,7 @@ import net.quantium.harvester.screen.InventoryScreen;
 import net.quantium.harvester.screen.PauseScreen;
 import net.quantium.harvester.screen.Screen;
 import net.quantium.harvester.screen.ScreenService;
-import net.quantium.harvester.tile.Tiles;
+import net.quantium.harvester.tile.Tile;
 import net.quantium.harvester.utilities.MathUtils;
 import net.quantium.harvester.world.PassingInfo;
 import net.quantium.harvester.world.World;
@@ -95,12 +95,12 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 	@Override
 	public void render(Renderer render) {
 		int o0 = direction == 1 ? 0 : direction == 0 || direction == 2 ? 8 : 16;
-		boolean isInWater = world.getTile(x >> 4, y >> 4) == Tiles.water;
+		boolean isInWater = world.getTile(x >> 4, y >> 4) == Tile.water;
 		int offset = 0;
 		if(isInWater){
 			offset = -(world.getHeight(x >> 4, y >> 4) + 10) / 2;
 			if(offset > 10) offset = 10;
-			render.get().draw(x - hitbox.getWidth() / 2 - 1, y - hitbox.getHeight(), 12 + (Main.getInstance().getCounter() / 30 % 2 == 0 ? 2 : 0), 19, 2, 1, "sheet0", 0);
+			render.get().draw(x - hitbox.getWidth() / 2 - 1, y - hitbox.getHeight(), 12 + (Main.instance().getCounter() / 30 % 2 == 0 ? 2 : 0), 19, 2, 1, "sheet0", 0);
 			render.get().clipY1 = y - hitbox.getHeight() + 5 - getYOffset();	
 		}
 		render.get().draw(x - hitbox.getWidth() / 2, y - hitbox.getHeight() - 18 + offset, o0 + (walking > 0 ? walkFrame / 10 * 2 : 0), 16, 2, 3, "sheet0", direction == 0 ? 1 : 0);
@@ -123,17 +123,17 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 
 	@Override
 	public int getXOffset() {
-		int x = this.x - Main.getInstance().getRenderWidth() / 2;
+		int x = this.x - Main.instance().getRenderWidth() / 2;
 		if (x < 0) x = 0;
-		if (x > this.world.w * 16 - Main.getInstance().getRenderWidth()) x = this.world.h * 16 - Main.getInstance().getRenderWidth();
+		if (x > this.world.w * 16 - Main.instance().getRenderWidth()) x = this.world.h * 16 - Main.instance().getRenderWidth();
 		return x;
 	}
 
 	@Override
 	public int getYOffset() {
-		int y = this.y - Main.getInstance().getRenderHeight() / 2;
+		int y = this.y - Main.instance().getRenderHeight() / 2;
 		if (y < 0) y = 0;
-		if (y > this.world.h * 16 - Main.getInstance().getRenderHeight()) y = this.world.h * 16 - Main.getInstance().getRenderHeight();
+		if (y > this.world.h * 16 - Main.instance().getRenderHeight()) y = this.world.h * 16 - Main.instance().getRenderHeight();
 		return y;
 	}
 
@@ -206,7 +206,7 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 	
 	@Override
 	public void move(int xx, int yy){
-		if(world.getTile(x >> 4, y >> 4) == Tiles.water && Main.getInstance().getCounter() % 2 != 0) return;
+		if(world.getTile(x >> 4, y >> 4) == Tile.water && Main.instance().getCounter() % 2 != 0) return;
 		PassingInfo infx = world.tryPass(this, xx, 0);
 		PassingInfo infy = world.tryPass(this, 0, yy);
 		if(infx.isPassed()){
@@ -235,11 +235,11 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 	}
 
 	private ScreenService screen() {
-		return Main.getInstance().getScreenService();
+		return Main.instance().getScreenService();
 	}
 
 	private InputService input(){
-		return Main.getInstance().getInputService();
+		return Main.instance().getInputService();
 	}
 	
 	@Override
@@ -270,36 +270,24 @@ public class PlayerEntity extends LivingEntity implements ISpectator{
 	}
 	
 	public void respawn(){
-		if(this.spawnX >= 0 && this.spawnY >= 0 && this.spawnX < world.w && this.spawnY < world.h){
-			if(!world.isTilePassableBy(this, spawnX, spawnY)){
-				resetSpawn();
-				boolean found = false;
-				Random r = new Random(world.seed);
-				while(!found){
-					int x = r.nextInt(world.w);
-					int y = r.nextInt(world.h);
-					if(world.getTile(x, y) == Tiles.grass){
-						this.x = x * 16;
-						this.y = y * 16;
-						found = true;
-					}
+		if(!(this.spawnX >= 0 && this.spawnY >= 0 && this.spawnX < world.w && this.spawnY < world.h) || !world.isTilePassableBy(this, spawnX, spawnY)){
+			resetSpawn();
+			boolean found = false;
+			Random r = new Random(world.seed);
+			while(!found){
+				int x = r.nextInt(world.w);
+				int y = r.nextInt(world.h);
+				if(world.getTile(x, y) == Tile.grass){
+					this.x = x * 16;
+					this.y = y * 16;
+					found = true;
 				}
-			}else{
-				this.x = this.spawnX * 16;
-				this.y = this.spawnY * 16;
 			}
+		}else{
+			this.x = this.spawnX * 16;
+			this.y = this.spawnY * 16;
 		}
-		boolean found = false;
-		Random r = new Random(world.seed);
-		while(!found){
-			int x = r.nextInt(world.w);
-			int y = r.nextInt(world.h);
-			if(world.getTile(x, y) == Tiles.grass){
-				this.x = x * 16;
-				this.y = y * 16;
-				found = true;
-			}
-		}
+
 		this.health = this.maxHealth;
 		this.died = false;
 	}

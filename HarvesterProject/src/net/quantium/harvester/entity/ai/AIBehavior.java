@@ -22,13 +22,14 @@ public abstract class AIBehavior<T extends Entity> {
 	
 	public abstract void update();
 	
+	//TODO merge heatmap x and y functions and fix local optima bug
 	public int getHeatmapOffsetX(){
 		int x = getEntity().x >> World.ENTITY_TILE_COORDSHIFT;
 		int y = getEntity().y >> World.ENTITY_TILE_COORDSHIFT;
 		int diff = getWorld().getAITarget(x + 1, y) - getWorld().getAITarget(x - 1, y);
 		if(diff == 0){
 			if(getWorld().player == null)
-				return Main.GLOBAL_RANDOM.nextInt(3) - 1;
+				return Main.RANDOM.nextInt(3) - 1;
 			return MathUtils.sign(getWorld().player.x - getEntity().x);
 		}
 		return diff;
@@ -40,7 +41,7 @@ public abstract class AIBehavior<T extends Entity> {
 		int diff = getWorld().getAITarget(x, y + 1) - getWorld().getAITarget(x, y - 1);
 		if(diff == 0){
 			if(getWorld().player == null)
-				return Main.GLOBAL_RANDOM.nextInt(3) - 1;
+				return Main.RANDOM.nextInt(3) - 1;
 			return MathUtils.sign(getWorld().player.y - getEntity().y);
 		}
 		return diff;

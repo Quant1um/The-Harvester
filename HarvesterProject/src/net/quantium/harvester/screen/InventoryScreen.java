@@ -30,7 +30,7 @@ public class InventoryScreen extends IngameScreen {
 	@Override
 	protected void init() {
 		super.init();
-		InventoryLayout first = new InventoryLayout(0, 0, Main.getInstance().getRenderWidth(), Main.getInstance().getRenderHeight());
+		InventoryLayout first = new InventoryLayout(0, 0, Main.instance().getRenderWidth(), Main.instance().getRenderHeight());
 		first.add(new ActiveInventorySlot(50 + EMPTYSPACE, 50 + EMPTYSPACE + 12, inventory, 0));
 		for(int i = 1; i < inventory.size(); i++){
 			int x = 50 + EMPTYSPACE + (i % SLOTS_PER_ROW) * EMPTYSPACE * 8;
@@ -41,7 +41,7 @@ public class InventoryScreen extends IngameScreen {
 			InventorySlot[] slots = behavior.getLayout(additionalInventory);
 			if(slots != null){
 				for(int i = 0; i < slots.length; i++){
-					slots[i].setX(slots[i].getX() + Main.getInstance().getRenderWidth() - 170);
+					slots[i].setX(slots[i].getX() + Main.instance().getRenderWidth() - 170);
 					slots[i].setY(slots[i].getY() + 50);
 					first.add(slots[i]);
 				}
@@ -59,7 +59,7 @@ public class InventoryScreen extends IngameScreen {
 	public void render(Renderer render) {
 		renderBox(render, 50, 50, 120, (inventory.size() / SLOTS_PER_ROW) * (EMPTYSPACE + 24) + 26, "inventory");
 		if(isDual){
-			renderBox(render, Main.getInstance().getRenderWidth() - 170, 50, 120, behavior.boxHeight, behavior.name);
+			renderBox(render, Main.instance().getRenderWidth() - 170, 50, 120, behavior.boxHeight, behavior.name);
 		}
 		super.render(render);
 	}

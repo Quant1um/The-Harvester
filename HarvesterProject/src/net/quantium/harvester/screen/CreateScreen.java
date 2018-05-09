@@ -26,21 +26,21 @@ public class CreateScreen extends MenuScreen{
 	protected void init() {
 		super.init();
 		Component back = new BackButton(5, 5);
-		Component confirm = new Button((Main.getInstance().getRenderWidth() - 15 * Layer.BLOCK_SIZE) / 2, 130, 15, "create", 7){
+		Component confirm = new Button((Main.instance().getRenderWidth() - 15 * Layer.BLOCK_SIZE) / 2, 130, 15, "create", 7){
 
 			@Override
 			public void onClick(MouseState button) {
 				if(name.getValue().length() > 0){
 					Session session = new Session(slot, name.getValue(), sizes[size.getValue()], true);
 					session.save();
-					Main.getInstance().setSession(session);
+					Main.instance().setSession(session);
 					service.setScreen(null);
 				}
 			}
 		};
 		
-		this.name = new InputField((Main.getInstance().getRenderWidth() - 15 * Layer.BLOCK_SIZE) / 2, 90, 15, "name");
-		this.size = new Selector((Main.getInstance().getRenderWidth() - 15 * Layer.BLOCK_SIZE) / 2, 110, 15, new String[]{"256x256", "512x512", "1024x1024"});
+		this.name = new InputField((Main.instance().getRenderWidth() - 15 * Layer.BLOCK_SIZE) / 2, 90, 15, "name");
+		this.size = new Selector((Main.instance().getRenderWidth() - 15 * Layer.BLOCK_SIZE) / 2, 110, 15, new String[]{"256x256", "512x512", "1024x1024"});
 		
 		getContainer().add(back);
 		getContainer().add(confirm);

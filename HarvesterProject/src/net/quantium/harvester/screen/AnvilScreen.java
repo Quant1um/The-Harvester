@@ -20,7 +20,7 @@ public class AnvilScreen extends InventoryScreen {
 	private HitType[] pattern = new HitType[3];
 	public void init(){
 		super.init();
-		getContainer().addFirst(new Button(Main.getInstance().getRenderWidth() - 162, 200, 13, "create", 0){
+		getContainer().addFirst(new Button(Main.instance().getRenderWidth() - 162, 200, 13, "create", 0){
 
 			@Override
 			public void onClick(MouseState button) {
@@ -37,7 +37,7 @@ public class AnvilScreen extends InventoryScreen {
 				final int l = j;
 				final HitType hit = HitType.values()[j];
 				final int k = i;
-				getContainer().addFirst(new Button(Main.getInstance().getRenderWidth() - 137 + i * 20, 120 + j * 20, 2, "", l + 21){
+				getContainer().addFirst(new Button(Main.instance().getRenderWidth() - 137 + i * 20, 120 + j * 20, 2, "", l + 21){
 
 					@Override
 					public void onClick(MouseState button) {
@@ -50,8 +50,8 @@ public class AnvilScreen extends InventoryScreen {
 	@Override
 	public void render(Renderer render) {
 		super.render(render);
-		render.get().drawColored(Main.getInstance().getRenderWidth() - 120, 75, 3, 4, 4, 2, ColorBundle.get(-1, -1, -1, -1, -1, 888), "gui", 0);
+		render.get().drawColored(Main.instance().getRenderWidth() - 120, 75, 3, 4, 4, 2, ColorBundle.get(-1, -1, -1, -1, -1, 888), "gui", 0);
 		for(int i = 0; i < 3; i++)
-			render.get().drawRect(Main.getInstance().getRenderWidth() - 137 + i * 20, 120 + pattern[i].offsetX * 20, 17, 17, 373);
+			render.get().drawRect(Main.instance().getRenderWidth() - 137 + i * 20, 120 + pattern[i].offsetX * 20, 17, 17, 373);
 	}
 }

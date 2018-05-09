@@ -9,7 +9,6 @@ import javax.swing.JOptionPane;
 
 import net.quantium.harvester.entity.TreeEntity;
 import net.quantium.harvester.tile.Tile;
-import net.quantium.harvester.tile.Tiles;
 import net.quantium.harvester.world.SimplexNoise.SimplexOctave;
 
 public class WorldGenerator {
@@ -31,29 +30,29 @@ public class WorldGenerator {
 						tree.y = y * 16;
 						world.addEntity(tree);
 					}
-				if(world.map[x + y * world.w] == Tiles.littleStone.getId()){
+				if(world.map[x + y * world.w] == Tile.littleStone.getId()){
 					world.meta[x + y * world.w] = (short) rnd.nextInt(32);
 				}
 			}
 	}
 	
 	private static Tile get(byte b, byte c, byte d, Random rnd) {
-		if(b < -7) return Tiles.water;
-		if(b < 2) return Tiles.sand;
+		if(b < -7) return Tile.water;
+		if(b < 2) return Tile.sand;
 		if(b < 39){
-			if(rnd.nextInt(70) == 0) return Tiles.littleStone;
-			return Tiles.grass;
+			if(rnd.nextInt(70) == 0) return Tile.littleStone;
+			return Tile.grass;
 		}
-		if(d > 20 && rnd.nextInt(150) == 0) return Tiles.gemPurple;
-		if(d < 25 && rnd.nextInt(200) == 0) return Tiles.gemGreen;
-		if(c > 20 && rnd.nextInt(220) == 0) return Tiles.gemBlue;
-		if(c < 25 && rnd.nextInt(280) == 0) return Tiles.gemRed;
-		if(rnd.nextInt(40) == 0) return Tiles.oreCoal;
-		if(rnd.nextInt(60) == 0) return Tiles.oreCopper;
-		if(rnd.nextInt(140) == 0) return Tiles.oreGold;
-		if(rnd.nextInt(90) == 0) return Tiles.oreIron;
-		if(rnd.nextInt(100) == 0) return Tiles.orePlumbum;
-		return Tiles.rock;
+		if(d > 20 && rnd.nextInt(150) == 0) return Tile.gemPurple;
+		if(d < 25 && rnd.nextInt(200) == 0) return Tile.gemGreen;
+		if(c > 20 && rnd.nextInt(220) == 0) return Tile.gemBlue;
+		if(c < 25 && rnd.nextInt(280) == 0) return Tile.gemRed;
+		if(rnd.nextInt(40) == 0) return Tile.oreCoal;
+		if(rnd.nextInt(60) == 0) return Tile.oreCopper;
+		if(rnd.nextInt(140) == 0) return Tile.oreGold;
+		if(rnd.nextInt(90) == 0) return Tile.oreIron;
+		if(rnd.nextInt(100) == 0) return Tile.orePlumbum;
+		return Tile.rock;
 	}
 	
 	public static void main(String[] args){

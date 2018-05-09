@@ -62,7 +62,7 @@ public class TileRock extends Tile{
 		world.damageParticle(i * 16, j * 16, damage);
 		if(world.getMetadata(i, j, 1) >= 40){
 			world.setMetadata(i, j, 1, (byte) 0);
-			world.setTile(i, j, Tiles.grass);
+			world.setTile(i, j, Tile.grass);
 			world.throwItem(i * 16, j * 16, new ItemSlot(Items.rock, 0, 2));
 		}
 	}

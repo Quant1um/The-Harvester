@@ -150,11 +150,11 @@ public class BuildableInfo {
 			@Override
 			public void update(BuildableEntity e) {
 				FurnaceContainer container = (FurnaceContainer) e.container;
-				if(container.fuel > 0 && Main.getInstance().getCounter() % 40 == 0) container.fuel--;
+				if(container.fuel > 0 && Main.instance().getCounter() % 40 == 0) container.fuel--;
 				if(container.fuel< 500 && e.inventory.get(2) != null){
 					if(e.inventory.get(2).getItem() instanceof FuelItem){
 						int ccc = ((FuelItem) e.inventory.get(2).getItem()).getFuelValue();
-						if(Main.getInstance().getCounter() % 50 == 0 && e.inventory.get(2).consume(1)){
+						if(Main.instance().getCounter() % 50 == 0 && e.inventory.get(2).consume(1)){
 							container.fuel += ccc;
 							if(container.fuel > 500) container.fuel = 500;
 						}

@@ -32,7 +32,7 @@ public class MainScreen extends MenuScreen {
 
 			@Override
 			public void onClick(MouseState button) {
-				Main.getInstance().forceExit();
+				Main.instance().forceExit();
 			}
 		});
 	}
@@ -40,7 +40,7 @@ public class MainScreen extends MenuScreen {
 	@Override
 	public void render(Renderer render) {
 		super.render(render);
-		render.get().drawText(Main.getInstance().getRenderWidth() / 2 + MenuScreen.SHADOWS_OFFSET, 35 + MenuScreen.SHADOWS_OFFSET, FontSize.BIG, Main.NAME, 0, 0, 0, TextAlign.CENTER);
-		render.get().drawText(Main.getInstance().getRenderWidth() / 2, 35, FontSize.BIG, Main.NAME, 474, 686, 353, TextAlign.CENTER);
+		render.get().drawText(Main.instance().getRenderWidth() / 2 + MenuScreen.SHADOWS_OFFSET, 35 + MenuScreen.SHADOWS_OFFSET, FontSize.BIG, Main.NAME, 0, 0, 0, TextAlign.CENTER);
+		render.get().drawText(Main.instance().getRenderWidth() / 2, 35, FontSize.BIG, Main.NAME, 474, 686, 353, TextAlign.CENTER);
 	}
 }

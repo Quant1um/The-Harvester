@@ -48,7 +48,7 @@ public class ItemSlot implements Serializable{
 	}
 	
 	public Item getItem(){
-		return Item.Registry.get(getItemId());
+		return Item.get(getItemId());
 	}
 	
 	public void setItem(Item item){
@@ -68,7 +68,7 @@ public class ItemSlot implements Serializable{
 	}
 	
 	public void setCount(int count) {
-		if(count > Item.Registry.get(item).getMaxSizeInSlot()) count = Item.Registry.get(item).getMaxSizeInSlot();
+		if(count > Item.get(item).getMaxSizeInSlot()) count = Item.get(item).getMaxSizeInSlot();
 			this.count = count;
 	}
 	
@@ -114,7 +114,7 @@ public class ItemSlot implements Serializable{
 			render.get().drawText(x + 2 * Layer.BLOCK_SIZE,     y + 2 * Layer.BLOCK_SIZE - 8, FontSize.NORMAL, ss, 777, TextAlign.RIGHT);
 		}
 		
-		if(Main.getInstance().getDebugMode() == DebugMode.METADATA)
+		if(Main.instance().getDebugMode() == DebugMode.METADATA)
 			render.get().drawText(x, y, FontSize.SMALL, String.valueOf(item.meta), 358, TextAlign.LEFT);
 	}
 	
@@ -131,8 +131,8 @@ public class ItemSlot implements Serializable{
 		if(i0.meta != i1.meta) return new MergedItem(i0, i1, false);
 		int sum = i0.count + i1.count;
 		int red = 0;
-		if(sum > Item.Registry.get(i0.item).getMaxSizeInSlot()){
-			int c = Item.Registry.get(i0.item).getMaxSizeInSlot();
+		if(sum > Item.get(i0.item).getMaxSizeInSlot()){
+			int c = Item.get(i0.item).getMaxSizeInSlot();
 			red = sum - c;
 			sum = c;
 		}
@@ -171,6 +171,7 @@ public class ItemSlot implements Serializable{
 			return "MergedItem{" + merged + ", First=" + slot + ", Second=" + other + "}";
 		}
 	}
+	
 	public ItemSlot copy() {
 		return new ItemSlot(item, meta, count);
 	}
@@ -184,6 +185,6 @@ public class ItemSlot implements Serializable{
 	}
 	
 	public String toString(){
-		return "Item{" + (Item.Registry.get(item) == null ? "null" : Item.Registry.get(item).getName()) + ", Count=" + count + ", Meta=" + meta + "}";
+		return "Item{" + (getItem() == null ? "null" : getItem().getName()) + ", Count=" + count + ", Meta=" + meta + "}";
 	}
 }

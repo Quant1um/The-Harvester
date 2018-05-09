@@ -24,7 +24,7 @@ public class FurnaceScreen extends InventoryScreen {
 	
 	public void init(){
 		super.init();
-		getContainer().addFirst(new Button(Main.getInstance().getRenderWidth() - 162, 105, 13, "create", 0){
+		getContainer().addFirst(new Button(Main.instance().getRenderWidth() - 162, 105, 13, "create", 0){
 
 			@Override
 			public void onClick(MouseState button) {
@@ -40,9 +40,9 @@ public class FurnaceScreen extends InventoryScreen {
 	@Override
 	public void render(Renderer render) {
 		super.render(render);
-		render.get().drawColored(Main.getInstance().getRenderWidth() - 122, 65, 3, 4, 4, 2, ColorBundle.get(-1, -1, -1, -1, -1, 888), "gui", 0);
-		render.get().fillRect(Main.getInstance().getRenderWidth() - 160, 100, 100, 2, 444);
-		render.get().fillRect(Main.getInstance().getRenderWidth() - 160, 100, ((FurnaceContainer)entity.container).fuel / 5, 2, 822);
+		render.get().drawColored(Main.instance().getRenderWidth() - 122, 65, 3, 4, 4, 2, ColorBundle.get(-1, -1, -1, -1, -1, 888), "gui", 0);
+		render.get().fillRect(Main.instance().getRenderWidth() - 160, 100, 100, 2, 444);
+		render.get().fillRect(Main.instance().getRenderWidth() - 160, 100, ((FurnaceContainer)entity.container).fuel / 5, 2, 822);
 	}
 	
 	@Override

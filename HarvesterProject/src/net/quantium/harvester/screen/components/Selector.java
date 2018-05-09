@@ -2,7 +2,6 @@ package net.quantium.harvester.screen.components;
 
 import com.sun.glass.events.KeyEvent;
 
-import net.quantium.harvester.Main;
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.render.ColorBundle;
@@ -75,8 +74,8 @@ public class Selector extends Component implements IValueHolder<Integer>{
 
 	@Override
 	public void update() {
-		lHover = Main.getInstance().getInputService().isMouseOverRectangle(x, y, 2 * Layer.BLOCK_SIZE, 2 * Layer.BLOCK_SIZE);
-		rHover = Main.getInstance().getInputService().isMouseOverRectangle(x + w - 2 * Layer.BLOCK_SIZE, y, 2 * Layer.BLOCK_SIZE, 2 * Layer.BLOCK_SIZE);
+		lHover = input().isMouseOverRectangle(x, y, 2 * Layer.BLOCK_SIZE, 2 * Layer.BLOCK_SIZE);
+		rHover = input().isMouseOverRectangle(x + w - 2 * Layer.BLOCK_SIZE, y, 2 * Layer.BLOCK_SIZE, 2 * Layer.BLOCK_SIZE);
 		if(lClick > 0){
 			lClick--;
 			if(lClick <= 0){

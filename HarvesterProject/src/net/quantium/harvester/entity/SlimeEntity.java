@@ -34,14 +34,14 @@ public class SlimeEntity extends MobEntity implements AIEntity<SlimeEntity> {
 	@Override
 	public void init() {
 		ai = new AISlime(this);
-		hitbox = new Hitbox(8, 4, -12, -6);
+		hitbox = new Hitbox(8, 4, -4, -2);
 	}
 
 	@Override
 	public void render(Renderer render) {
-		render.get().draw(x - 16, y - yOffset[frame] - 16, frame * 2, 33 + type.spriteOffset * 2, 2, 2, "sheet0", 0);
+		render.get().draw(x - 8, y - yOffset[frame] - 12, frame * 2, 33 + type.spriteOffset * 2, 2, 2, "sheet0", 0);
 		if(invincibleTime >= 20)
-			render.get().drawTinted(x - 16, y - yOffset[frame] - 16, frame * 2, 33 + type.spriteOffset * 2, 2, 2, DAMAGE_TINT_COLOR, "sheet0", 0);
+			render.get().drawTinted(x - 8, y - yOffset[frame] - 12, frame * 2, 33 + type.spriteOffset * 2, 2, 2, DAMAGE_TINT_COLOR, "sheet0", 0);
 		//render.get().drawLine(x - 8, y - 8, x - 8 + ai.getHeatmapOffsetX() * 16, y - 8 + ai.getHeatmapOffsetY() * 16, 990);
 	}
 

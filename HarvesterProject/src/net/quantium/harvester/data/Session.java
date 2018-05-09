@@ -4,13 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Random;
 
 import net.quantium.harvester.Main;
 import net.quantium.harvester.entity.ISpectator;
 import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.render.Renderer;
-import net.quantium.harvester.tile.Tiles;
 import net.quantium.harvester.utilities.IOContainer;
 import net.quantium.harvester.world.World;
 
@@ -22,7 +20,6 @@ public class Session {
 	private final int slot;
 	
 	private static final String[] names = new String[7];
-	
 	private static final IOContainer[] ios = new IOContainer[7];
 	
 	@Override
@@ -37,18 +34,8 @@ public class Session {
 		if(createWorld){
 			this.player = new PlayerEntity();
 			this.world = new World(size, size);
-			boolean found = false;
-			Random r = new Random(world.seed);
-			while(!found){
-				int x = r.nextInt(world.w);
-				int y = r.nextInt(world.h);
-				if(world.getTile(x, y) == Tiles.grass){
-					this.player.x = x * 16;
-					this.player.y = y * 16;
-					found = true;
-				}
-			}
 			this.world.addEntity(this.player);
+			this.player.respawn();
 		}
 		names[slot] = name;
 	}

@@ -55,12 +55,10 @@ public class Main extends Canvas implements IInputListener, ITextListener{
 	public static final double NANOSECONDS_PER_TICK = NANOSECONDS_PER_SECOND / TICKS_PER_SECOND;
 	public static final int SCALE = 2;
 	public static final int VERSION = 1;
-	
-	public int counter = 0;
-	
 	public static final String NAME = "THE HARVESTER";
+	public static final Random RANDOM = new Random();
 	
-	public static final Random GLOBAL_RANDOM = new Random();
+	private int counter = 0;
 	
 	private int frames = 0, 
 				updates = 0;
@@ -82,9 +80,9 @@ public class Main extends Canvas implements IInputListener, ITextListener{
 	private int renderWidth, renderHeight;
 	
 	
-	private static Main _instance;
-	public static Main getInstance(){
-		return _instance;
+	private final static Main instance = new Main();
+	public static Main instance(){
+		return instance;
 	}
 	
 	public static void main(String[] args){
@@ -93,39 +91,38 @@ public class Main extends Canvas implements IInputListener, ITextListener{
 		BuildableInfo.register();
 		Session.updateNames();
 		
-		_instance = new Main();
-		_instance.init();
-		_instance.setPreferredSize(new Dimension(_instance.getRenderWidth() * SCALE, _instance.getRenderHeight() * SCALE));
-		_instance.setMinimumSize(new Dimension(_instance.getRenderWidth() * SCALE, _instance.getRenderHeight() * SCALE));
-		_instance.setMaximumSize(new Dimension(_instance.getRenderWidth() * SCALE, _instance.getRenderHeight() * SCALE));
-		_instance.frame = new JFrame(NAME + " v0.0.2 ALPHA");
-		_instance.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		_instance.frame.setLayout(new BorderLayout());
-		_instance.frame.getContentPane().add(_instance, BorderLayout.CENTER);
-		_instance.frame.getContentPane().setPreferredSize(new Dimension(_instance.getRenderWidth() * SCALE, _instance.getRenderHeight() * SCALE));
-		_instance.frame.getContentPane().setMinimumSize(new Dimension(_instance.getRenderWidth() * SCALE, _instance.getRenderHeight() * SCALE));
-		_instance.frame.getContentPane().setMaximumSize(new Dimension(_instance.getRenderWidth() * SCALE, _instance.getRenderHeight() * SCALE));
-		_instance.frame.setResizable(false);
-		_instance.frame.pack();
-		_instance.frame.setVisible(true);
-		_instance.frame.getContentPane().requestFocus();
+		instance.init();
+		instance.setPreferredSize(new Dimension(instance.getRenderWidth() * SCALE, instance.getRenderHeight() * SCALE));
+		instance.setMinimumSize(new Dimension(instance.getRenderWidth() * SCALE, instance.getRenderHeight() * SCALE));
+		instance.setMaximumSize(new Dimension(instance.getRenderWidth() * SCALE, instance.getRenderHeight() * SCALE));
+		instance.frame = new JFrame(NAME + " v0.0.2 ALPHA");
+		instance.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		instance.frame.setLayout(new BorderLayout());
+		instance.frame.getContentPane().add(instance, BorderLayout.CENTER);
+		instance.frame.getContentPane().setPreferredSize(new Dimension(instance.getRenderWidth() * SCALE, instance.getRenderHeight() * SCALE));
+		instance.frame.getContentPane().setMinimumSize(new Dimension(instance.getRenderWidth() * SCALE, instance.getRenderHeight() * SCALE));
+		instance.frame.getContentPane().setMaximumSize(new Dimension(instance.getRenderWidth() * SCALE, instance.getRenderHeight() * SCALE));
+		instance.frame.setResizable(false);
+		instance.frame.pack();
+		instance.frame.setVisible(true);
+		instance.frame.getContentPane().requestFocus();
 		BufferedImage cursorImg = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 		Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
 		    cursorImg, new Point(0, 0), "blank");
-		_instance.frame.getContentPane().setCursor(blankCursor);
+		instance.frame.getContentPane().setCursor(blankCursor);
 		
-		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(_instance));
+		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(instance));
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable(){
 
 			@Override
 			public void run() {
-				if(_instance.session != null) _instance.session.save(true);
-				_instance.active = false;
+				if(instance.session != null) instance.session.save(true);
+				instance.active = false;
 			}
 			
 		}));
 		
-		_instance.run();
+		instance.run();
 	}
 	
 	public void forceExit(){
@@ -194,10 +191,6 @@ public class Main extends Canvas implements IInputListener, ITextListener{
 
 	public int getRenderHeight(){
 		return renderHeight;
-	}
-	
-	public boolean useShadows(){
-		return settings.useShadows;
 	}
 	
 	public ScreenService getScreenService(){

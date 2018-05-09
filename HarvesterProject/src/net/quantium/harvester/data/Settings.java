@@ -11,10 +11,10 @@ public class Settings {
 			   								   {450, 350},
 			   								   {450, 400}};
 	
-	public IOContainer container = new IOContainer("settings.dat");
-	public boolean useShadows;
-	public int resolution;
-	public int localization;
+	private IOContainer container = new IOContainer("settings.dat");
+	private boolean useShadows;
+	private int resolution;
+	private int localization;
 	
 	public int getWidth(){
 		return resolutions[resolution][0];
@@ -24,6 +24,30 @@ public class Settings {
 		return resolutions[resolution][1];
 	}
 	
+	public boolean useShadows() {
+		return useShadows;
+	}
+
+	public void setShadows(boolean useShadows) {
+		this.useShadows = useShadows;
+	}
+
+	public int getLocalizationId() {
+		return localization;
+	}
+
+	public void setLocalizationId(int localization) {
+		this.localization = localization;
+	}
+
+	public int getResolutionId() {
+		return resolution;
+	}
+
+	public void setResolutionId(int resolution) {
+		this.resolution = resolution;
+	}
+
 	public void restore(){
 		useShadows = (boolean) container.get().getOrDefault("shadows", false);
 		resolution = (int) container.get().getOrDefault("res", 0);

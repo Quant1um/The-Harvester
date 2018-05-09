@@ -29,7 +29,7 @@ public class InputField extends Component implements IValueHolder<String>{
 	public void render(Renderer render) {
 		super.render(render);
 		render.get().renderPseudo3DRect(x, y, w / Layer.BLOCK_SIZE, 2, 222, 777, 444, 666, false);
-		boolean renderCursor = isFocused() && (Main.getInstance().getCounter() & 32) == 0;
+		boolean renderCursor = isFocused() && (Main.instance().getCounter() & 32) == 0;
 		if(value.length() > 0)
 			render.get().drawText(x + 3, y + Layer.BLOCK_SIZE - 4, FontSize.NORMAL, value, 888, TextAlign.LEFT, false);
 		else

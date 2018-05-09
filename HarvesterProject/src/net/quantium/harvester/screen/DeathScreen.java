@@ -36,8 +36,8 @@ public class DeathScreen extends IngameScreen {
 	}
 
 	private void goToMainMenu(){
-		Main.getInstance().getSession().save();
-		Main.getInstance().resetSession();
+		Main.instance().getSession().save();
+		Main.instance().resetSession();
 		service.setScreen(new MainScreen());
 	}
 	

@@ -32,7 +32,7 @@ public class ToolItem extends AbstractItem {
 		if(mode == InteractionMode.LEFT){
 			//System.out.println(slot);
 			ply.hitSelected(level, type);
-			if(Main.GLOBAL_RANDOM.nextInt(5) == 0)
+			if(Main.RANDOM.nextInt(5) == 0)
 				slot.damage(1);
 			if(slot.getMeta() >= durability) slot.anullate();
 			return true;

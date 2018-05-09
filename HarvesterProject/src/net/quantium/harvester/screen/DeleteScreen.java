@@ -24,7 +24,7 @@ public class DeleteScreen extends MenuScreen {
 	protected void init() {
 		super.init();
 		Component back = new BackButton(5, 5);
-		Component confirm = new Button((Main.getInstance().getRenderWidth() - 15 * Layer.BLOCK_SIZE) / 2, 130, 15, "confirm", 6){
+		Component confirm = new Button((Main.instance().getRenderWidth() - 15 * Layer.BLOCK_SIZE) / 2, 130, 15, "confirm", 6){
 
 			@Override
 			public void onClick(MouseState button) {
@@ -42,8 +42,8 @@ public class DeleteScreen extends MenuScreen {
 		
 		String text0 = "deleteconf";
 		String text1 = Session.getName(slot) + "?";
-		render.get().drawText(Main.getInstance().getRenderWidth() / 2, 100, FontSize.NORMAL, text0, 888, TextAlign.CENTER);
-		render.get().drawText(Main.getInstance().getRenderWidth() / 2, 110, FontSize.NORMAL, text1, 888, TextAlign.CENTER, false);
+		render.get().drawText(Main.instance().getRenderWidth() / 2, 100, FontSize.NORMAL, text0, 888, TextAlign.CENTER);
+		render.get().drawText(Main.instance().getRenderWidth() / 2, 110, FontSize.NORMAL, text1, 888, TextAlign.CENTER, false);
 		
 		getContainer().render(render);
 	}

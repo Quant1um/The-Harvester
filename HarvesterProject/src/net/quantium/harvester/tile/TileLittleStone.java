@@ -38,7 +38,7 @@ public class TileLittleStone extends TileGrass {
 		if(world.getMetadata(i, j, 1) >= 3){
 			world.setMetadata(i, j, 1, (byte) 0);
 			world.throwItem(i * 16, j * 16, new ItemSlot(Items.rock, 0, 1));
-			world.setTile(i, j, Tiles.grass);
+			world.setTile(i, j, Tile.grass);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 package net.quantium.harvester.timehook;
 
 public class TimeHookManager {
-	public static TimeHook[] hooks = new TimeHook[16]; //16 hooks can be registered
+	private static final TimeHook[] hooks = new TimeHook[16]; //16 hooks can be registered
 	
 	public static int register(TimeHook h){
 		for(int i = 0; i < hooks.length; i++)
@@ -13,16 +13,18 @@ public class TimeHookManager {
 	}
 	
 	public static void update(double delta){
-		for(int i = 0; i < hooks.length; i++)
-			if(hooks[i] != null){
-				hooks[i].time += delta;
-				if(hooks[i].time >= hooks[i].duration){
-					hooks[i].time = 0;
-					hooks[i].elapsed();
-					if(!hooks[i].repeating)
-						hooks[i] = null;
+		for(int i = 0; i < hooks.length; i++){
+			TimeHook hook = get(i);
+			if(hook != null){
+				hook.time += delta;
+				if(hook.time >= hook.duration){
+					hook.time -= hook.duration;
+					hook.elapsed();
+					if(!hook.repeating)
+						hook = null;
 				}	
 			}
+		}
 	}
 	
 	public static TimeHook get(int id){

@@ -25,8 +25,8 @@ public class AISlime extends AIBehavior<SlimeEntity> {
 		
 		if(player != null && change){
 			change = false;
-			xx = Main.GLOBAL_RANDOM.nextInt(3) - 1;
-			yy = Main.GLOBAL_RANDOM.nextInt(3) - 1;
+			xx = Main.RANDOM.nextInt(3) - 1;
+			yy = Main.RANDOM.nextInt(3) - 1;
 			
 			float sqrDist = getEntity().sqrDistanceTo(player);
 			if(sqrDist <= PLAYER_CHECK_DISTANCE * PLAYER_CHECK_DISTANCE){

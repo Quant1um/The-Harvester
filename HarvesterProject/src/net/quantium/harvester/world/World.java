@@ -10,23 +10,22 @@ import java.util.Queue;
 
 import net.quantium.harvester.Main;
 import net.quantium.harvester.Main.DebugMode;
-import net.quantium.harvester.entity.MobEntity;
 import net.quantium.harvester.entity.CollidableTileEntity;
 import net.quantium.harvester.entity.Entity;
 import net.quantium.harvester.entity.ItemEntity;
+import net.quantium.harvester.entity.MobEntity;
 import net.quantium.harvester.entity.PlayerEntity;
 import net.quantium.harvester.entity.SlimeEntity;
 import net.quantium.harvester.entity.SlimeEntity.SlimeType;
 import net.quantium.harvester.entity.hitbox.Hitbox;
-import net.quantium.harvester.entity.particle.NumberParticle;
 import net.quantium.harvester.entity.particle.DotParticle;
+import net.quantium.harvester.entity.particle.NumberParticle;
 import net.quantium.harvester.entity.particle.ParticleEntity;
 import net.quantium.harvester.item.ItemSlot;
 import net.quantium.harvester.render.Renderer;
 import net.quantium.harvester.text.FontSize;
 import net.quantium.harvester.text.TextAlign;
 import net.quantium.harvester.tile.Tile;
-import net.quantium.harvester.tile.Tiles;
 
 public class World implements Serializable{
 	/**
@@ -64,7 +63,7 @@ public class World implements Serializable{
 	public transient PlayerEntity player;
 	public final int seed;
 	
-	private transient Comparator<Entity> compatator = new Comparator<Entity>() {
+	private static final Comparator<Entity> compatator = new Comparator<Entity>() {
 		  public int compare(Entity a, Entity b) {
 			return a.compareTo(b);
 		  }
@@ -74,7 +73,7 @@ public class World implements Serializable{
 	@SuppressWarnings("unchecked")
 	public World(int w, int h){
 		this.w = w;
-		this.seed = Main.GLOBAL_RANDOM.nextInt(Integer.MAX_VALUE);
+		this.seed = Main.RANDOM.nextInt(Integer.MAX_VALUE);
 		this.h = h;
 		this.map = new byte[w * h];
 		this.meta = new short[w * h * METADATA_LAYERS];
@@ -92,12 +91,12 @@ public class World implements Serializable{
 		time += TIME_PER_TICK;
 		if(time >= 86400) time = 0;
 		for(int i = 0; i < w * h / 120; i++){
-			int j = Main.GLOBAL_RANDOM.nextInt(w * h);
-			Tile.Registry.get(map[j]).
-				randomTick(this, j % w, j / w);
+			int j = Main.RANDOM.nextInt(w * h);
+			Tile tile = Tile.get(map[j]);
+			tile.randomTick(this, j % w, j / w);
 		}
 		
-		if(Main.GLOBAL_RANDOM.nextInt(300) == 0) updateEntitySpawningCycle();
+		if(Main.RANDOM.nextInt(300) == 0) updateEntitySpawningCycle();
 		
 		for(int i = 0; i < entities.size(); i++){
 			Entity e = entities.get(i);
@@ -117,7 +116,7 @@ public class World implements Serializable{
 			player.refetchPosition();
 			if((preX >> ENTITY_TILE_COORDSHIFT) != (player.x >> ENTITY_TILE_COORDSHIFT) || (preY >> ENTITY_TILE_COORDSHIFT) != (player.y >> ENTITY_TILE_COORDSHIFT)){
 				recacheEntity((preX >> ENTITY_TILE_COORDSHIFT), (preY >> ENTITY_TILE_COORDSHIFT), (player.x >> ENTITY_TILE_COORDSHIFT), (player.y >> ENTITY_TILE_COORDSHIFT), player);
-				updateAITargetMap((player.x >> ENTITY_TILE_COORDSHIFT), (player.y >> ENTITY_TILE_COORDSHIFT));
+				updateAITargetMap(((player.x - 1) >> ENTITY_TILE_COORDSHIFT), ((player.y - 1) >> ENTITY_TILE_COORDSHIFT));
 			}
 		}
 		for(int i = 0; i < particles.size(); i++){
@@ -141,7 +140,7 @@ public class World implements Serializable{
 		}
 	}
 	
-	private static final int MAX_DEPTH = 5;
+	private static final int MAX_DEPTH = 7;
 	private void updateAITargetMap(int x, int y) {
 		for(int i = 0; i < w * h; i++){
 			if(this.aiTargetMap[i] > 0)
@@ -170,7 +169,7 @@ public class World implements Serializable{
 		if(x < 0 || x >= w || y < 0 || y >= h) return false;
 	
 		Tile tile = getTile(x, y);
-		return tile != Tiles.water && tile.isPassable(this, x, y, this.player);
+		return tile != Tile.water && tile.isPassable(this, x, y, this.player);
 	}
 
 	public void renderLayer(Renderer render, int layer){
@@ -178,10 +177,13 @@ public class World implements Serializable{
 		final int OFFSCEEEN = 2;
 		switch(layer){
 			case RENDERLAYER_TILE: {
-				for(int i = (int)(render.get().transform().x / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; i <= (int)(Main.getInstance().getRenderWidth() + render.get().transform().x) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; i++)
-					for(int j = (int)(render.get().transform().y / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; j <= (int)(Main.getInstance().getRenderHeight() + render.get().transform().y) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; j++){
+				for(int i = (int)(render.get().transform().x / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; i <= (int)(Main.instance().getRenderWidth() + render.get().transform().x) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; i++)
+					for(int j = (int)(render.get().transform().y / ENTITY_TILE_COORDSCALE) - OFFSCEEEN; j <= (int)(Main.instance().getRenderHeight() + render.get().transform().y) / ENTITY_TILE_COORDSCALE + OFFSCEEEN; j++){
+						if(i < 0 || i >= w || j < 0 || j >= h)
+							continue;
+						
 						getTile(i, j).render(render, this, i, j);
-						switch(Main.getInstance().getDebugMode()){
+						switch(Main.instance().getDebugMode()){
 							case METADATA: render.get().drawText(i * 16, j * 16, FontSize.SMALL, getMetadata(i, j, 0) + "; " + getMetadata(i, j, 1), 338, TextAlign.LEFT); break;
 							case AITARGET: render.get().drawText(i * 16, j * 16, FontSize.SMALL, String.valueOf(this.aiTargetMap[i + j * w]), 833, TextAlign.LEFT); break;
 							default: break;
@@ -191,7 +193,7 @@ public class World implements Serializable{
 			}
 			
 			case RENDERLAYER_ENTITY: {
-				List<Entity> ents = new ArrayList<Entity>();//getEntitiesIn((int)(render.get().transform().x / ENTITY_TILE_COORDSCALE) - OFFSCEEEN, (int)(render.get().transform().y / ENTITY_TILE_COORDSCALE) - OFFSCEEEN , (Main.getInstance().getRenderWidth() + render.get().transform().x) / ENTITY_TILE_COORDSCALE + OFFSCEEEN + 1, (Main.getInstance().getRenderHeight() + render.get().transform().y) / ENTITY_TILE_COORDSCALE + OFFSCEEEN + 1);
+				List<Entity> ents = new ArrayList<Entity>();//getEntitiesIn((int)(render.get().transform().x / ENTITY_TILE_COORDSCALE) - OFFSCEEEN, (int)(render.get().transform().y / ENTITY_TILE_COORDSCALE) - OFFSCEEEN , (Main.instance().getRenderWidth() + render.get().transform().x) / ENTITY_TILE_COORDSCALE + OFFSCEEEN + 1, (Main.instance().getRenderHeight() + render.get().transform().y) / ENTITY_TILE_COORDSCALE + OFFSCEEEN + 1);
 				
 				if(!player.isDied()) ents.add(player);
 				
@@ -199,15 +201,15 @@ public class World implements Serializable{
 					Entity e = entities.get(i);
 					if(e.x >= render.get().transform().x - OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
 							   e.y >= render.get().transform().y - OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
-							   e.x <= Main.getInstance().getRenderWidth() + render.get().transform().x + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
-							   e.y <= Main.getInstance().getRenderHeight() + render.get().transform().y + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE)
+							   e.x <= Main.instance().getRenderWidth() + render.get().transform().x + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
+							   e.y <= Main.instance().getRenderHeight() + render.get().transform().y + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE)
 					ents.add(e);
 				}
 				
 				ents.sort(compatator);
 				for(Entity e : ents){
 					e.render(render);
-					if(Main.getInstance().getDebugMode() == DebugMode.HITBOX){
+					if(Main.instance().getDebugMode() == DebugMode.HITBOX){
 						Hitbox hbox = e.hitbox;
 						render.get().drawRect(e.x + hbox.getOffsetX(), e.y + hbox.getOffsetY(), hbox.getWidth(), hbox.getHeight(), 911);
 						render.get().put(e.x, e.y, 119);
@@ -224,8 +226,8 @@ public class World implements Serializable{
 					
 					if(e.x >= render.get().transform().x - OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
 					   e.y >= render.get().transform().y - OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
-					   e.x <= Main.getInstance().getRenderWidth() + render.get().transform().x + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
-					   e.y <= Main.getInstance().getRenderHeight() + render.get().transform().y + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE)
+					   e.x <= Main.instance().getRenderWidth() + render.get().transform().x + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE &&
+					   e.y <= Main.instance().getRenderHeight() + render.get().transform().y + OFFSCEEEN * 2 * ENTITY_TILE_COORDSCALE)
 					ents.add(e);
 				}
 				ents.sort(compatator);
@@ -285,7 +287,7 @@ public class World implements Serializable{
 	public byte getTileId(int x, int y){
 		if(x >= 0 && y >= 0 && x < w && y < h)
 			return map[x + y * w];
-		return Tiles.rock.getId();
+		return Tile.rock.getId();
 	}
 	
 	public void setTileId(int x, int y, byte b){
@@ -294,7 +296,7 @@ public class World implements Serializable{
 	}
 	
 	public Tile getTile(int x, int y){
-		return Tile.Registry.get(getTileId(x, y));
+		return Tile.get(getTileId(x, y));
 	}
 	
 	public void setTile(int x, int y, Tile tile){
@@ -498,7 +500,7 @@ public class World implements Serializable{
 		//int temperature = getTemperature(x, y);
 		int height = getHeight(x, y);
 		
-		int seed = Main.GLOBAL_RANDOM.nextInt(10);
+		int seed = Main.RANDOM.nextInt(10);
 		if(seed < 5 && moisture > 10) return new SlimeEntity(SlimeType.WATER);
 		if(seed < 2 && height > 27) return new SlimeEntity(SlimeType.DARKIE);
 		if(seed < 9 && height > 7) return new SlimeEntity(SlimeType.GRASS);
@@ -507,16 +509,16 @@ public class World implements Serializable{
 	
 	private int genEntityPos(int ply){
 		return ply 
-				+ (Main.GLOBAL_RANDOM.nextBoolean() ? -1 : 1)
-				* (Main.GLOBAL_RANDOM.nextInt(MOB_SPAWNING_BOUNDS_MAX - MOB_SPAWNING_BOUNDS_MIN + 1) + MOB_SPAWNING_BOUNDS_MIN);
+				+ (Main.RANDOM.nextBoolean() ? -1 : 1)
+				* (Main.RANDOM.nextInt(MOB_SPAWNING_BOUNDS_MAX - MOB_SPAWNING_BOUNDS_MIN + 1) + MOB_SPAWNING_BOUNDS_MIN);
 	}
 	
 	public void throwItem(int xx, int yy, ItemSlot slot){
 		ItemSlot single = slot.copy();
 		single.setCount(1);
 		for(int i = 0; i < slot.getCount(); i++){
-			float fx = (float)(Main.GLOBAL_RANDOM.nextGaussian() * 0.8f);
-			float fy = (float)(Main.GLOBAL_RANDOM.nextGaussian() * 0.8f);
+			float fx = (float)(Main.RANDOM.nextGaussian() * 0.8f);
+			float fy = (float)(Main.RANDOM.nextGaussian() * 0.8f);
 			ItemEntity ie = new ItemEntity(single, fx, fy);
 			ie.x = xx;
 			ie.y = yy;

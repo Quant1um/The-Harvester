@@ -42,10 +42,10 @@ public class ItemEntity extends Entity {
 	@Override
 	public void render(Renderer render) {
 		if(slot == null) return;
-		if(time >= BLINKING_TIME && ((Main.getInstance().getCounter() / 20) % 2) == 0)
+		if(time >= BLINKING_TIME && ((Main.instance().getCounter() / 20) % 2) == 0)
 			return;
 		
-		int offground = (Main.getInstance().getCounter() / 30) % 2;
+		int offground = (Main.instance().getCounter() / 30) % 2;
 		Item itemd = slot.getItem();
 		render.get().drawTinted(x - 3, y - 3, itemd.getIconX() * 2, itemd.getIconY() * 2, 2, 2, 5000,"sheet0", 0);
 		render.get().draw(x - 3, y - 4 - offground, itemd.getIconX() * 2, itemd.getIconY() * 2, 2, 2, "sheet0", 0);

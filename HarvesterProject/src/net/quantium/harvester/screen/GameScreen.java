@@ -52,10 +52,10 @@ public class GameScreen extends MenuScreen{
 
 					@Override
 					public void onClick(MouseState button) {
-						Main.getInstance().setSession(Session.load(j));
-						if(!Main.getInstance().hasSession()) return;
-						service.setScreen(Main.getInstance().getSession().getPlayer().isDied() ? 
-										  new DeathScreen(Main.getInstance().getSession().getPlayer()) : null);
+						Main.instance().setSession(Session.load(j));
+						if(!Main.instance().hasSession()) return;
+						service.setScreen(Main.instance().getSession().getPlayer().isDied() ? 
+										  new DeathScreen(Main.instance().getSession().getPlayer()) : null);
 					}
 				
 				});

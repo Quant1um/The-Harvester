@@ -33,7 +33,7 @@ public class InformationScreen extends MenuScreen {
 	public void render(Renderer render) {
 		super.render(render);
 		
-		final int xx = (Main.getInstance().getRenderWidth() - 55 * 6) / 2;
+		final int xx = (Main.instance().getRenderWidth() - 55 * 6) / 2;
 		final int yy = 40;
 		render.get().drawText(xx, yy,      FontSize.NORMAL,  "infoline0", 888, TextAlign.LEFT);
 		render.get().drawText(xx, yy + 10, FontSize.NORMAL,  "infoline1", 888, TextAlign.LEFT);

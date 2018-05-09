@@ -10,6 +10,6 @@ public class BackButton extends Button {
 
 	@Override
 	public void onClick(MouseState button) {
-		Main.getInstance().getScreenService().back();
+		Main.instance().getScreenService().back();
 	}
 }

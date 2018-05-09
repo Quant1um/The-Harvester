@@ -3,6 +3,7 @@ package net.quantium.harvester.screen.components;
 import net.quantium.harvester.Main;
 import net.quantium.harvester.input.IInputListener;
 import net.quantium.harvester.input.ITextListener;
+import net.quantium.harvester.input.InputService;
 import net.quantium.harvester.input.InputService.Key;
 import net.quantium.harvester.input.MouseState;
 import net.quantium.harvester.input.TextModifiers;
@@ -68,7 +69,11 @@ public abstract class Component implements IInputListener, ITextListener {
 	@Override public void onMouseWheel(int ticks){}
 	@Override public void onTextInput(char character, TextModifiers mod){}
 	
+	protected InputService input(){
+		return Main.instance().getInputService();
+	}
+	
 	public boolean isMouseOver(){
-		return Main.getInstance().getInputService().isMouseOverRectangle(x, y, w, h);
+		return input().isMouseOverRectangle(x, y, w, h);
 	}
 }

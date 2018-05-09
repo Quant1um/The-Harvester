@@ -23,21 +23,25 @@ public class SettingsScreen extends MenuScreen {
 
 	private Selector selector, language;
 	
+	private Settings settings(){
+		return Main.instance().getSettings();
+	}
+	
 	@Override
 	public void init() {
 		super.init();
 		Component back = new BackButton(5, 5);
-		Component shadows = new ToggleButton(MenuScreen.BUTTON_CENTER_X, 50, MenuScreen.BUTTON_SIZE, "shadows", Main.getInstance().useShadows()){
+		Component shadows = new ToggleButton(MenuScreen.BUTTON_CENTER_X, 50, MenuScreen.BUTTON_SIZE, "shadows", settings().useShadows()){
 
 			@Override
 			public void onValueChanged(Boolean value) {
-				Main.getInstance().getSettings().useShadows = value;
+				settings().setShadows(value);
 			}
 			
 		};
 		
 		selector = new Selector(MenuScreen.BUTTON_CENTER_X + 9 * 8, 70, 11, resolutionStrings);
-		selector.setValue(Main.getInstance().getSettings().resolution);
+		selector.setValue(Main.instance().getSettings().getResolutionId());
 		String[] langs = new String[ResourceLoader.LocaleLoader.size()];
 		for(int i = 0; i < langs.length; i++)
 			langs[i] = ResourceLoader.LocaleLoader.get(i).getName();
@@ -49,7 +53,7 @@ public class SettingsScreen extends MenuScreen {
 			}
 		};
 		
-		language.setValue(Main.getInstance().getSettings().localization);
+		language.setValue(settings().getLocalizationId());
 		
 		getContainer().add(back);
 		getContainer().add(shadows);
@@ -66,9 +70,9 @@ public class SettingsScreen extends MenuScreen {
 
 	@Override
 	public void release() {
-		Settings settings = Main.getInstance().getSettings();
-		settings.resolution = selector.getValue();
-		settings.localization = language.getValue();
+		Settings settings = settings();
+		settings.setResolutionId(selector.getValue());
+		settings.setLocalizationId(language.getValue());
 		settings.save();
 	}
 }

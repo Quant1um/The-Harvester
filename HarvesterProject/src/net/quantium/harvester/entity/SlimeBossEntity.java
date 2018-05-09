@@ -35,14 +35,14 @@ public class SlimeBossEntity extends SlimeEntity {
 	@Override
 	public void update() {
 		super.update();
-		if(Main.getInstance().getCounter() % 4 != 0) jump--;
+		if(Main.instance().getCounter() % 4 != 0) jump--;
 		
 		if(readyToEject) eject();	
 	}
 
 	private void eject() {
 		readyToEject = false;
-		for(double i = 0; i < 2 * Math.PI; i += (Math.PI / 3) + (Main.GLOBAL_RANDOM.nextInt(100) / 100f)){
+		for(double i = 0; i < 2 * Math.PI; i += (Math.PI / 3) + (Main.RANDOM.nextInt(100) / 100f)){
 			world.addEntity(new SpikeEntity(x, y, (float)Math.cos(i) * 7f, (float)Math.sin(i) * 7f));
 		}
 	}

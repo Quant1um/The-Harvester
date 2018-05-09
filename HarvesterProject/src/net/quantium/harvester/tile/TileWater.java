@@ -21,7 +21,7 @@ public class TileWater extends Tile{
 	public void render(Renderer render, World w, int x, int y) {
 		render.get().draw(x * 16, y * 16, 9, 4, 2, 2, "sheet0", 0);
 		if((((x / 2) & 7) ^ (y & 5)) == 0){
-			int animframe = pattern[(Main.getInstance().getCounter() / 10 + x * 2 + y * 7) % pattern.length];
+			int animframe = pattern[(Main.instance().getCounter() / 10 + x * 2 + y * 7) % pattern.length];
 			render.get().drawColored(x * 16, y * 16, animframe * 2, 13, 2, 2, ColorBundle.get(-1, -1, -1, -1, -1, 778), "ambient", 0);
 		}
 	}

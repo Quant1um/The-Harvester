@@ -86,14 +86,14 @@ public class TreeEntity extends LivingEntity {
 		}else{
 			this.hit(1);
 		}
-		if(Main.GLOBAL_RANDOM.nextInt(5) == 0) world.throwItem(x, y, new ItemSlot(Items.stick, 0, Main.GLOBAL_RANDOM.nextInt(2) + 1));
-		if(Main.GLOBAL_RANDOM.nextInt(30) == 0) world.throwItem(x, y, new ItemSlot(Items.nut, 0, Main.GLOBAL_RANDOM.nextInt(1) + 1));
+		if(Main.RANDOM.nextInt(5) == 0) world.throwItem(x, y, new ItemSlot(Items.stick, 0, Main.RANDOM.nextInt(2) + 1));
+		if(Main.RANDOM.nextInt(30) == 0) world.throwItem(x, y, new ItemSlot(Items.nut, 0, Main.RANDOM.nextInt(1) + 1));
 		return true;
 	}
 
 	@Override
 	public void onDied() {
 		super.onDied();
-		world.throwItem(x, y, new ItemSlot(Items.wood, 0, Main.GLOBAL_RANDOM.nextInt(5) + 1));
+		world.throwItem(x, y, new ItemSlot(Items.wood, 0, Main.RANDOM.nextInt(5) + 1));
 	}
 }
