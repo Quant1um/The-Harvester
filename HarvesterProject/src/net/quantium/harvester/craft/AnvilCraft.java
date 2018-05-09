@@ -18,6 +18,8 @@ public class AnvilCraft {
 	public AnvilCraft(ItemSlot result, ItemSlot needed, HitType[] pattern) {
 		this.result = result;
 		this.needed = needed;
+		
+		if(pattern.length != 3) throw new IllegalArgumentException("Pattern length must = 3!");
 		this.pattern = pattern;
 	}
 

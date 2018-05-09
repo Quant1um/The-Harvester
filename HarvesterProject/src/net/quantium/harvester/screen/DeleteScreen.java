@@ -29,7 +29,7 @@ public class DeleteScreen extends MenuScreen {
 			@Override
 			public void onClick(MouseState button) {
 				Session.delete(slot);
-				service.back(new GameScreen());
+				service.back();
 			}
 		};
 		getContainer().add(back);

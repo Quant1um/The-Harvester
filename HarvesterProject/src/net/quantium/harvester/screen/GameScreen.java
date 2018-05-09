@@ -30,7 +30,8 @@ public class GameScreen extends MenuScreen{
 
 
 	@Override
-	public void init() {
+	public void shown() {
+		getContainer().clear();
 		getContainer().add(new BackButton(5, 5));
 		
 		for(int i = 0; i < 7; i++){

@@ -22,34 +22,11 @@ public class ScreenService {
 	}
 	
 	public void back(){
-		back(this.screen == null ? null : this.screen.parent);
+		setScreen(this.screen == null ? null : this.screen.parent);
 	}
 
-	public void setScreenUnreferenced(MainScreen screen) {
-		if(this.screen != null)
-			this.screen.release();
-		if(screen != null){
-			screen.service = this;
-			screen.initialize(this, null);
-			screen.shown();
-		}
-		this.screen = screen;
-	}
-	
 	@Override
 	public String toString(){
 		return "ScreenService{" + screen + "}";
-	}
-
-	public void back(Screen backScreen) {
-		if(backScreen == null){
-			setScreenUnreferenced(null);
-		}else{
-			if(this.screen != null){
-				this.screen.release();
-				backScreen.parent = this.screen.parent == null ? null : this.screen.parent.parent;
-				this.screen = backScreen;
-			}
-		}
 	}
 }

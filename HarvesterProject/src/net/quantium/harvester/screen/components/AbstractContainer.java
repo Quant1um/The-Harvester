@@ -95,4 +95,8 @@ public class AbstractContainer<T extends Component> extends Component{
 			focused = null;
 		comps.remove(comp);
 	}
+	
+	public void clear(){
+		comps.clear();
+	}
 }
