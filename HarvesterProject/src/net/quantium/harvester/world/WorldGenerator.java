@@ -16,12 +16,21 @@ public class WorldGenerator {
 		SimplexOctave.update(seed);
 		Random rnd = new Random(seed);
 		SimplexNoise noise = new SimplexNoise(8, 1, 0.5);
+		SimplexNoise clusterNoise1 = new SimplexNoise(4, 1.5, 0.5);
+		SimplexNoise clusterNoise2 = new SimplexNoise(4, 1.2, 0.5);
+		
 		for(int x = 0; x < world.w; x++)
 			for(int y = 0; y < world.h; y++){
-				world.height	  [x + y * world.w] = (byte) (noise.octavedNoise(x +       0, y +       0, world.w, world.h) * 127);
-				world.temperature [x + y * world.w] = (byte) (noise.octavedNoise(x + world.w, y - world.h, world.w, world.h) * 127);
-				world.moisture	  [x + y * world.w] = (byte) (noise.octavedNoise(x - world.w, y + world.h, world.w, world.h) * 127);
-				world.map		  [x + y * world.w] = get(world.height[x + y * world.w], world.temperature[x + y * world.w], world.moisture[x + y * world.w], rnd).getId();
+				world.height	  [x + y * world.w] = (byte) (noise.octavedNoise(x +       0, y +       0) * 127);
+				world.temperature [x + y * world.w] = (byte) (noise.octavedNoise(x + world.w, y - world.h) * 127);
+				world.moisture	  [x + y * world.w] = (byte) (noise.octavedNoise(x - world.w, y + world.h) * 127);
+				
+				byte clust1 = (byte) (clusterNoise1.octavedNoise(x + world.w, y + world.h) * 127);
+				byte clust2 = (byte) (clusterNoise2.octavedNoise(x - world.w, y - world.h) * 127);
+				
+				world.map		  [x + y * world.w] = get(world.height[x + y * world.w], world.temperature[x + y * world.w], world.moisture[x + y * world.w], rnd, clust1, clust2).getId();
+				
+				
 				
 				if(world.height[x + y * world.w] > 3 && world.height[x + y * world.w] < 35)
 					if((world.moisture[x + y * world.w] > 20 && world.height[x + y * world.w] > 15 && rnd.nextInt(15) == 0) || rnd.nextInt(100) == 0){
@@ -36,28 +45,29 @@ public class WorldGenerator {
 			}
 	}
 	
-	private static Tile get(byte b, byte c, byte d, Random rnd) {
+	private static Tile get(byte b, byte c, byte d, Random rnd, byte clust1, byte clust2) {
 		if(b < -7) return Tile.water;
 		if(b < 2) return Tile.sand;
-		if(b < 39){
+		if(b < 38){
 			if(rnd.nextInt(70) == 0) return Tile.littleStone;
 			return Tile.grass;
 		}
+		
 		if(d > 20 && rnd.nextInt(150) == 0) return Tile.gemPurple;
 		if(d < 25 && rnd.nextInt(200) == 0) return Tile.gemGreen;
 		if(c > 20 && rnd.nextInt(220) == 0) return Tile.gemBlue;
 		if(c < 25 && rnd.nextInt(280) == 0) return Tile.gemRed;
-		if(rnd.nextInt(40) == 0) return Tile.oreCoal;
-		if(rnd.nextInt(60) == 0) return Tile.oreCopper;
-		if(rnd.nextInt(140) == 0) return Tile.oreGold;
-		if(rnd.nextInt(90) == 0) return Tile.oreIron;
-		if(rnd.nextInt(100) == 0) return Tile.orePlumbum;
+		if(rnd.nextInt(40) == 0 	||  clust1 > 67) 	return Tile.oreCoal;
+		if(rnd.nextInt(60) == 0 	||  clust2 > 67) 	return Tile.oreCopper;
+		if(rnd.nextInt(140) == 0) 						return Tile.oreGold;
+		if(rnd.nextInt(90) == 0 	||  clust1 < -67) 	return Tile.oreIron;
+		if(rnd.nextInt(100) == 0	||  clust2 < -67) 	return Tile.orePlumbum;
 		return Tile.rock;
 	}
 	
 	public static void main(String[] args){
 		int w = 256;
-		int h = 256;
+		int h = 128;
 		
 		BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
 		World ww = new World(w, h);

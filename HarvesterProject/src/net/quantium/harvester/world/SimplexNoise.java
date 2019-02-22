@@ -15,7 +15,7 @@ public class SimplexNoise {
 		this.persistence = persistence;
 	}
 
-	public double octavedNoise(int x, int y, int w, int h){
+	public double octavedNoise(int x, int y){
         double result = 0;
         double frequency = this.frequency;
         double persistence = this.persistence;
