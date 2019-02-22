@@ -153,15 +153,16 @@ public class World implements Serializable{
 		while(!queue.isEmpty()){
 			BFSNode node = queue.poll();
 			if(node.depth >= MAX_DEPTH) continue;
+			if(!isViableAINode(node.x, node.y)) continue;
 			
 			byte val = (byte) (MAX_DEPTH - node.depth);
 			if(val > this.aiTargetMap[node.x + node.y * w])
 				this.aiTargetMap[node.x + node.y * w] = val;
 			
-			if(isViableAINode(node.x - 1, node.y)) queue.offer(new BFSNode(node.x - 1, node.y, node.depth + 1));
-			if(isViableAINode(node.x, node.y - 1)) queue.offer(new BFSNode(node.x, node.y - 1, node.depth + 1));
-			if(isViableAINode(node.x, node.y + 1)) queue.offer(new BFSNode(node.x, node.y + 1, node.depth + 1));
-			if(isViableAINode(node.x + 1, node.y)) queue.offer(new BFSNode(node.x + 1, node.y, node.depth + 1));
+			queue.offer(new BFSNode(node.x - 1, node.y, node.depth + 1));
+			queue.offer(new BFSNode(node.x, node.y - 1, node.depth + 1));
+			queue.offer(new BFSNode(node.x, node.y + 1, node.depth + 1));
+			queue.offer(new BFSNode(node.x + 1, node.y, node.depth + 1));
 		}
 	}
 

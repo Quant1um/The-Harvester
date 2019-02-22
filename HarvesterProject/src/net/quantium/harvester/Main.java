@@ -384,6 +384,10 @@ public class Main extends Canvas implements IInputListener, ITextListener{
 	}
 	
 	public enum DebugMode{
-		NONE, HITBOX, METADATA, AITARGET, GUI_INPUT
+		NONE, 
+		HITBOX, 
+		METADATA, 
+		AITARGET, 
+		GUI_INPUT
 	}
 }

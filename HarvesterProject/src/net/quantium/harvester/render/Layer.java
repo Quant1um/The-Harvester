@@ -90,16 +90,18 @@ public class Layer {
 	private void _drawLine(int x0, int y0, int x1, int y1, int c){
 	     double deltax = x0 - x1;
 	     double deltay = y0 - y1;
-	     double delta = 0;
-	     double deltaerr = Math.abs(deltay / deltax);           
+	     double t = 0;
+	     double slope = Math.abs(deltay / deltax);     
+	     int dir = -(int)Math.signum(deltay);
+	     
 	     int y = y0;
 	     for (int x = x0; x < x1; x++){
 	         put(x, y, c);
-	         delta += deltaerr;
-	         while (delta >= 0.5){
+	         t += slope;
+	         while (t >= 0.5){
 	         	put(x, y, c);
-	             y += Math.signum(y1 - y0);
-	             delta--;
+	            y += dir;
+	            t--;
 	         }
 	     }
 	}
